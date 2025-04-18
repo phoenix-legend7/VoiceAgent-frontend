@@ -28,7 +28,7 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
     msClient.on("onclose", () => {
       setIsCalling(false)
     })
-    msClient.on("onerror", (error) => {
+    msClient.on("onerror", (error: Event) => {
       setIsCalling(false)
       toast.error(`Error: ${error}`)
     })
