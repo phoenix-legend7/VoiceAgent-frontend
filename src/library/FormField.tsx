@@ -1,9 +1,11 @@
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 interface InputBoxProps {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   label?: string;
   placeholder?: string;
   className?: string;
@@ -11,7 +13,7 @@ interface InputBoxProps {
   disabled?: boolean;
 }
 
-export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, placeholder, className, disabled, inputClassName }) => {
+export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBlur, onKeyDown, placeholder, className, disabled, inputClassName }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -36,7 +38,8 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, plac
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
         placeholder={placeholder}
         disabled={disabled}
       />
@@ -106,7 +109,7 @@ export const SwtichWithLabel: React.FC<SwitchWithLabelProps> = ({ label, value, 
         role="switch"
         aria-checked={value}
         className={clsx(
-          'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-1 focus:ring-green-600 focus:ring-offset-2 disabled:opacity-20',
+          'relative cursor-pointer inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-1 focus:ring-green-600 focus:ring-offset-2 disabled:opacity-20',
           value ? 'bg-green-600 disabled:bg-green-600/20' : 'bg-gray-700',
         )}
         onClick={() => onChange(!value)}
@@ -158,6 +161,104 @@ export const SwitchWithMessage: React.FC<SwitchWithMessageProps> = ({ label, val
             {message.label}
           </button>
         ))}
+      </div>
+    </div>
+  )
+}
+
+interface SliderProps {
+  value: number;
+  onChange: (value: number) => void;
+  defaultValue?: number;
+  min?: number;
+  max?: number;
+  step?: number;
+  className?: string;
+  disabled?: boolean;
+}
+
+export const Slider: React.FC<SliderProps> = ({
+  value,
+  onChange,
+  className,
+  disabled,
+  defaultValue,
+  min = 0,
+  max = 1,
+  step = 0.05,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const progress = useMemo(() =>
+    (value - min) / (max - min) * 100,
+    [value, min, max]
+  );
+  const defaultValueProgress = useMemo(() =>
+    defaultValue ? (defaultValue - min) / (max - min) * 100 : 0,
+    [defaultValue, min, max]
+  );
+
+  useEffect(() => {
+    if (tooltipRef.current) {
+      const tooltipWidth = tooltipRef.current.offsetWidth;
+      tooltipRef.current.style.left = `calc(${progress}% - ${tooltipWidth / 2}px)`;
+    }
+  }, [progress]);
+  useEffect(() => {
+    if (inputRef.current) {
+      const mainColor = disabled ? 'oklch(0.872 0.01 258.338)' : 'oklch(0.627 0.194 149.214)';
+      const backColor = disabled ? 'oklch(0.551 0.027 264.364)' : 'oklch(0.393 0.095 152.535)';
+      inputRef.current.style.background = `linear-gradient(to right, ${mainColor} ${progress}%, ${backColor} ${progress}%)`;
+    }
+  }, [value, min, max, disabled]);
+
+  return (
+    <div className={className}>
+      <div className="relative">
+        <input
+          ref={inputRef}
+          type="range"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          onMouseEnter={() => setIsDragging(true)}
+          onMouseLeave={() => setIsDragging(false)}
+          disabled={disabled}
+          className="w-full cursor-pointer disabled:cursor-not-allowed focus:outline-none h-1 range-input"
+          min={min}
+          max={max}
+          step={step}
+        />
+        <div
+          className={clsx(
+            "absolute transition-opacity duration-300",
+            isDragging ? 'opacity-100' : 'opacity-0'
+          )}
+          ref={tooltipRef}
+          style={{ top: 'calc(-100% - 5px)' }}
+        >
+          <div className='px-3 py-1 rounded-xs bg-neutral-500 text-sm'>{value}</div>
+        </div>
+        {defaultValue && (
+          <>
+            <div className="absolute top-full mt-1" style={{ left: `calc(${defaultValueProgress}% - 25px)` }}>
+              <div className={value >= defaultValue ? 'text-white' : 'text-gray-400'}>
+                Default
+              </div>
+            </div>
+            <div
+              className="absolute w-0.5 h-1 top-[50%] mt-0.5 bg-green-400"
+              style={{ left: `calc(${defaultValueProgress}% - 1px)` }}
+            />
+          </>
+        )}
+      </div>
+      <div className="flex items-center justify-between mt-1">
+        <div className="text-white">{min}</div>
+        <div className={value === max ? 'text-white' : 'text-gray-400'}>
+          {max}
+        </div>
       </div>
     </div>
   )
