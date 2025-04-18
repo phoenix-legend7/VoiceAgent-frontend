@@ -14,7 +14,7 @@ const CallAgent: FC<CallAgentProps> = ({ agent }) => {
   const [activeTab, setActiveTab] = useState<string>("web")
 
   return (
-    <Accordian title="Call Agent" className="mt-1.5 border border-green-600">
+    <Accordian title="Call Agent" className="mt-1.5 border border-sky-600">
       <div>
         <div className="flex items-center px-4">
           <TabButton label="Web" onClick={() => setActiveTab("web")} isActive={activeTab === "web"} />

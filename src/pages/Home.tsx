@@ -25,12 +25,12 @@ function Home() {
         className="relative py-44 text-center"
         style={{ backgroundImage: 'radial-gradient(circle farthest-corner at 50% 20%, #0000, #060f11 32%), linear-gradient(to bottom, #060f113d, #060f113d), url(https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fa2a656f67211f0f4ece36_Abstract%20Lines%20BG.webp)' }}
       >
-        <div className='absolute w-[500px] h-[500px] bg-[#a9fc81] rounded-full blur-[200px] mx-auto my-auto top-[-388px] left-0 right-0 z-[1]' />
+        <div className='absolute w-[500px] h-[500px] bg-indigo-300 rounded-full blur-[200px] mx-auto my-auto top-[-388px] left-0 right-0 z-[1]' />
         <div className="container mx-auto px-6 py-4">
           <div className='max-w-[864px] mx-auto mb-24'>
             <h1 className="text-6xl font-bold text-white leading-[1.2] mb-3">
               Build next-gen voice agents with
-              <span className='text-[#a9fc81]'> 500ms </span>
+              <span className='text-indigo-600'> 500ms </span>
               latency
             </h1>
             <p className="text-neutral-500 mb-6 max-w-[564px] mx-auto">
@@ -52,8 +52,8 @@ function Home() {
             </div>
           </div>
           <div className='relative max-w-[1114px] mx-auto'>
-            <img src="/media/wireframe.png" alt="" className='relative w-4/5 max-w-full mx-auto z-[2]' />
-            <div className='absolute w-[400px] h-[400px] bg-[#a9fc81] rounded-full blur-[156px] mx-auto my-auto top-0 left-0 right-0 bottom-0 z-[1]'></div>
+            <img src="https://www.elysiapartners.com/wp-content/uploads/2025/04/ai-agent-2.webp" alt="" className='relative w-4/5 max-w-full mx-auto z-[2]' />
+            <div className='absolute w-[400px] h-[400px] bg-indigo-400 rounded-full blur-[156px] mx-auto my-auto top-0 left-0 right-0 bottom-0 z-[1]'></div>
           </div>
         </div>
       </section>
@@ -101,7 +101,7 @@ function Home() {
               <div className="flex flex-col gap-2 backdrop-blur-xs border border-white/30 rounded-2xl overflow-hidden">
                 <div className='px-14 py-12'>
                   <div className='mb-4'>
-                    <div className="rounded-lg w-12 h-12 bg-white/5 text-green-500 border border-white/30 flex items-center justify-center">
+                    <div className="rounded-lg w-12 h-12 bg-white/5 text-sky-800 border border-white/30 flex items-center justify-center">
                       <img src="https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fb66df77b82401eb5d551e_speed_white_24dp.svg" alt="" />
                     </div>
                   </div>
@@ -129,7 +129,7 @@ function Home() {
               </div>
             ))}
           </div>
-          <div className="absolute w-[200px] h-[200px] bg-[#a9fc81] rounded-full blur-[156px] mx-auto my-auto top-0 left-0 right-0 bottom-0 z-[1]" />
+          <div className="absolute w-[200px] h-[200px] bg-sky-600 rounded-full blur-[156px] mx-auto my-auto top-0 left-0 right-0 bottom-0 z-[1]" />
         </div>
       </section>
       <section className="py-24 relative">
@@ -164,7 +164,7 @@ function Home() {
       <section className="py-24 relative">
         <div className="container mx-auto px-6 py-4">
           <div className='mb-14 w-3/5'>
-            <div className='text-green-500 text-xl tracking-wider font-bold mb-3'>Integrations</div>
+            <div className='text-sky-700 text-xl tracking-wider font-bold mb-3'>Integrations</div>
             <h2 className='text-4xl font-bold text-white mb-3'>
               Build, Integrate, and Deploy Advanced Voice Agents in minutes
             </h2>
@@ -183,11 +183,11 @@ function Home() {
         <div className="container mx-auto px-6 py-4 relative">
           <div
             className='max-w-full rounded-2xl p-14 border border-white/30 bg-cover bg-center'
-            style={{ backgroundImage: 'linear-gradient(to right, #060f111f, #a9fc811f), url("/media/65fa2a656f67211f0f4ece36_Abstract20BG.webp")' }}
+            style={{ backgroundImage: 'linear-gradient(to right, #060ff11f, #a9fcf11f), url("/media/65fa2a656f67211f0f4ece36_Abstract20BG.webp")' }}
           >
             <div className="flex flex-col text-center">
               <h2 className="mb-3 text-xl font-semibold">
-                Get Started with Millis AI.
+                Get Started with us.
               </h2>
               <p className="mb-3">
                 Join Us on the Cutting Edge of Conversational AI — Let's Build Something Amazing Together.
@@ -209,7 +209,7 @@ function Home() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex gap-6 flex-col">
             <a href="/">
-              <img src="/media/logo-lg.png" alt="Logo" className='w-[100px]' />
+              <img src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png" alt="Logo" className='w-[100px]' />
             </a>
             <div className="flex gap-3 items-center">
               <a
@@ -230,24 +230,24 @@ function Home() {
             </a>
           </div>
           <div className="border-t border-white/30 mt-14 pt-5 flex justify-between">
-            <div className='text-sm'>© 2024 Millis AI by TMate Inc. All rights reserved.</div>
+            <div className='text-sm'>© 2025 All rights reserved.</div>
             <div className="flex gap-6">
               <a
                 href="/privacy"
-                className="text-green-600 hover:text-white transition-all duration-300"
+                className="text-sky-600 hover:text-white transition-all duration-300"
               >
                 Privacy Policy
               </a>
               <a
                 href="/terms"
-                className="text-green-600 hover:text-white transition-all duration-300"
+                className="text-sky-600 hover:text-white transition-all duration-300"
               >
                 Terms & Conditions
               </a>
             </div>
           </div>
         </div>
-        <div className="absolute w-[500px] h-[500px] bg-[#a9fc81] rounded-[50%] blur-[200px] mx-auto my-auto top-[90%] left-0 right-0 z-[1]" />
+        <div className="absolute w-[500px] h-[500px] bg-sky-800 rounded-[50%] blur-[200px] mx-auto my-auto top-[90%] left-0 right-0 z-[1]" />
       </section>
     </>
   )

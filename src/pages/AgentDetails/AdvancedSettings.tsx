@@ -19,7 +19,7 @@ const ToolBar: FC<ToolBarProps> = ({ handleSave }) => {
   return (
     <div>
       <button
-        className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-300"
+        className="cursor-pointer bg-sky-600 text-white px-4 py-2 rounded-md hover:bg-sky-700 transition-colors duration-300"
         onClick={handleSave}
       >
         Save
@@ -67,7 +67,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
           <div className="font-semibold">Agent Timezone</div>
           <div>
             <select
-              className="rounded-md text-gray-400 bg-neutral-800/50 border border-gray-700 w-full py-2 px-3 focus:border-green-600 focus:outline-none transition-all duration-300"
+              className="rounded-md text-gray-400 bg-neutral-800/50 border border-gray-700 w-full py-2 px-3 focus:border-sky-600 focus:outline-none transition-all duration-300"
               value={editData.config.timezone || ''}
               onChange={(e) => {
                 setEditData({

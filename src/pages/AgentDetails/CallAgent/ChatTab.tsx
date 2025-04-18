@@ -96,7 +96,7 @@ const ChatTab: FC<ChatTabProps> = ({ agent }) => {
     <div className="p-2">
       <div className="flex flex-col items-center h-[50vh]">
         <button
-          className="bg-transparent hover:bg-green-600/10 rounded-md px-2 py-1.5 w-full text-sm cursor-pointer transition-all duration-300"
+          className="bg-transparent hover:bg-sky-600/10 rounded-md px-2 py-1.5 w-full text-sm cursor-pointer transition-all duration-300"
           onClick={handleClear}
         >
           Clear
@@ -124,7 +124,7 @@ const ChatTab: FC<ChatTabProps> = ({ agent }) => {
             placeholder="Type your message..."
           />
           <button
-            className="p-2 cursor-pointer text-green-600 hover:bg-green-600/10 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-transparent rounded-md transition-all duration-300"
+            className="p-2 cursor-pointer text-sky-600 hover:bg-sky-600/10 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-transparent rounded-md transition-all duration-300"
             onClick={handleSendMessage}
             disabled={isWaiting || message.trim() === ""}
           >

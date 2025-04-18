@@ -21,7 +21,7 @@ const NavLink = ({ href, icon, label, rightIcon, isExternal }: Props) => {
         target={isExternal ? "_blank" : undefined}
         className={clsx(
           "flex items-center gap-3 px-1.5 py-3 rounded active:bg-gray-800 transition-all duration-300 nav-link",
-          isActive(href) ? "text-green-600" : "text-gray-400"
+          isActive(href) ? "text-sky-600" : "text-gray-400"
         )}
       >
         {icon}

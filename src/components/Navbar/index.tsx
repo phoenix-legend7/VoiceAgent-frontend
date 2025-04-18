@@ -38,7 +38,7 @@ const SettingsButtonGroup = () => {
             href={`/settings/${item.href}`}
             className={clsx(
               "flex items-center gap-3 cursor-pointer w-full pl-6 pr-1.5 py-3 rounded hover:bg-gray-900 active:bg-gray-800 transition-all duration-300",
-              isActive(item.href) ? "text-green-600" : "text-gray-400",
+              isActive(item.href) ? "text-sky-600" : "text-gray-400",
               isOpen ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
             )}
           >
@@ -109,7 +109,7 @@ const Navbar = () => {
           </div>
           <hr className="text-gray-400 mb-1.5" />
           <Link
-            className="rounded cursor-pointer px-2 py-1.5 text-green-600 hover:bg-green-600/5 transition-all duration-300"
+            className="rounded cursor-pointer px-2 py-1.5 text-sky-600 hover:bg-sky-600/5 transition-all duration-300"
             to="/settings/billing"
           >
             Purchase Credits

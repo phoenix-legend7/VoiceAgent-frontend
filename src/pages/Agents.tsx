@@ -127,7 +127,7 @@ const Agents = () => {
       <div>
         <div className="flex justify-between">
           <h2 className="flex items-center gap-2 text-2xl font-bold">Voice Agents</h2>
-          <button className="flex gap-2 items-center cursor-pointer bg-green-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-green-700">
+          <button className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700">
             <FaPlus />
             Add
           </button>

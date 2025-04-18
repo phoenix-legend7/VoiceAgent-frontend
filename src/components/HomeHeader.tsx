@@ -10,12 +10,12 @@ const NavLink: React.FC<{ href: string; children: React.ReactNode }> = ({ href, 
   );
 };
 
-const navLinks = [
-  { href: "https://docs.millis.ai/pricing", children: "Pricing" },
-  { href: "https://docs.millis.ai", children: "Documentation" },
-  { href: "https://millis-ai.canny.io/changelog", children: "Changelog" },
-  { href: "https://www.millis.ai/affiliates", children: "Affiliate" },
-  { href: "https://www.millis.ai/contact", children: "Get In Touch" },
+const navLinks: { href: string; children: React.ReactNode }[] = [
+  // { href: "https://docs.millis.ai/pricing", children: "Pricing" },
+  // { href: "https://docs.millis.ai", children: "Documentation" },
+  // { href: "https://millis-ai.canny.io/changelog", children: "Changelog" },
+  // { href: "https://www.millis.ai/affiliates", children: "Affiliate" },
+  // { href: "https://www.millis.ai/contact", children: "Get In Touch" },
 ];
 
 const HomeHeader: React.FC = () => {
@@ -26,7 +26,7 @@ const HomeHeader: React.FC = () => {
         <div className="flex items-center gap-12">
           <a href="/" className="w-nav-brand">
             <img
-              src="/media/logo.png"
+              src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png"
               alt="Millis AI Logo"
               width={100}
               className="hover:scale-90 transition-all duration-300"
@@ -44,9 +44,9 @@ const HomeHeader: React.FC = () => {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <TransparentButton onClick={() => window.open("https://demo.millis.ai/", "_blank")}>
+          {/* <TransparentButton onClick={() => window.open("https://demo.millis.ai/", "_blank")}>
             Demo
-          </TransparentButton>
+          </TransparentButton> */}
           <GradientButton onClick={() => navigate("/agents")}>Get Started</GradientButton>
         </div>
       </div>

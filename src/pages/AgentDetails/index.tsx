@@ -78,7 +78,7 @@ const AgentActions: FC<AgentActionsProps> = ({ agent, setIsOverlayShow }) => {
   return (
     <div className="relative">
       <button
-        className="cursor-pointer bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-500 transition-all duration-300 flex items-center gap-2 agent-actions"
+        className="cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md hover:bg-sky-500 transition-all duration-300 flex items-center gap-2 agent-actions"
         onClick={() => setIsOpen(!isOpen)}
       >
         Actions
@@ -189,12 +189,12 @@ const AgentDetails = () => {
                   <div className="flex items-center">
                     <input
                       type="text"
-                      className="text-white py-1 border-b border-white focus:border-green-600 focus:outline-none transition-all duration-300"
+                      className="text-white py-1 border-b border-white focus:border-sky-600 focus:outline-none transition-all duration-300"
                       value={editAgentName}
                       onChange={(e) => setEditAgentName(e.target.value)}
                     />
                     <button
-                      className="p-3 rounded-md cursor-pointer bg-transparent text-green-600 hover:bg-green-500/10 transition-all duration-300"
+                      className="p-3 rounded-md cursor-pointer bg-transparent text-sky-600 hover:bg-sky-500/10 transition-all duration-300"
                       onClick={handleEditAgentName}
                     >
                       <FaCheck />
@@ -246,7 +246,7 @@ const AgentDetails = () => {
                     <PiOpenAiLogo size={20} className="mr-4" />
                     <div className="grow">
                       <div className="text-sm text-gray-400 leading-[1.6]">Model</div>
-                      <div className="text-xs text-green-400 leading-[2.46] uppercase text-nowrap">
+                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap">
                         {agent.config.llm?.model || 'Millis LLM'}
                       </div>
                     </div>
@@ -258,7 +258,7 @@ const AgentDetails = () => {
                     <BsSoundwave size={20} className="mr-4" />
                     <div className="grow">
                       <div className="text-sm text-gray-400 leading-[1.6]">Voice</div>
-                      <div className="text-xs text-green-400 leading-[2.46] uppercase text-nowrap">
+                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap">
                         (Rachel) {agent.config.voice.provider || 'elevenlabs'}
                       </div>
                     </div>
@@ -270,7 +270,7 @@ const AgentDetails = () => {
                     <BiWorld size={20} className="mr-4" />
                     <div className="grow">
                       <div className="text-sm text-gray-400 leading-[1.6]">Language</div>
-                      <div className="text-xs text-green-400 leading-[2.46] uppercase text-nowrap">
+                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap">
                         {agent.config.language || 'English'}
                       </div>
                     </div>

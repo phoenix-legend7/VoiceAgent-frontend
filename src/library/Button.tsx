@@ -25,8 +25,8 @@ export const RoundedButton: React.FC<ButtonProps> = ({ children, className, onCl
   return (
     <button
       className={clsx(
-        'cursor-pointer gap-x-2 border-[1px] border-white/30 rounded-full py-2 px-6 min-w-[48px] min-h-[48px] font-normal leading-none no-underline transition-all duration-300 flex items-center justify-center hover:border-white/50 hover:outline-0 hover:px-8 active:bg-green-500',
-        isActive ? 'bg-green-500 text-black' : 'bg-transparent text-neutral-50',
+        'cursor-pointer gap-x-2 border-[1px] border-white/30 rounded-full py-2 px-6 min-w-[48px] min-h-[48px] font-normal leading-none no-underline transition-all duration-300 flex items-center justify-center hover:border-white/50 hover:outline-0 hover:px-8 active:bg-sky-500',
+        isActive ? 'bg-sky-500 text-black' : 'bg-transparent text-neutral-50',
         className
       )}
       onClick={onClick}

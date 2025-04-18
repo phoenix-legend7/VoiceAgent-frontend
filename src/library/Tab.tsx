@@ -12,7 +12,7 @@ export const TabButton: FC<TabButtonProps> = ({ label, onClick, isActive }) => {
     <button
       className={clsx(
         'cursor-pointer w-full border-b-2 transition-all duration-300',
-        isActive ? "border-green-600 text-green-600" : "text-gray-400 border-transparent", "px-4 py-2"
+        isActive ? "border-sky-600 text-sky-600" : "text-gray-400 border-transparent", "px-4 py-2"
       )}
       onClick={onClick}
     >

@@ -15,7 +15,7 @@ const Accordian: FC<AccordianProps> = ({ className, title, children }) => {
 
   return (
     <div className={clsx(className, "rounded-md overflow-hidden bg-gray-900")}>
-      <div className="flex items-center px-6 py-4 gap-4 text-green-600 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+      <div className="flex items-center px-6 py-4 gap-4 text-sky-600 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
         <TbPhone size={20} />
         <h3 className="text-lg font-medium">{title}</h3>
         <button className="ml-auto text-gray-400 hover:text-gray-600">

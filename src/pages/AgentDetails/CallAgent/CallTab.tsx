@@ -52,7 +52,7 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
     <div className="p-2 relative">
       <div className="h-[50vh] text-center">
         <select
-          className="opacity-0 px-3 py-2 cursor-pointer rounded-md bg-gray-900 border border-gray-700 focus:border-green-600 focus:outline-none transition-all duration-300"
+          className="opacity-0 px-3 py-2 cursor-pointer rounded-md bg-gray-900 border border-gray-700 focus:border-sky-600 focus:outline-none transition-all duration-300"
           onChange={(e) => setRegion(e.target.value)}
         >
           {regions.map((region, index) => (
@@ -68,7 +68,7 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
         <div className="flex items-center justify-center w-full h-full -mt-10">
           {(!isConnecting && !isCalling) && (
             <button
-              className="flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,252,129,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300"
+              className="flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300"
               onClick={handleStartCall}
             >
               <BsMic size={48} />
@@ -76,17 +76,17 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
             </button>
           )}
           {isConnecting && (
-            <button className="flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,252,129,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300">
+            <button className="flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300">
               <FaEllipsis size={48} />
               <div className="text-xl font-semibold">Connecting...</div>
             </button>
           )}
           {(isCalling && !isConnecting) && (
             <div className="relative">
-              <div className="absolute inset-0 w-40 h-40 rounded-full bg-green-500/20 animate-ping"></div>
-              <div className="absolute inset-0 w-40 h-40 rounded-full bg-green-500/10 animate-pulse" style={{ animationDelay: "0.5s" }}></div>
+              <div className="absolute inset-0 w-40 h-40 rounded-full bg-sky-500/20 animate-ping"></div>
+              <div className="absolute inset-0 w-40 h-40 rounded-full bg-sky-500/10 animate-pulse" style={{ animationDelay: "0.5s" }}></div>
               <button
-                className="relative flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,252,129,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-green-500/50 transition-all duration-300"
+                className="relative flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-sky-500/50 transition-all duration-300"
                 onClick={handleStopCall}
               >
                 <BsMicMute size={48} />
