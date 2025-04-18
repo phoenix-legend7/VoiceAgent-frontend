@@ -36,9 +36,9 @@ const MasterLayout = () => {
     <div className="flex flex-col min-h-screen">
       {/* rgb(16, 24, 40) */}
       <div className="flex justify-between min-h-16 px-6 bg-gray-900 text-white">
-        <a href="/agents" className="flex items-center">
+        <Link to="/agents" className="flex items-center">
           <img src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png" alt="logo" className="h-10" />
-        </a>
+        </Link>
         <div className="flex items-center gap-4">
           <Notification />
         </div>

@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GradientButton } from "../library/Button";
 
 const NavLink: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => {
@@ -24,14 +24,14 @@ const HomeHeader: React.FC = () => {
     <header className="fixed top-0 left-0 right-0 z-50 w-full bg-[rgba(0,0,0,0.56)] text-white">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-12">
-          <a href="/" className="w-nav-brand">
+          <Link to="/" className="w-nav-brand">
             <img
               src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png"
               alt="Millis AI Logo"
               width={100}
               className="hover:scale-90 transition-all duration-300 h-10 w-auto"
             />
-          </a>
+          </Link>
           <nav className="flex items-center gap-12">
             <a href="#Features" className="hover:text-[#a9fc81]">
               Features
