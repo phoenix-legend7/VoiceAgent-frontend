@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { GradientButton, TransparentButton } from "../library/Button";
+import { GradientButton } from "../library/Button";
 
 const NavLink: React.FC<{ href: string; children: React.ReactNode }> = ({ href, children }) => {
   return (

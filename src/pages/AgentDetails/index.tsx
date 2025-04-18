@@ -1,14 +1,14 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
-import { FaArrowLeft, FaCheck, FaChevronDown, FaCode, FaRegCopy, FaSlidersH } from "react-icons/fa"
+import { useEffect, useState } from "react"
+import { FaArrowLeft, FaCheck, FaRegCopy, FaSlidersH } from "react-icons/fa"
 import { Link, useParams } from "react-router-dom"
 import { BiWorld } from "react-icons/bi"
 import { BsSoundwave } from "react-icons/bs"
 import { FaPencil } from "react-icons/fa6"
-import { MdDialerSip } from "react-icons/md"
+// import { MdDialerSip } from "react-icons/md"
 import { PiOpenAiLogo } from "react-icons/pi"
 import { toast } from "react-toastify"
 
-import { AIAgentIcon } from "../../consts/svgIcons"
+// import { AIAgentIcon } from "../../consts/svgIcons"
 import axiosInstance from "../../core/axiosInstance"
 import { AgentTypeRead } from "../../models/agent"
 import VoiceType from "../../models/voice"
@@ -20,103 +20,103 @@ import AgentPrompt from "./AgentPrompt"
 import CallAgent from "./CallAgent"
 import AdvancedSettings from "./AdvancedSettings"
 
-interface AgentActionsProps {
-  agent: AgentTypeRead
-  setIsOverlayShow: Dispatch<SetStateAction<boolean>>
-}
+// interface AgentActionsProps {
+//   agent: AgentTypeRead
+//   setIsOverlayShow: Dispatch<SetStateAction<boolean>>
+// }
 
-const AgentActions: FC<AgentActionsProps> = ({ agent, setIsOverlayShow }) => {
-  const [isOpen, setIsOpen] = useState(false)
+// const AgentActions: FC<AgentActionsProps> = ({ agent, setIsOverlayShow }) => {
+//   const [isOpen, setIsOpen] = useState(false)
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (isOpen && !(event.target as HTMLElement).closest('.agent-actions')) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [isOpen])
+//   useEffect(() => {
+//     const handleClickOutside = (event: MouseEvent) => {
+//       if (isOpen && !(event.target as HTMLElement).closest('.agent-actions')) {
+//         setIsOpen(false)
+//       }
+//     }
+//     document.addEventListener('click', handleClickOutside)
+//     return () => document.removeEventListener('click', handleClickOutside)
+//   }, [isOpen])
 
-  const handleEmbedToPublicSite = async () => {
-    try {
-      setIsOverlayShow(true)
-      await axiosInstance.post(`/agent/${agent.id}/embed`)
-      toast.success('Embed to public site')
-    } catch (error) {
-      console.error(error)
-      toast.error(`Failed to embed to public site: ${error}`)
-    } finally {
-      setIsOverlayShow(false)
-    }
-  }
+//   const handleEmbedToPublicSite = async () => {
+//     try {
+//       setIsOverlayShow(true)
+//       await axiosInstance.post(`/agent/${agent.id}/embed`)
+//       toast.success('Embed to public site')
+//     } catch (error) {
+//       console.error(error)
+//       toast.error(`Failed to embed to public site: ${error}`)
+//     } finally {
+//       setIsOverlayShow(false)
+//     }
+//   }
 
-  const handleUseCustomLLM = async () => {
-    // try {
-    //   setIsOverlayShow(true)
-    //   await axiosInstance.post(`/agent/${agent.id}/custom-llm`)
-    //   toast.success('Use custom LLM')
-    // } catch (error) {
-    //   console.error(error)
-    // } finally {
-    //   setIsOverlayShow(false)
-    // }
-  }
+//   const handleUseCustomLLM = async () => {
+//     // try {
+//     //   setIsOverlayShow(true)
+//     //   await axiosInstance.post(`/agent/${agent.id}/custom-llm`)
+//     //   toast.success('Use custom LLM')
+//     // } catch (error) {
+//     //   console.error(error)
+//     // } finally {
+//     //   setIsOverlayShow(false)
+//     // }
+//   }
 
-  const handleManageSIPEndpoints = async () => {
-    // try {
-    //   setIsOverlayShow(true)
-    //   await axiosInstance.post(`/agent/${agent.id}/manage-sip-endpoints`)
-    //   toast.success('Manage SIP Endpoints')
-    // } catch (error) {
-    //   console.error(error)
-    // } finally {
-    //   setIsOverlayShow(false)
-    // }
-  }
+//   const handleManageSIPEndpoints = async () => {
+//     // try {
+//     //   setIsOverlayShow(true)
+//     //   await axiosInstance.post(`/agent/${agent.id}/manage-sip-endpoints`)
+//     //   toast.success('Manage SIP Endpoints')
+//     // } catch (error) {
+//     //   console.error(error)
+//     // } finally {
+//     //   setIsOverlayShow(false)
+//     // }
+//   }
 
-  return (
-    <div className="relative">
-      <button
-        className="cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md hover:bg-sky-500 transition-all duration-300 flex items-center gap-2 agent-actions"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        Actions
-        <FaChevronDown />
-      </button>
-      {isOpen && (
-        <div className="absolute top-full right-0 bg-gray-800 text-white rounded-md py-2">
-          <div className="flex flex-col rounded-md text-nowrap">
-            <a
-              href="#"
-              className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
-              onClick={handleEmbedToPublicSite}
-            >
-              <FaCode />
-              Embed to public site
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
-              onClick={handleUseCustomLLM}
-            >
-              <AIAgentIcon />
-              Use Custom LLM
-            </a>
-            <a
-              href="#"
-              className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
-              onClick={handleManageSIPEndpoints}
-            >
-              <MdDialerSip />
-              Manage SIP Endpoints
-            </a>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+//   return (
+//     <div className="relative">
+//       <button
+//         className="cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md hover:bg-sky-500 transition-all duration-300 flex items-center gap-2 agent-actions"
+//         onClick={() => setIsOpen(!isOpen)}
+//       >
+//         Actions
+//         <FaChevronDown />
+//       </button>
+//       {isOpen && (
+//         <div className="absolute top-full right-0 bg-gray-800 text-white rounded-md py-2">
+//           <div className="flex flex-col rounded-md text-nowrap">
+//             <a
+//               href="#"
+//               className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
+//               onClick={handleEmbedToPublicSite}
+//             >
+//               <FaCode />
+//               Embed to public site
+//             </a>
+//             <a
+//               href="#"
+//               className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
+//               onClick={handleUseCustomLLM}
+//             >
+//               <AIAgentIcon />
+//               Use Custom LLM
+//             </a>
+//             <a
+//               href="#"
+//               className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
+//               onClick={handleManageSIPEndpoints}
+//             >
+//               <MdDialerSip />
+//               Manage SIP Endpoints
+//             </a>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   )
+// }
 
 const AgentDetails = () => {
   const { id } = useParams()
