@@ -1,6 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { FaEllipsisV, FaPlus, FaUserAlt } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 
 import axiosInstance from "../core/axiosInstance"
 import Table, { TableCell, TableRow } from "../library/Table"
@@ -41,6 +42,7 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
       setIsChanged(prev => !prev)
     } catch (error) {
       console.error(error)
+      toast.error(`Failed to duplicate agent: ${error}`)
     } finally {
       setIsOverlayShow(false)
     }
@@ -55,6 +57,7 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
       setIsChanged(prev => !prev)
     } catch (error) {
       console.error(error)
+      toast.error(`Failed to delete agent: ${error}`)
     } finally {
       setIsOverlayShow(false)
     }
@@ -115,6 +118,7 @@ const Agents = () => {
         setAgents(data)
       } catch (error) {
         console.error(error)
+        toast.error(`Failed to fetch agents: ${error}`)
       } finally {
         setIsOverlayShow(false)
       }

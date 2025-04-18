@@ -163,6 +163,7 @@ const AgentDetails = () => {
       })
     } catch (error) {
       console.error(error)
+      toast.error(`Failed to edit agent name: ${error}`)
     } finally {
       setIsOverlayShow(false)
       setIsEditAgentName(false)
