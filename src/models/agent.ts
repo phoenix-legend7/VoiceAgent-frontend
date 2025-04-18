@@ -10,7 +10,7 @@ interface AgentTypeBase {
       provider: VoiceProvider
       voice_id: string | null
       model: string | null
-      settings: { [key: string]: any } | null
+      settings: { [key: string]: string | number | boolean | null } | null
     }
     flow: {
       user_start_first: boolean | null

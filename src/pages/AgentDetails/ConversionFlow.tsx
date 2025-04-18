@@ -15,6 +15,9 @@ interface ConversionFlowProps {
   setAgent: Dispatch<SetStateAction<AgentTypeRead | null>>
   setIsOverlayShow: Dispatch<SetStateAction<boolean>>
 }
+interface KeyValueType {
+  [key: string]: string | number | boolean | null
+}
 
 const ChildItem: FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
@@ -84,7 +87,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
   const handleUpdateData = (
     key: keyof AgentTypeRead['config']['flow'],
     value: boolean,
-    defaultValue?: any
+    defaultValue?: KeyValueType | null
   ) => {
     const flow = editData.config.flow
     if (defaultValue) {
@@ -108,7 +111,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
   const handleUpdateSubData = (
     key: keyof AgentTypeRead['config']['flow'],
     subKey: string,
-    value: any
+    value: string | number | boolean | null | string[]
   ) => {
     if (key === 'user_start_first') return
     const flow = editData.config.flow
