@@ -10,7 +10,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon }) =
       <div className='p-6'>
         <div className='mb-4'>
           <div className="rounded-lg w-12 h-12 bg-white/5 text-sky-500 border border-white/30 flex items-center justify-center">
-            <img src={icon} alt="" />
+            <img src={icon} alt="" className="hue-rotate-[135deg]" />
           </div>
         </div>
         <h3 className="mb-3 text-2xl font-semibold leading-[1.2]">{title}</h3>

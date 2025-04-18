@@ -93,7 +93,7 @@ function Home() {
               Frustrated by latency and complexity in Voice AI?
             </h2>
             <p className='text-xl mb-3'>
-              Millis AI gives you everything you need to create instant, human-like, and affordable voice agents.
+              We give you everything you need to create instant, human-like, and affordable voice agents.
             </p>
           </div>
           <div className='z-[2] grid grid-cols-3 grid-rows-2 gap-6'>
@@ -102,7 +102,11 @@ function Home() {
                 <div className='px-14 py-12'>
                   <div className='mb-4'>
                     <div className="rounded-lg w-12 h-12 bg-white/5 text-sky-800 border border-white/30 flex items-center justify-center">
-                      <img src="https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fb66df77b82401eb5d551e_speed_white_24dp.svg" alt="" />
+                      <img 
+                        src="https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fb66df77b82401eb5d551e_speed_white_24dp.svg" 
+                        alt="" 
+                        className='hue-rotate-[135deg]'
+                      />
                     </div>
                   </div>
                   <h3 className="mb-3 text-2xl font-semibold leading-[1.2]">
@@ -117,7 +121,7 @@ function Home() {
                   <img
                     src="https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/6603487522f60ac2cc4c3e61_Frame%20113.png"
                     alt=""
-                    className='object-cover w-full h-full'
+                    className='object-cover w-full h-full hue-rotate-[135deg]'
                     loading="lazy"
                   />
                 </div>
