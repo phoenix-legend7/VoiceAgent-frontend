@@ -29,7 +29,7 @@ const HomeHeader: React.FC = () => {
               src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png"
               alt="Millis AI Logo"
               width={100}
-              className="hover:scale-90 transition-all duration-300"
+              className="hover:scale-90 transition-all duration-300 h-10 w-auto"
             />
           </a>
           <nav className="flex items-center gap-12">
