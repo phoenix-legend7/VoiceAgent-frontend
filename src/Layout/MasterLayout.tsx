@@ -36,7 +36,7 @@ const MasterLayout = () => {
     <div className="flex flex-col min-h-screen">
       {/* rgb(16, 24, 40) */}
       <div className="flex justify-between min-h-16 px-6 bg-gray-900 text-white">
-        <Link to="/agents" className="flex items-center">
+        <Link to="/" className="flex items-center">
           <img src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png" alt="logo" className="h-10" />
         </Link>
         <div className="flex items-center gap-4">
@@ -46,19 +46,8 @@ const MasterLayout = () => {
       <div className="flex h-[calc(100vh-4rem)]">
         <Navbar />
         <ToastContainer newestOnTop limit={3} />
-        <div className="container mx-auto flex flex-col justify-between overflow-y-auto">
+        <div className="container mx-auto overflow-y-auto">
           <Outlet />
-          <div className="flex p-6">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-400">© 2025 All rights reserved</span>
-            </div>
-            <Link to="/" className="ml-auto mr-10 text-sm text-gray-400">
-              About Us
-            </Link>
-            <Link to="/terms" className="text-sm text-gray-400">
-              Terms
-            </Link>
-          </div>
         </div>
       </div>
     </div>
