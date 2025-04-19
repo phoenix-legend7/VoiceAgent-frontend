@@ -109,7 +109,7 @@ export const SwtichWithLabel: React.FC<SwitchWithLabelProps> = ({ label, value, 
         role="switch"
         aria-checked={value}
         className={clsx(
-          'relative cursor-pointer inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-1 focus:ring-sky-600 focus:ring-offset-2 disabled:opacity-20',
+          'relative cursor-pointer inline-flex h-6 min-w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-1 focus:ring-sky-600 focus:ring-offset-2 disabled:opacity-20',
           value ? 'bg-sky-600 disabled:bg-sky-600/20' : 'bg-gray-700',
         )}
         onClick={() => onChange(!value)}

@@ -136,7 +136,7 @@ const Agents = () => {
             Add
           </button>
         </div>
-        <div className="bg-gray-900/80 mt-8">
+        <div className="bg-gray-900/80 overflow-x-auto mt-8">
           <Table>
             <thead>
               <tr className="border-b border-gray-700">

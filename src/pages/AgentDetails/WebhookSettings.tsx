@@ -79,7 +79,7 @@ const WebhookSettings: FC<WebhookSettingsProps> = ({ agent, setAgent, setIsOverl
 
   return (
     <Card title="Webhook Settings" toolbar={isEditted && <ToolBar handleSave={handleSave} />}>
-      <div className="p-6">
+      <div className="p-6 min-w-80">
         <InputBox
           label="Prefetch Data Webhook"
           value={prefetchDataWebhook}

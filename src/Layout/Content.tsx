@@ -19,11 +19,11 @@ const Content: FC<Props> = ({ className, isOverlayShown, children }) => {
         </div>
       )}
       {children}
-      <div className="flex py-6">
+      <div className="flex py-6 gap-3">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-400">© 2025 All rights reserved</span>
         </div>
-        <Link to="/" className="ml-auto mr-10 text-sm text-gray-400">
+        <Link to="/" className="ml-auto sm:mr-6 md:mr-10 text-sm text-gray-400">
           About Us
         </Link>
         <Link to="/terms" className="text-sm text-gray-400">

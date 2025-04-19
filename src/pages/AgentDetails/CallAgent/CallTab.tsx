@@ -36,13 +36,12 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
 
   const handleStartCall = async () => {
     setIsConnecting(true)
-    await msClient.start({
-      agent: {
-        agent_id: agent.id,
-        agent_config: agent.config,
-      }
-    })
-    setIsConnecting(true)
+    // await msClient.start({
+    //   agent: {
+    //     agent_id: agent.id,
+    //     agent_config: agent.config,
+    //   }
+    // })
   }
   const handleStopCall = async () => {
     await msClient.stop()
@@ -68,7 +67,7 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
         <div className="flex items-center justify-center w-full h-full -mt-10">
           {(!isConnecting && !isCalling) && (
             <button
-              className="flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300"
+              className="flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300"
               onClick={handleStartCall}
             >
               <BsMic size={48} />
@@ -76,9 +75,9 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
             </button>
           )}
           {isConnecting && (
-            <button className="flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300">
+            <button className="flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-white/25 transition-all duration-300">
               <FaEllipsis size={48} />
-              <div className="text-xl font-semibold">Connecting...</div>
+              <div className="sm:text-xl font-semibold">Connecting...</div>
             </button>
           )}
           {(isCalling && !isConnecting) && (
@@ -86,7 +85,7 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
               <div className="absolute inset-0 w-40 h-40 rounded-full bg-sky-500/20 animate-ping"></div>
               <div className="absolute inset-0 w-40 h-40 rounded-full bg-sky-500/10 animate-pulse" style={{ animationDelay: "0.5s" }}></div>
               <button
-                className="relative flex flex-col items-center justify-center w-40 h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-sky-500/50 transition-all duration-300"
+                className="relative flex flex-col items-center justify-center w-32 h-32 sm:w-40 sm:h-40 rounded-full cursor-pointer text-white shadow-[0_0_50px_rgba(169,129,252,0.5)] bg-gradient-to-br from-neutral-800 to-neutral-700 border border-sky-500/50 transition-all duration-300"
                 onClick={handleStopCall}
               >
                 <BsMicMute size={48} />

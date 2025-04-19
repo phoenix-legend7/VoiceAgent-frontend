@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { FaAngleDown, FaAngleLeft, FaAngleRight, FaBook, FaBullhorn, FaCog, FaFileAlt, FaHistory, FaPhoneAlt, FaUsers } from "react-icons/fa"
 import { LiaExternalLinkAltSolid } from "react-icons/lia"
@@ -28,10 +28,13 @@ const SettingsButtonGroup = () => {
           <FaAngleDown size={18} />
         </div>
       </button>
-      <div className={clsx(
-        "rounded-md overflow-hidden transition-all duration-500 nav-link-dropdown",
-        isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-      )}>
+      <div
+        className={clsx(
+          "rounded-md overflow-hidden transition-all duration-500 nav-link-dropdown",
+          isOpen ? "opacity-100" : "opacity-0"
+        )}
+        style={{ maxHeight: isOpen ? '24rem' : '0' }}
+      >
         {settingsItems.map((item, index) => (
           <a
             key={index}
@@ -78,9 +81,32 @@ const NewsGroup = () => {
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const checkIsMobile = () => {
+      if (window.innerWidth < 768) {
+        setIsMobile(true)
+      } else {
+        setIsMobile(false)
+      }
+    }
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+    return () => {
+      window.removeEventListener('resize', checkIsMobile)
+    }
+  }, [])
+  useEffect(() => {
+    if (isMobile) {
+      setIsOpen(false)
+    } else {
+      setIsOpen(true)
+    }
+  }, [isMobile])
+
   return (
     <div className={clsx(
-      "flex flex-col justify-between items-center p-4 top-16 z-50 text-white border-r border-gray-800 transition-all duration-300",
+      "fixed md:static flex flex-col justify-between items-center bg-gray-950 p-4 top-16 left-0 bottom-0 z-50 text-white border-r border-gray-800 transition-all duration-300",
       isOpen ? "min-w-72" : "navbar overflow-hidden"
     )}>
       <div className="w-full">
@@ -118,7 +144,10 @@ const Navbar = () => {
         <hr className="w-full h-px text-gray-800" />
         <div className="pt-2">
           <button
-            className="rounded p-2 cursor-pointer text-gray-400 hover:bg-gray-900 transition duration-300"
+            className={clsx(
+              "rounded p-2 cursor-pointer text-gray-400 hover:bg-gray-900 transition duration-300",
+              { "opacity-0": isMobile }
+            )}
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <FaAngleLeft /> : <FaAngleRight />}

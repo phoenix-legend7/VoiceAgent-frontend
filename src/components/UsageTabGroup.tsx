@@ -85,21 +85,21 @@ const UsageTabGroup = () => {
         </RoundedButton>
       </div>
       {activeTab === 'tab1' && (
-        <div className='grid grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
           {cards.tab1.map((card, index) => (
             <Card key={`card-${index}`} {...card} />
           ))}
         </div>
       )}
       {activeTab === 'tab2' && (
-        <div className='grid grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
           {cards.tab2.map((card, index) => (
             <Card key={`card-${index}`} {...card} />
           ))}
         </div>
       )}
       {activeTab === 'tab3' && (
-        <div className='grid grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6'>
           {cards.tab3.map((card, index) => (
             <Card key={`card-${index}`} {...card} />
           ))}

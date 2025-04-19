@@ -182,41 +182,43 @@ const AgentDetails = () => {
         <div>
           <div className="flex justify-between">
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-4">
-                <Link to="/agents" className="text-gray-400 hover:text-gray-300 transition-all duration-300">
-                  <FaArrowLeft />
-                </Link>
-                {isEditAgentName ? (
-                  <div className="flex items-center">
-                    <input
-                      type="text"
-                      className="text-white py-1 border-b border-white focus:border-sky-600 focus:outline-none transition-all duration-300"
-                      value={editAgentName}
-                      onChange={(e) => setEditAgentName(e.target.value)}
-                    />
-                    <button
-                      className="p-3 rounded-md cursor-pointer bg-transparent text-sky-600 hover:bg-sky-500/10 transition-all duration-300"
-                      onClick={handleEditAgentName}
-                    >
-                      <FaCheck />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-2xl font-semibold">{agent.name}</h2>
-                    <button
-                      className="text-gray-400 hover:text-gray-300 cursor-pointer transition-all duration-300"
-                      onClick={() => {
-                        setIsEditAgentName(true)
-                        setEditAgentName(agent.name)
-                      }}
-                    >
-                      <FaPencil />
-                    </button>
-                  </div>
-                )}
-                <div className="w-0.5 h-full bg-gray-800" />
-                <div className="flex items-center gap-2 text-sm rounded bg-gray-800 p-1">
+              <div className="flex flex-col lg:flex-row items-center gap-4">
+                <div className="flex gap-4 items-center">
+                  <Link to="/agents" className="text-gray-400 hover:text-gray-300 transition-all duration-300">
+                    <FaArrowLeft />
+                  </Link>
+                  {isEditAgentName ? (
+                    <div className="flex items-center">
+                      <input
+                        type="text"
+                        className="text-white py-1 max-w-36 sm:max-w-auto border-b border-white focus:border-sky-600 focus:outline-none transition-all duration-300"
+                        value={editAgentName}
+                        onChange={(e) => setEditAgentName(e.target.value)}
+                      />
+                      <button
+                        className="p-3 rounded-md cursor-pointer bg-transparent text-sky-600 hover:bg-sky-500/10 transition-all duration-300"
+                        onClick={handleEditAgentName}
+                      >
+                        <FaCheck />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg sm:text-2xl font-semibold">{agent.name}</h2>
+                      <button
+                        className="text-gray-400 hover:text-gray-300 cursor-pointer transition-all duration-300"
+                        onClick={() => {
+                          setIsEditAgentName(true)
+                          setEditAgentName(agent.name)
+                        }}
+                      >
+                        <FaPencil />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="w-0.5 h-full bg-gray-800 hidden lg:block" />
+                <div className="flex items-center gap-2 text-xs sm:text-sm rounded bg-gray-800 p-1">
                   <div className="bg-gray-700 px-2 py-1 text-xs rounded">ID</div>
                   <div>{id}</div>
                   <div
@@ -240,9 +242,9 @@ const AgentDetails = () => {
             </div>
           </div>
           <div className="flex flex-wrap mt-8">
-            <div className="p-3 w-full md:w-2/3">
+            <div className="p-3 w-full xl:w-2/3">
               <div className="flex flex-wrap items-center justify-between">
-                <div className="w-1/2 xl:w-1/3 p-1.5">
+                <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
                   <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
                     <PiOpenAiLogo size={20} className="mr-4" />
                     <div className="grow">
@@ -254,7 +256,7 @@ const AgentDetails = () => {
                     <FaSlidersH size={20} className="my-4 mx-2 text-gray-400" />
                   </div>
                 </div>
-                <div className="w-1/2 xl:w-1/3 p-1.5">
+                <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
                   <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
                     <BsSoundwave size={20} className="mr-4" />
                     <div className="grow">
@@ -266,7 +268,7 @@ const AgentDetails = () => {
                     <FaSlidersH size={20} className="my-4 mx-2 text-gray-400" />
                   </div>
                 </div>
-                <div className="w-1/2 xl:w-1/3 p-1.5">
+                <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
                   <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
                     <BiWorld size={20} className="mr-4" />
                     <div className="grow">
@@ -300,7 +302,7 @@ const AgentDetails = () => {
                 setIsOverlayShow={setIsOverlayShow}
               />
             </div>
-            <div className="p-3 w-full md:w-1/3">
+            <div className="p-3 w-full xl:w-1/3">
               <CallAgent agent={agent} />
             </div>
           </div>

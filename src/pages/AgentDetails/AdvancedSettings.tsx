@@ -62,7 +62,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
 
   return (
     <Card title="Advanced Settings" toolbar={isEditted && <ToolBar handleSave={handleSave} />}>
-      <div>
+      <div className="min-w-80">
         <div className="flex items-center justify-between gap-3 px-6 pt-6">
           <div className="font-semibold">Agent Timezone</div>
           <div>

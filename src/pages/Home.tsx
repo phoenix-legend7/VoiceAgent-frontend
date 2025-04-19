@@ -96,7 +96,7 @@ function Home() {
               We give you everything you need to create instant, human-like, and affordable voice agents.
             </p>
           </div>
-          <div className='z-[2] grid grid-cols-3 grid-rows-2 gap-6'>
+          <div className='z-[2] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
             <div className='col-span-1 row-span-2'>
               <div className="flex flex-col gap-2 backdrop-blur-xs border border-white/30 rounded-2xl overflow-hidden">
                 <div className='px-14 py-12'>
@@ -121,14 +121,14 @@ function Home() {
                   <img
                     src="https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/6603487522f60ac2cc4c3e61_Frame%20113.png"
                     alt=""
-                    className='object-cover w-full h-full hue-rotate-[135deg]'
+                    className='object-cover w-full h-full hue-rotate-[135deg] max-w-[300px] mx-auto'
                     loading="lazy"
                   />
                 </div>
               </div>
             </div>
             {features.map((feature, index) => (
-              <div key={`card-${index}`} className='col-span-1 row-span-1'>
+              <div key={`card-${index}`} className='col-span-1'>
                 <FeatureCard {...feature} />
               </div>
             ))}
@@ -167,7 +167,7 @@ function Home() {
       </section>
       <section className="py-24 relative">
         <div className="container mx-auto px-6 py-4">
-          <div className='mb-14 w-3/5'>
+          <div className='mb-14 md:w-3/5'>
             <div className='text-sky-700 text-xl tracking-wider font-bold mb-3'>Integrations</div>
             <h2 className='text-4xl font-bold text-white mb-3'>
               Build, Integrate, and Deploy Advanced Voice Agents in minutes
@@ -176,7 +176,7 @@ function Home() {
               From creation to deployment, Millis AI provides a complete solution that fits seamlessly into your existing systems.
             </p>
           </div>
-          <div className='grid grid-cols-4 gap-4'>
+          <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4'>
             {integrations.map((integration, index) => (
               <IntegrationCard key={`integration-${index}`} {...integration} />
             ))}
@@ -233,7 +233,7 @@ function Home() {
               <img src="/media/featured-on-taaft.png" alt="" className='w-[300px]' />
             </a>
           </div>
-          <div className="border-t border-white/30 mt-14 pt-5 flex justify-between">
+          <div className="border-t border-white/30 mt-14 pt-5 flex justify-between gap-6">
             <div className='text-sm'>© 2025 All rights reserved.</div>
             <div className="flex gap-6">
               <a

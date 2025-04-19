@@ -135,7 +135,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
 
   return (
     <Card title="Conversion Flow" toolbar={isEditted && <ToolBar handleSave={handleSave} />}>
-      <div className="p-6">
+      <div className="p-6 min-w-80">
         <SwtichWithLabel
           label="User starts first:"
           value={!!editData.config.flow.user_start_first}
