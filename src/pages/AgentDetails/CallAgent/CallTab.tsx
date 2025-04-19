@@ -36,12 +36,12 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
 
   const handleStartCall = async () => {
     setIsConnecting(true)
-    // await msClient.start({
-    //   agent: {
-    //     agent_id: agent.id,
-    //     agent_config: agent.config,
-    //   }
-    // })
+    await msClient.start({
+      agent: {
+        agent_id: agent.id,
+        agent_config: agent.config,
+      }
+    })
   }
   const handleStopCall = async () => {
     await msClient.stop()
