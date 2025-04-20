@@ -47,9 +47,9 @@ const NavbarMobile = () => {
           {link.children}
         </a>
       ))}
-      <a href="/agents" className="hover:bg-gray-600 transition-all duration-300 px-5 py-2">
+      <Link to="/agents" className="hover:bg-gray-600 transition-all duration-300 px-5 py-2">
         Get Started
-      </a>
+      </Link>
     </nav>
   );
 };
