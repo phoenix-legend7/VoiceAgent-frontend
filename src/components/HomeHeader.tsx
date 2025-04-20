@@ -52,7 +52,7 @@ const NavbarMobile = () => {
 };
 
 const HomeHeader: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
   const navigate = useNavigate()
@@ -71,13 +71,6 @@ const HomeHeader: React.FC = () => {
       window.removeEventListener('resize', checkIsMobile)
     }
   }, [])
-  useEffect(() => {
-    if (isMobile) {
-      setIsOpen(false)
-    } else {
-      setIsOpen(true)
-    }
-  }, [isMobile])
 
   const handleClickOutside = (event: MouseEvent) => {
     if (!(event.target as HTMLElement).closest('.navbar-mobile')) {
