@@ -6,6 +6,7 @@ import UsageTabGroup from '../components/UsageTabGroup';
 import integrations from '../consts/integrations';
 import features from '../consts/features';
 import { GradientButton, TransparentButton } from '../library/Button'
+import { useEffect } from 'react';
 
 const slideImages = [
   '/media/annie.png',
@@ -18,6 +19,30 @@ const slideImages = [
 ]
 
 function Home() {
+  useEffect(() => {
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a');
+
+      if (anchor && anchor.hash && anchor.hash === '#Features') {
+        e.preventDefault();
+        const element = document.getElementById('Features');
+        if (element) {
+          window.scrollTo({
+            top: element.offsetTop,
+            behavior: 'smooth'
+          });
+          history.pushState(null, '', anchor.hash);
+        }
+      }
+    };
+    document.addEventListener('click', handleAnchorClick);
+
+    return () => {
+      document.removeEventListener('click', handleAnchorClick);
+    };
+  }, []);
+
   return (
     <>
       <HomeHeader />
@@ -102,9 +127,9 @@ function Home() {
                 <div className='px-14 py-12'>
                   <div className='mb-4'>
                     <div className="rounded-lg w-12 h-12 bg-white/5 text-sky-800 border border-white/30 flex items-center justify-center">
-                      <img 
-                        src="https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fb66df77b82401eb5d551e_speed_white_24dp.svg" 
-                        alt="" 
+                      <img
+                        src="https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fb66df77b82401eb5d551e_speed_white_24dp.svg"
+                        alt=""
                         className='hue-rotate-[135deg]'
                       />
                     </div>
