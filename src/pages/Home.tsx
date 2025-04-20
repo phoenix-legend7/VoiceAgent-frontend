@@ -21,8 +21,8 @@ function Home() {
   return (
     <>
       <HomeHeader />
-      <section
-        className="relative py-44 text-center"
+      <div
+        className="relative py-44 text-center overflow-hidden"
         style={{ backgroundImage: 'radial-gradient(circle farthest-corner at 50% 20%, #0000, #060f11 32%), linear-gradient(to bottom, #060f113d, #060f113d), url(https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fa2a656f67211f0f4ece36_Abstract%20Lines%20BG.webp)' }}
       >
         <div className='absolute w-[500px] h-[500px] bg-indigo-300 rounded-full blur-[200px] mx-auto my-auto top-[-388px] left-0 right-0 z-[1]' />
@@ -56,8 +56,8 @@ function Home() {
             <div className='absolute w-[400px] h-[400px] bg-indigo-400 rounded-full blur-[156px] mx-auto my-auto top-0 left-0 right-0 bottom-0 z-[1]'></div>
           </div>
         </div>
-      </section>
-      <section className='py-6 relative'>
+      </div>
+      <div className='py-6 relative'>
         <div className='relative max-w-[1312px] px-6 mx-auto'>
           <div className="text-center mb-12 text-xl font-bold">
             Trusted by Developers & Businesses Worldwide
@@ -85,8 +85,8 @@ function Home() {
             </div>
           </div>
         </div>
-      </section>
-      <section id="Features" className='py-24 relative'>
+      </div>
+      <div id="Features" className='py-24 relative'>
         <div className="container mx-auto mb-14 px-6 py-4 relative">
           <div className='max-w-[900px] mb-14 mx-auto flex justify-center items-center flex-col gap-3 text-center'>
             <h2 className='text-5xl font-bold text-white mb-3'>
@@ -135,8 +135,8 @@ function Home() {
           </div>
           <div className="absolute w-[200px] h-[200px] bg-sky-600 rounded-full blur-[156px] mx-auto my-auto top-0 left-0 right-0 bottom-0 z-[1]" />
         </div>
-      </section>
-      <section className="py-24 relative">
+      </div>
+      <div className="py-24 relative">
         <div className="container mx-auto px-6 py-4">
           <div className='max-w-[900px] mb-14 mx-auto flex justify-center items-center flex-col gap-3 text-center'>
             <h2 className='text-5xl font-bold text-white mb-3'>
@@ -164,8 +164,8 @@ function Home() {
             </div>
           </div>
         </div>
-      </section>
-      <section className="py-24 relative">
+      </div>
+      <div className="py-24 relative">
         <div className="container mx-auto px-6 py-4">
           <div className='mb-14 md:w-3/5'>
             <div className='text-sky-700 text-xl tracking-wider font-bold mb-3'>Integrations</div>
@@ -182,8 +182,8 @@ function Home() {
             ))}
           </div>
         </div>
-      </section>
-      <section className="py-14 relative">
+      </div>
+      <div className="py-14 relative">
         <div className="container mx-auto px-6 py-4 relative">
           <div
             className='max-w-full rounded-2xl p-14 border border-white/30 bg-cover bg-center'
@@ -208,9 +208,9 @@ function Home() {
             </div>
           </div>
         </div>
-      </section>
-      <section className="pt-10 relative overflow-hidden">
-        <div className="container mx-auto px-6 py-4">
+      </div>
+      <div className="pt-10 relative overflow-hidden">
+        <div className="container mx-auto px-6 pt-4">
           <div className="flex gap-6 flex-col">
             <a href="/">
               <img src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png" alt="Logo" className='w-[100px]' />
@@ -233,7 +233,7 @@ function Home() {
               <img src="/media/featured-on-taaft.png" alt="" className='w-[300px]' />
             </a>
           </div>
-          <div className="border-t border-white/30 mt-14 pt-5 flex justify-between gap-6">
+          <div className="border-t border-white/30 mt-14 py-5 flex justify-between gap-6">
             <div className='text-sm'>© 2025 All rights reserved.</div>
             <div className="flex gap-6">
               <a
@@ -252,7 +252,7 @@ function Home() {
           </div>
         </div>
         <div className="absolute w-[500px] h-[500px] bg-sky-800 rounded-[50%] blur-[200px] mx-auto my-auto top-[90%] left-0 right-0 z-[1]" />
-      </section>
+      </div>
     </>
   )
 }
