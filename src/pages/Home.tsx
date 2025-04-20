@@ -51,8 +51,8 @@ function Home() {
         style={{ backgroundImage: 'radial-gradient(circle farthest-corner at 50% 20%, #0000, #060f11 32%), linear-gradient(to bottom, #060f113d, #060f113d), url(https://cdn.prod.website-files.com/65fa2a656f67211f0f4ecd57/65fa2a656f67211f0f4ece36_Abstract%20Lines%20BG.webp)' }}
       >
         <div className='absolute w-[500px] h-[500px] bg-indigo-300 rounded-full blur-[200px] mx-auto my-auto top-[-388px] left-0 right-0 z-[1]' />
-        <div className="container mx-auto px-6 py-4">
-          <div className='max-w-[864px] mx-auto mb-24'>
+        <div className="container mx-auto py-4">
+          <div className='max-w-[864px] mx-auto mb-24 px-6'>
             <h1 className="text-6xl font-bold text-white leading-[1.2] mb-3">
               Build next-gen voice agents with
               <span className='text-indigo-600'> 500ms </span>
@@ -76,8 +76,13 @@ function Home() {
               </TransparentButton>
             </div>
           </div>
-          <div className='relative max-w-[1114px] mx-auto'>
-            <img src="https://www.elysiapartners.com/wp-content/uploads/2025/04/ai-agent-2.webp" alt="" className='relative w-4/5 max-w-full mx-auto z-[2]' />
+          <div className='relative max-w-[1114px] mx-auto overflow-hidden'>
+            <img 
+              src="https://www.elysiapartners.com/wp-content/uploads/2025/04/ai-agent-2.webp" 
+              alt="" 
+              className='relative w-full md:w-4/5 max-w-full mx-auto z-[2]' 
+              loading="lazy"
+            />
             <div className='absolute w-[400px] h-[400px] bg-indigo-400 rounded-full blur-[156px] mx-auto my-auto top-0 left-0 right-0 bottom-0 z-[1]'></div>
           </div>
         </div>
