@@ -6,6 +6,7 @@ import Agents from './pages/Agents'
 import AgentDetails from './pages/AgentDetails'
 import PhoneNumbers from './pages/PhoneNumbers'
 import Campaigns from './pages/Campaigns'
+import AgentKnowledge from './pages/Knowledge'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/agents/:id" element={<AgentDetails />} />
           <Route path="/phones" element={<PhoneNumbers />} />
           <Route path="/campaigns" element={<Campaigns />} />
+          <Route path="/knowledge" element={<AgentKnowledge />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
