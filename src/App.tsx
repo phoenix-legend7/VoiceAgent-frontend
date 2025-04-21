@@ -4,6 +4,7 @@ import MasterLayout from './Layout/MasterLayout'
 import NotFound from './pages/error/404'
 import Agents from './pages/Agents'
 import AgentDetails from './pages/AgentDetails'
+import PhoneNumbers from './pages/PhoneNumbers'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route element={<MasterLayout />}>
           <Route path="/agents" element={<Agents />} />
           <Route path="/agents/:id" element={<AgentDetails />} />
+          <Route path="/phones" element={<PhoneNumbers />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

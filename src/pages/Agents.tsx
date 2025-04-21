@@ -195,7 +195,7 @@ const Agents = () => {
 
   return (
     <Content isOverlayShown={isOverlayShow}>
-      <div>
+      <div className="flex flex-col h-full">
         <div className="flex justify-between">
           <h2 className="flex items-center gap-2 text-2xl font-bold">Voice Agents</h2>
           <button
@@ -206,7 +206,7 @@ const Agents = () => {
             Add
           </button>
         </div>
-        <div className="bg-gray-900/80 overflow-x-auto mt-8">
+        <div className="bg-gray-900/80 h-full overflow-x-auto mt-8">
           <Table>
             <thead>
               <tr className="border-b border-gray-700">
