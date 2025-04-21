@@ -1,9 +1,9 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { FaAngleDown, FaAngleLeft, FaAngleRight, FaBook, FaBullhorn, FaCog, FaFileAlt, FaHistory, FaPhoneAlt, FaUsers } from "react-icons/fa"
-import { LiaExternalLinkAltSolid } from "react-icons/lia"
-import { PiSparkle } from "react-icons/pi"
+import { FaAngleDown, FaAngleLeft, FaAngleRight, FaBook, FaBullhorn, FaCog, FaHistory, FaPhoneAlt, FaUsers } from "react-icons/fa"
+// import { LiaExternalLinkAltSolid } from "react-icons/lia"
+// import { PiSparkle } from "react-icons/pi"
 import NavLink from "./NavLink"
 import settingsItems from "../../consts/settings"
 
@@ -53,31 +53,31 @@ const SettingsButtonGroup = () => {
   )
 }
 
-const NewsGroup = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  return (
-    <div className="relative">
-      <button
-        className="flex items-center gap-3 cursor-pointer w-full px-1.5 py-3 text-gray-400 rounded hover:bg-gray-900 active:bg-gray-800 transition-all duration-300 nav-link"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <PiSparkle size={20} />
-        <div className="text-white nav-link-label">What's New</div>
-        <div className="absolute -right-1 -top-1 bg-red-500 rounded-full w-3 h-3 border border-white nav-link-badge" />
-      </button>
-      <div className={clsx(
-        "absolute bottom-0 left-full rounded-md overflow-hidden transition-all duration-500 z-[1000] nav-link-dropdown",
-        isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-      )}>
-        {/* <div className="flex flex-col gap-2 p-4">
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-medium">What's New</span>
-          </div>
-        </div> */}
-      </div>
-    </div>
-  )
-}
+// const NewsGroup = () => {
+//   const [isOpen, setIsOpen] = useState(false)
+//   return (
+//     <div className="relative">
+//       <button
+//         className="flex items-center gap-3 cursor-pointer w-full px-1.5 py-3 text-gray-400 rounded hover:bg-gray-900 active:bg-gray-800 transition-all duration-300 nav-link"
+//         onClick={() => setIsOpen(!isOpen)}
+//       >
+//         <PiSparkle size={20} />
+//         <div className="text-white nav-link-label">What's New</div>
+//         <div className="absolute -right-1 -top-1 bg-red-500 rounded-full w-3 h-3 border border-white nav-link-badge" />
+//       </button>
+//       <div className={clsx(
+//         "absolute bottom-0 left-full rounded-md overflow-hidden transition-all duration-500 z-[1000] nav-link-dropdown",
+//         isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+//       )}>
+//         {/* <div className="flex flex-col gap-2 p-4">
+//           <div className="flex items-center gap-2">
+//             <span className="text-lg font-medium">What's New</span>
+//           </div>
+//         </div> */}
+//       </div>
+//     </div>
+//   )
+// }
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(true)
@@ -116,14 +116,14 @@ const Navbar = () => {
         <NavLink href="/knowledge" icon={<FaBook size={20} />} label="Agent Knowledge" />
         <NavLink href="/histories" icon={<FaHistory size={20} />} label="Call Logs" />
         <SettingsButtonGroup />
-        <NavLink
+        {/* <NavLink
           href="https://millisai.mintlify.app/"
           icon={<FaFileAlt size={20} />}
           label="Documentation"
           rightIcon={<LiaExternalLinkAltSolid size={18} />}
           isExternal
-        />
-        <NewsGroup />
+        /> */}
+        {/* <NewsGroup /> */}
       </div>
       <div className="w-full">
         <div className="rounded bg-gray-800/40 py-5 px-6 credit-usage">
