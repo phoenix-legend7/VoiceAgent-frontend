@@ -1,9 +1,5 @@
 const settingsItems = [
   {
-    label: "API Keys",
-    href: "keys",
-  },
-  {
     label: "Credentials",
     href: "credentials",
   },
