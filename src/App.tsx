@@ -5,6 +5,7 @@ import NotFound from './pages/error/404'
 import Agents from './pages/Agents'
 import AgentDetails from './pages/AgentDetails'
 import PhoneNumbers from './pages/PhoneNumbers'
+import Campaigns from './pages/Campaigns'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/agents" element={<Agents />} />
           <Route path="/agents/:id" element={<AgentDetails />} />
           <Route path="/phones" element={<PhoneNumbers />} />
+          <Route path="/campaigns" element={<Campaigns />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
