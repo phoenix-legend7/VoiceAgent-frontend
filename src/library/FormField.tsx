@@ -54,15 +54,18 @@ interface InputBoxWithUnitProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  showRightUnit?: boolean;
 }
 
-export const InputBoxWithUnit: React.FC<InputBoxWithUnitProps> = ({ unit, value, onChange, placeholder, className, disabled }) => {
+export const InputBoxWithUnit: React.FC<InputBoxWithUnitProps> = ({ unit, value, onChange, placeholder, className, disabled, showRightUnit = true }) => {
   const [isFocused, setIsFocused] = useState(false);
   return (
     <div className={clsx(
-      className, 'flex items-center justify-center rounded pr-3.5 border border-gray-700 transition-all duration-300',
-      isFocused ? 'border-sky-600' : 'hover:border-white'
+      className, 'flex items-center justify-center rounded border border-gray-700 transition-all duration-300',
+      isFocused ? 'border-sky-600' : 'hover:border-white',
+      showRightUnit ? 'pr-3.5' : 'pl-3.5'
     )}>
+      {!showRightUnit && <span className="text-gray-400">{unit}</span>}
       <input
         type="number"
         className={clsx(
@@ -75,7 +78,7 @@ export const InputBoxWithUnit: React.FC<InputBoxWithUnitProps> = ({ unit, value,
         placeholder={placeholder}
         onChange={(e) => onChange(Number(e.target.value))}
       />
-      <span className="text-gray-400">{unit}</span>
+      {showRightUnit && <span className="text-gray-400">{unit}</span>}
     </div>
   )
 }
