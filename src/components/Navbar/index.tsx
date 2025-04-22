@@ -36,9 +36,9 @@ const SettingsButtonGroup = () => {
         style={{ maxHeight: isOpen ? '24rem' : '0' }}
       >
         {settingsItems.map((item, index) => (
-          <a
+          <Link
             key={index}
-            href={`/settings/${item.href}`}
+            to={`/settings/${item.href}`}
             className={clsx(
               "flex items-center gap-3 cursor-pointer w-full pl-6 pr-1.5 py-3 rounded hover:bg-gray-900 active:bg-gray-800 transition-all duration-300",
               isActive(item.href) ? "text-sky-600" : "text-gray-400",
@@ -46,7 +46,7 @@ const SettingsButtonGroup = () => {
             )}
           >
             {item.label}
-          </a>
+          </Link>
         ))}
       </div>
     </div>
