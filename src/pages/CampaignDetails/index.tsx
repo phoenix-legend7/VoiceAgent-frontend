@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { FaArrowLeft, FaPlus } from "react-icons/fa"
+import { FaArrowLeft, FaPlus, FaStop } from "react-icons/fa"
 import { Link, useParams } from "react-router-dom"
 import { toast } from "react-toastify"
 
@@ -67,6 +67,21 @@ const CampaignDetails = () => {
       setIsOverlayShow(false)
     }
   }
+  const handleStopCampaign = async () => {
+    setIsOverlayShow(true)
+    try {
+      const response = await axiosInstance.post(`/campaigns/${id}/stop`)
+      const data = response.data
+      if (data !== 'ok') {
+        throw new Error(data.detail)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error(`Failed to stop campaign: ${error}`)
+    } finally {
+      setIsOverlayShow(false)
+    }
+  }
   // const handleDeleteRecord = async (index: number) => {
   //   if (!campaign) return
   //   const newRecords = campaign.records.splice(index, 1)
@@ -110,13 +125,23 @@ const CampaignDetails = () => {
                   <FaPlus />
                   Add Record
                 </button>
-                <button
-                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
-                  onClick={() => setIsConfirmStartModalOpen(true)}
-                >
-                  <FaPlus />
-                  Start
-                </button>
+                {campaign.status === 'started' ? (
+                  <button
+                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
+                    onClick={handleStopCampaign}
+                  >
+                    <FaStop />
+                    Stop
+                  </button>
+                ) : (
+                  <button
+                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
+                    onClick={() => setIsConfirmStartModalOpen(true)}
+                  >
+                    <FaPlus />
+                    Start
+                  </button>
+                )}
               </div>
             </div>
             <div className="mt-8 rounded-xl text-sm bg-gray-900">
