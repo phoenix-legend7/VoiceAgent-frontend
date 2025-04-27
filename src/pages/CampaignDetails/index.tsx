@@ -26,7 +26,7 @@ const CampaignDetails = () => {
   const [isSetCallerPhoneModalOpen, setIsCallerPhoneModalOpen] = useState(false)
 
   useEffect(() => {
-    const fetchAgent = async () => {
+    const fetchCampaign = async () => {
       setIsOverlayShow(true)
       try {
         const response = await axiosInstance.get(`/campaigns/${id}`)
@@ -39,7 +39,7 @@ const CampaignDetails = () => {
         setIsOverlayShow(false)
       }
     }
-    fetchAgent()
+    fetchCampaign()
   }, [id, isChanged])
 
   const handleIncludeMetaData = async () => {
@@ -60,6 +60,7 @@ const CampaignDetails = () => {
       if (data !== 'ok') {
         throw new Error(data.detail)
       }
+      setIsChanged(prev => !prev)
     } catch (error) {
       console.error(error)
       toast.error(`Failed to start campaign: ${error}`)
@@ -75,6 +76,7 @@ const CampaignDetails = () => {
       if (data !== 'ok') {
         throw new Error(data.detail)
       }
+      setIsChanged(prev => !prev)
     } catch (error) {
       console.error(error)
       toast.error(`Failed to stop campaign: ${error}`)
