@@ -6,6 +6,7 @@ import Agents from './pages/Agents'
 import AgentDetails from './pages/AgentDetails'
 import PhoneNumbers from './pages/PhoneNumbers'
 import Campaigns from './pages/Campaigns'
+import CampaignDetails from './pages/CampaignDetails'
 import AgentKnowledge from './pages/Knowledge'
 import CallLogs from './pages/CallLogs'
 import Credentials from './pages/Settings/Credentials'
@@ -35,6 +36,7 @@ function App() {
           <Route path="/agents/:id" element={<AgentDetails />} />
           <Route path="/phones" element={<PhoneNumbers />} />
           <Route path="/campaigns" element={<Campaigns />} />
+          <Route path="/campaigns/:id" element={<CampaignDetails />} />
           <Route path="/knowledge" element={<AgentKnowledge />} />
           <Route path="/histories" element={<CallLogs />} />
           <Route path="/settings/*" element={<Settings />} />

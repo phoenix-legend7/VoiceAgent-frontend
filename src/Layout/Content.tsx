@@ -10,7 +10,7 @@ interface Props {
 
 const Content: FC<Props> = ({ className, isOverlayShown, children }) => {
   return (
-    <div className={clsx(className, 'relative flex flex-col justify-between h-full px-6 pt-8')}>
+    <div className={clsx(className, 'relative flex flex-col justify-between h-full px-6 pt-8 ml-20 md:ml-0')}>
       {isOverlayShown && (
         <div className="absolute inset-0 bg-gray-950/90 cursor-wait z-50">
           <div className="flex items-center justify-center h-full">

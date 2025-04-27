@@ -46,7 +46,7 @@ const MasterLayout = () => {
       <div className="flex h-[calc(100vh-4rem)]">
         <Navbar />
         <ToastContainer newestOnTop limit={3} />
-        <div className="container mx-auto overflow-y-auto ml-20 md:ml-0">
+        <div className="container mx-auto overflow-y-auto">
           <Outlet />
         </div>
       </div>

@@ -3,6 +3,7 @@ import { FaEllipsisV, FaPlus, FaUserAlt } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 
+import StatusBadge from "../components/StatusBadge"
 import axiosInstance from "../core/axiosInstance"
 import { InputBox } from "../library/FormField"
 import Modal from "../library/ModalProvider"
@@ -238,10 +239,7 @@ const Agents = () => {
                     </TableCell>
                     <TableCell>{formatDateTime(agent.created_at)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                        Active
-                      </div>
+                      <StatusBadge status="active" color="bg-green-500" />
                     </TableCell>
                     <TableCell>
                       <EditAgentAction

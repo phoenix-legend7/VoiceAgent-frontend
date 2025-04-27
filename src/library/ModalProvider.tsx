@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { RoundedButton, TransparentButton } from './Button';
 
 interface ModalProps {
+  headerIcon?: ReactNode;
   title?: string;
   content?: ReactNode;
   isOpen: boolean;
@@ -19,9 +20,11 @@ interface ModalProps {
   okBtnIcon?: ReactNode;
   cancelBtnLabel?: string;
   cancelBtnIcon?: ReactNode;
+  modalSize?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
+  headerIcon,
   title,
   content,
   isOpen,
@@ -38,6 +41,7 @@ const Modal: React.FC<ModalProps> = ({
   okBtnIcon,
   cancelBtnLabel = 'Cancel',
   cancelBtnIcon,
+  modalSize = 'max-w-md',
 }) => {
   if (!isOpen) return null;
 
@@ -54,29 +58,33 @@ const Modal: React.FC<ModalProps> = ({
     >
       <div
         className={clsx(
-          'bg-gray-900 border border-white/20 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-auto',
+          'bg-gray-900 border border-white/20 rounded-lg p-6 w-full max-h-[90vh] overflow-auto',
+          modalSize,
           className
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {title && <h2 className="text-2xl font-bold mb-4">{title}</h2>}
-        
+        <div className="flex items-center gap-4 mb-4">
+          {headerIcon}
+          {title && <h2 className="text-2xl font-bold">{title}</h2>}
+        </div>
+
         <div className="mb-6">
           {content || children}
         </div>
-        
+
         <div className="flex justify-end gap-3 mt-6">
           {extraButtons}
-          
+
           {!hideCloseButton && (
             <TransparentButton onClick={onClose}>
               {cancelBtnIcon}
               {cancelBtnLabel}
             </TransparentButton>
           )}
-          
+
           {!hideOKButton && (
-            <RoundedButton 
+            <RoundedButton
               onClick={onOK}
               className={clsx(isLoading && 'opacity-70 cursor-not-allowed')}
             >

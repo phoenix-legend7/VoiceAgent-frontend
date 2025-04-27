@@ -11,9 +11,10 @@ interface InputBoxProps {
   className?: string;
   inputClassName?: string;
   disabled?: boolean;
+  invalidText?: string;
 }
 
-export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBlur, onKeyDown, placeholder, className, disabled, inputClassName }) => {
+export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBlur, onKeyDown, placeholder, className, disabled, inputClassName, invalidText }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -22,7 +23,11 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBl
         <label
           className={clsx(
             'leading-[1.6] transition-colors duration-300',
-            { 'text-sky-600': isFocused, 'text-gray-400': disabled }
+            {
+              'text-red-500': !!invalidText,
+              'text-sky-600': !invalidText && isFocused,
+              'text-gray-400': disabled,
+            }
           )}
         >
           {label}
@@ -32,17 +37,24 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBl
         type="text"
         className={clsx(
           inputClassName,
-          'rounded-md bg-neutral-800/50 border border-gray-700 w-full py-2 px-3 focus:border-sky-600 focus:outline-none transition-all duration-300',
+          'rounded-md bg-neutral-800/50 border w-full py-2 px-3 focus:outline-none transition-all duration-300',
+          !invalidText ? 'border-gray-700 focus:border-sky-600' : 'border-red-500',
           { 'text-gray-400': disabled }
         )}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={() => setIsFocused(true)}
-        onBlur={onBlur}
+        onBlur={() => {
+          setIsFocused(false)
+          onBlur?.()
+        }}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
         disabled={disabled}
       />
+      {!!invalidText && (
+        <div className="text-red-500 text-sm">{invalidText}</div>
+      )}
     </div>
   )
 }
