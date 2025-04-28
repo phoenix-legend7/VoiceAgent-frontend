@@ -137,6 +137,7 @@ const AgentDetails = () => {
     console.log(voices)
   }, [voices])
   useEffect(() => {
+    setIsOverlayShow(true)
     const fetchAgent = async () => {
       try {
         const response = await axiosInstance.get(`/agent/${id}`)

@@ -176,6 +176,7 @@ const Agents = () => {
 
   useEffect(() => {
     const fetchAgents = async () => {
+      setIsOverlayShow(true)
       try {
         const response = await axiosInstance.get('/agent')
         const data = response.data
