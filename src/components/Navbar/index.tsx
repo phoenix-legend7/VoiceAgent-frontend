@@ -7,7 +7,7 @@ import { FaAngleDown, FaAngleLeft, FaAngleRight, FaBook, FaBullhorn, FaCog, FaHi
 import NavLink from "./NavLink"
 import settingsItems from "../../consts/settings"
 
-const SettingsButtonGroup = () => {
+export const SettingsButtonGroup = () => {
   const [isOpen, setIsOpen] = useState(false)
   const params = useParams()
   const isActive = (href: string) => {
@@ -115,7 +115,7 @@ const Navbar = () => {
         <NavLink href="/campaigns" icon={<FaBullhorn size={20} />} label="Campaigns" />
         <NavLink href="/knowledge" icon={<FaBook size={20} />} label="Agent Knowledge" />
         <NavLink href="/histories" icon={<FaHistory size={20} />} label="Call Logs" />
-        <SettingsButtonGroup />
+        {/* <SettingsButtonGroup /> */}
         {/* <NavLink
           href="https://millisai.mintlify.app/"
           icon={<FaFileAlt size={20} />}
@@ -126,7 +126,7 @@ const Navbar = () => {
         {/* <NewsGroup /> */}
       </div>
       <div className="w-full">
-        <div className="rounded bg-gray-800/40 py-5 px-6 credit-usage">
+        {/* <div className="rounded bg-gray-800/40 py-5 px-6 credit-usage">
           <div className="text-gray-500 text-sm font-semibold">
             Credit Usage
           </div>
@@ -140,7 +140,7 @@ const Navbar = () => {
           >
             Purchase Credits
           </Link>
-        </div>
+        </div> */}
         <hr className="w-full h-px text-gray-800" />
         <div className="pt-2">
           <button
