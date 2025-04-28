@@ -116,6 +116,15 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
                 </span>
               </div>
             </div>
+            {!!selectedLog.voip && (
+              <div className="w-1/2 py-3 px-6">
+                <div>VoIP</div>
+                <div className="text-gray-400">
+                  From: {selectedLog.voip.from}<br />
+                  To: {selectedLog.voip.to}
+                </div>
+              </div>
+            )}
           </div>
           {!!selectedLog.cost_breakdown && (
             <div className="text-nowrap">
