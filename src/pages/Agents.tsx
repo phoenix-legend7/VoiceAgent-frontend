@@ -231,7 +231,7 @@ const Agents = () => {
                           <div>
                             {agent.name}
                             <div className="text-gray-400 text-sm">
-                              {agent.config.prompt}
+                              {agent.config.prompt.length > 90 ? agent.config.prompt.slice(0, 90) + ' ...' : agent.config.prompt}
                             </div>
                           </div>
                         </div>
