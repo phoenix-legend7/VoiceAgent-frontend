@@ -157,18 +157,18 @@ const CallLogs = () => {
                   <TableCell className="cursor-pointer" onClick={() => onTrClick(log)}>
                     {!!log.voip && (
                       <div className="flex flex-col gap-1">
-                        <span className="border border-gray-600 rounded px-2 py-0.5">
+                        <div className="border border-gray-600 rounded px-2 py-0.5 w-fit">
                           {log.voip.from}
-                        </span>
+                        </div>
                         <FaArrowRight size={14} className="mx-2" />
-                        <span className="border border-gray-600 rounded px-2 py-0.5">
+                        <div className="border border-gray-600 rounded px-2 py-0.5 w-fit">
                           {log.voip.to}
-                        </span>
+                        </div>
                       </div>
                     )}
                   </TableCell>
                   <TableCell className="cursor-pointer" onClick={() => onTrClick(log)}>
-                    <span className="border border-gray-600 rounded px-2 py-0.5">
+                    <span className="border border-gray-600 rounded px-2 py-0.5 w-fit">
                       {log.call_status}
                     </span>
                   </TableCell>
