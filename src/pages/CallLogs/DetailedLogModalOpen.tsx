@@ -78,37 +78,37 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
       {!!selectedLog && (
         <div>
           <div className="flex flex-wrap items-center -mx-6">
-            <div className="w-1/2 py-3 px-6">
+            <div className="w-full sm:w-1/2 py-3 px-6">
               <div>Session ID</div>
               <div className="text-gray-400">
                 {selectedLog.session_id}
               </div>
             </div>
-            <div className="w-1/2 py-3 px-6">
+            <div className="w-full sm:w-1/2 py-3 px-6">
               <div>Agent Id</div>
               <div className="text-gray-400">
                 {selectedLog.agent_id}
               </div>
             </div>
-            <div className="w-1/2 py-3 px-6">
+            <div className="w-full sm:w-1/2 py-3 px-6">
               <div>Duration</div>
               <div className="text-gray-400">
                 {!!selectedLog.duration && formatCallDuration(selectedLog.duration)}
               </div>
             </div>
-            <div className="w-1/2 py-3 px-6">
+            <div className="w-full sm:w-1/2 py-3 px-6">
               <div>Date</div>
               <div className="text-gray-400">
                 {!!selectedLog.ts && formatDateTime(selectedLog.ts)}
               </div>
             </div>
-            <div className="w-1/2 py-3 px-6">
+            <div className="w-full sm:w-1/2 py-3 px-6">
               <div>Characters used</div>
               <div className="text-gray-400">
                 {selectedLog.chars_used}
               </div>
             </div>
-            <div className="w-1/2 py-3 px-6">
+            <div className="w-full sm:w-1/2 py-3 px-6">
               <div>Status</div>
               <div className="my-1">
                 <span className="border border-gray-600 rounded px-2 py-0.5">
@@ -117,7 +117,7 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
               </div>
             </div>
             {!!selectedLog.voip && (
-              <div className="w-1/2 py-3 px-6">
+              <div className="w-full sm:w-1/2 py-3 px-6">
                 <div>VoIP</div>
                 <div className="text-gray-400">
                   From: {selectedLog.voip.from}<br />
