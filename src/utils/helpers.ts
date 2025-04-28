@@ -9,3 +9,10 @@ export const formatDateTime = (time: number) => {
     second: '2-digit',
   }).format(date)
 }
+
+export const formatCallDuration = (duration: number) => {
+  const hours = Math.floor(duration / 3600)
+  const minutes = Math.floor((duration % 3600) / 60)
+  const seconds = parseInt((duration % 60).toFixed(0))
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
