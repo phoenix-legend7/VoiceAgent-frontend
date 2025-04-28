@@ -1,8 +1,247 @@
-import { FaPlus } from "react-icons/fa"
+import axios from "axios"
+import clsx from "clsx"
+import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react"
+import { FaFileUpload, FaPlus, FaTrash } from "react-icons/fa"
+import { toast } from "react-toastify"
+
+import axiosInstance from "../core/axiosInstance"
 import Content from "../Layout/Content"
+import Modal from "../library/ModalProvider"
+
+interface CreateKnowledgeModalProps {
+  isOpen: boolean
+  isOverlayShow: boolean
+  setIsChanged: Dispatch<SetStateAction<boolean>>
+  setIsOverlayShow: Dispatch<SetStateAction<boolean>>
+  setIsOpen: Dispatch<SetStateAction<boolean>>
+}
+
+const CreateKnowledgeModal: FC<CreateKnowledgeModalProps> = ({
+  isOpen,
+  isOverlayShow,
+  setIsChanged,
+  setIsOpen,
+  setIsOverlayShow,
+}) => {
+  const [file, setFile] = useState<File | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [description, setDescription] = useState('')
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const onClose = () => {
+    setIsOpen(false)
+    setFile(null)
+  };
+  const generatePresignedUrl = async (filename: string) => {
+    const payload = { filename }
+    const response = await axiosInstance.post('knowledge/generate_presigned_url', payload)
+    const data = response.data
+    if (!data.url) {
+      throw new Error(data)
+    }
+    return data
+  }
+  const uploadFileToAWS = async (
+    key: string,
+    awsAccessKeyId: string,
+    awsSecurityToken: string,
+    policy: string,
+    signature: string,
+    file: File,
+  ) => {
+    const form = new FormData()
+    form.append('key', key)
+    form.append('AWSAccessKeyId', awsAccessKeyId)
+    form.append('x-amz-security-token', awsSecurityToken)
+    form.append('policy', policy)
+    form.append('signature', signature)
+    form.append('file', file)
+    return axios.post(
+      'https://millis-ai-agent-knowledge.s3.amazonaws.com/',
+      form,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    )
+  }
+  const onImport = async () => {
+    if (!file || !description) {
+      return
+    }
+    setIsOverlayShow(true)
+    try {
+      const presignedUrl = await generatePresignedUrl(file.name)
+      await uploadFileToAWS(
+        presignedUrl.fields['key'],
+        presignedUrl.fields['AWSAccessKeyId'],
+        presignedUrl.fields['x-amz-security-token'],
+        presignedUrl.fields['policy'],
+        presignedUrl.fields['signature'],
+        file,
+      )
+      const data = {
+        object_key: presignedUrl.fields.key,
+        description: description,
+        name: file.name,
+        file_type: file.type,
+        size: file.size,
+      }
+      await axiosInstance.post('/knowledge/create_file', data)
+      setIsChanged(prev => !prev)
+      onClose()
+    } catch (error) {
+      console.error(error)
+      toast.error(`Failed to create file: ${error}`)
+    } finally {
+      setIsOverlayShow(false)
+    }
+  }
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setIsDragging(true)
+    } else if (e.type === 'dragleave') {
+      setIsDragging(false)
+    }
+  }
+  const validateFile = (file: File): boolean => {
+    if (!file) return false
+
+    const fileType = file.type
+    const fileSize = file.size / 1024 / 1024
+    const acceptedFileTypes = ['text/csv', 'application/pdf', 'text/plain', 'application/json']
+
+    if (!acceptedFileTypes.includes(fileType)) {
+      toast.error('Invalid file type. Accepted formats: .csv, .json, .txt, .pdf')
+      return false
+    }
+
+    if (fileSize > 8) {
+      toast.error('File size exceeds 8MB limit.')
+      return false
+    }
+
+    return true
+  }
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+
+    const file = Array.from(e.dataTransfer.files)[0]
+    const isValidFile = validateFile(file)
+    if (isValidFile) {
+      setFile(file)
+    }
+  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    if (e.target.files) {
+      const file = Array.from(e.target.files)[0]
+      const isValidFile = validateFile(file)
+      if (isValidFile) {
+        setFile(file)
+      }
+    }
+  }
+  const formatFileSize = (size: number) => {
+    const units = ['B', 'KB', 'MB', 'GB', 'TB']
+    let unitIndex = 0
+    let sizeInBytes = size
+    while (sizeInBytes >= 1024 && unitIndex < units.length - 1) {
+      sizeInBytes /= 1024
+      unitIndex++
+    }
+    return `${sizeInBytes.toFixed(2)} ${units[unitIndex]}`
+  }
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Upload Document"
+      okBtnLabel="Upload"
+      onOK={onImport}
+      modalSize="max-w-xl"
+      isLoading={isOverlayShow}
+    >
+      {!file ? (
+        <div>
+          <div
+            className={clsx(
+              'cursor-pointer border-dashed border border-sky-500 p-8 text-center rounded-xl hover:bg-sky-800 transition duration-300',
+              isDragging ? 'text-white' : 'text-sky-500 hover:text-white',
+              { 'bg-sky-800': isDragging }
+            )}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => inputRef.current?.click()}
+          >
+            <input
+              ref={inputRef}
+              type='file'
+              className='hidden'
+              accept='text/csv, application/pdf, text/plain, application/json'
+              onChange={handleChange}
+            />
+            <FaFileUpload className="mx-auto mb-3 text-5xl" />
+            <div className='text-sm'>
+              Browse files from your computer. Max size: 8mb. Accepted formats: .csv, .json, .txt, .pdf
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <div className="flex items-center gap-4">
+            <FaFileUpload className="text-4xl text-gray-400" />
+            <div>
+              <div className="text-lg">{file.name}</div>
+              <div className="text-gray-500">
+                {formatFileSize(file.size)}
+              </div>
+            </div>
+            <div className="ml-auto mr-0">
+              <button
+                className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/20 rounded-full transition-all duration-300"
+                onClick={() => setFile(null)}
+              >
+                <FaTrash className="text-red-500" size={24} />
+              </button>
+            </div>
+          </div>
+          {!!file && (
+            <>
+              <div className="my-6 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-700 before:translate-y-1/2">
+                <div className="px-2.5 text-center text-nowrap">Description</div>
+              </div>
+              <div>
+                <textarea
+                  className="w-full h-24 resize-none border border-gray-600 rounded-md p-2 focus:outline-none focus:border-sky-500 transition-all duration-300"
+                  placeholder="Explain what the document is about. Provide as many details as possible for agent to understand."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </Modal>
+  )
+}
 
 const AgentKnowledge = () => {
-  // const [isOverlayShow, setIsOverlayShow] = useState(false)
+  const [isOverlayShow, setIsOverlayShow] = useState(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isChanged, setIsChanged] = useState(false)
+
+  useEffect(() => {
+  }, [isChanged])
+
   return (
     <Content>
       <div className="flex flex-col gap-8 h-full">
@@ -13,6 +252,7 @@ const AgentKnowledge = () => {
           <div className="flex gap-2 items-center">
             <button
               className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700"
+              onClick={() => setIsCreateModalOpen(true)}
             >
               <FaPlus />
               Add
@@ -25,6 +265,7 @@ const AgentKnowledge = () => {
             <div className="my-3">
               <button
                 className="flex gap-2 items-center cursor-pointer bg-transparent text-sky-600 border border-sky-600 px-4 py-2 mx-auto rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
+                onClick={() => setIsCreateModalOpen(true)}
               >
                 <FaPlus />
                 Add Document
@@ -33,6 +274,13 @@ const AgentKnowledge = () => {
           </div>
         </div>
       </div>
+      <CreateKnowledgeModal
+        isOpen={isCreateModalOpen}
+        isOverlayShow={isOverlayShow}
+        setIsChanged={setIsChanged}
+        setIsOpen={setIsCreateModalOpen}
+        setIsOverlayShow={setIsOverlayShow}
+      />
     </Content>
   )
 }
