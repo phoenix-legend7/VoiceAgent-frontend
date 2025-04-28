@@ -6,11 +6,15 @@ interface Props {
   className?: string
   isOverlayShown?: boolean
   children?: React.ReactNode
+  onScroll?: (e: React.UIEvent<HTMLDivElement, UIEvent>) => Promise<void>
 }
 
-const Content: FC<Props> = ({ className, isOverlayShown, children }) => {
+const Content: FC<Props> = ({ className, isOverlayShown, children, onScroll }) => {
   return (
-    <div className={clsx(className, 'relative flex flex-col justify-between h-full px-6 pt-8 ml-20 md:ml-0')}>
+    <div
+      className={clsx(className, 'relative flex flex-col justify-between h-full overflow-y-auto px-6 pt-8 ml-20 md:ml-0')}
+      onScroll={onScroll}
+    >
       {isOverlayShown && (
         <div className="absolute inset-0 bg-gray-950/90 cursor-wait z-50">
           <div className="flex items-center justify-center h-full">

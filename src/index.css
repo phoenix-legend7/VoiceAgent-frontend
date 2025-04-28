@@ -6,6 +6,7 @@
   --animate-text: text 5s ease infinite;
   --animate-fadeIn: fadeIn 0.3s ease-in-out;
   --animate-marquee-move: marquee-move 10s linear infinite;
+  --animate-background: background-animate 3s linear infinite;
 
   @keyframes text {
     0%, 100% {
@@ -32,6 +33,17 @@
   @keyframes marquee-move {
     to {
       transform: translateX(-50%);
+    }
+  }
+
+  @keyframes background-animate {
+    0% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+    100% {
+      background-size: 200% 200%;
+      background-position: left center;
     }
   }
 }

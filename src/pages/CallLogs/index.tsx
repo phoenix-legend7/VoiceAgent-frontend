@@ -94,7 +94,7 @@ const CallLogs = () => {
   }, [selectedAgent])
 
   return (
-    <Content>
+    <Content onScroll={handleScrollDown}>
       <div className="flex flex-col gap-3 shrink-0">
         <div className="flex flex-col gap-1 justify-center">
           <h2 className="text-2xl font-bold">Call Logs</h2>
@@ -120,10 +120,7 @@ const CallLogs = () => {
             />
           </div>
         </div>
-        <div
-          className="flex flex-col justify-between grow gap-4 rounded-lg bg-gray-900/80 overflow-auto"
-          onScroll={handleScrollDown}
-        >
+        <div className="flex flex-col justify-between grow gap-4 rounded-lg bg-gray-900/80 overflow-auto">
           <Table className="text-nowrap text-sm">
             <thead>
               <tr className="border-b border-gray-700">
@@ -185,9 +182,16 @@ const CallLogs = () => {
                   </TableCell>
                 </TableRow>
               ))}
+              {isOverlayShow && (
+                <TableRow>
+                  <td colSpan={7} className="pb-2">
+                    <div className="h-1 w-full bg-gradient-to-r from-sky-500 via-sky-950 to-sky-500 animate-background" />
+                  </td>
+                </TableRow>
+              )}
             </tbody>
           </Table>
-          {!totalLogs.length && (
+          {!totalLogs.length && !isOverlayShow && (
             <div className="w-full mt-6 text-center my-4 p-6">
               <div className="text-gray-400">No call logs found</div>
             </div>
