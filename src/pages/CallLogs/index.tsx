@@ -50,6 +50,7 @@ const CallLogs = () => {
       if (data.items.length < 20) {
         setEnableNext(false)
       }
+      setNextStartAt(parseInt(data.pagination.next_start_at.toFixed(0)))
       setTatalLogs([
         ...totalLogs,
         ...data.items
@@ -143,7 +144,7 @@ const CallLogs = () => {
                     {!!log.agent_id && (
                       <Link
                         to={`/agents/${log.agent_id}`}
-                        className="flex items-center gap-3 rounded bg-gray-700 px-2 py-1"
+                        className="flex items-center gap-3 rounded w-fit bg-gray-700 px-2 py-1"
                       >
                         {(() => {
                           const agent = agents.find((agent) => agent.id === log.agent_id)
