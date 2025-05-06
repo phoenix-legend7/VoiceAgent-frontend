@@ -194,8 +194,8 @@ const CampaignDetails = () => {
                       <TableCell>
                         {Object.keys(record.metadata).map((key, index) => (
                           <div key={`metadata-${index}`}>
-                            <span className="font-bold">{record.metadata[key]}: </span>
-                            <span>{key}</span>
+                            <span className="font-bold">{key}: </span>
+                            <span>{record.metadata[key]}</span>
                           </div>
                         ))}
                       </TableCell>
