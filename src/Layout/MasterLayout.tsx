@@ -40,7 +40,7 @@ const MasterLayout = () => {
       <div className="flex justify-between min-h-16 pr-6 pl-3 md:pl-6 bg-gray-900 text-white">
         <div className="flex items-center">
           <div
-            className="flex items-center px-3 hover:text-sky-600 transition-all duration-300 cursor-pointer"
+            className="flex items-center px-3 hover:text-sky-600 transition-all duration-300 cursor-pointer md:hidden"
             onClick={() => setIsOpen(true)}
             id="sidebar-toggle"
           >
