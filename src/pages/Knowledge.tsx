@@ -16,7 +16,7 @@ interface CreateKnowledgeModalProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>
 }
 
-const CreateKnowledgeModal: FC<CreateKnowledgeModalProps> = ({
+export const CreateKnowledgeModal: FC<CreateKnowledgeModalProps> = ({
   isOpen,
   isOverlayShow,
   setIsChanged,

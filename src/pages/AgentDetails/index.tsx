@@ -18,6 +18,7 @@ import AgentPrompt from "./AgentPrompt"
 import CallAgent from "./CallAgent"
 import AdvancedSettings from "./AdvancedSettings"
 import AgentActions from "./AgentActions"
+import KnowledgeCard from "./Knowledge"
 
 const AgentDetails = () => {
   const { id } = useParams()
@@ -208,6 +209,11 @@ const AgentDetails = () => {
             </div>
             <div className="p-3 w-full xl:w-1/3">
               <CallAgent agent={agent} />
+              <KnowledgeCard
+                agent={agent}
+                setAgent={setAgent}
+                setIsOverlayShow={setIsOverlayShow}
+              />
             </div>
           </div>
         </div>

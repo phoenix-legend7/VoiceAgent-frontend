@@ -21,6 +21,7 @@ interface ModalProps {
   cancelBtnLabel?: string;
   cancelBtnIcon?: ReactNode;
   modalSize?: string;
+  zIndex?: number;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -42,6 +43,7 @@ const Modal: React.FC<ModalProps> = ({
   cancelBtnLabel = 'Cancel',
   cancelBtnIcon,
   modalSize = 'max-w-md',
+  zIndex = 50,
 }) => {
   if (!isOpen) return null;
 
@@ -53,8 +55,9 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/70"
+      className="fixed inset-0 flex items-center justify-center bg-gray-950/70"
       onClick={handleBackdropClick}
+      style={{ zIndex }}
     >
       <div
         className={clsx(
