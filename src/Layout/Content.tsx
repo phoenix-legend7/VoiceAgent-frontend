@@ -12,7 +12,7 @@ interface Props {
 const Content: FC<Props> = ({ className, isOverlayShown, children, onScroll }) => {
   return (
     <div
-      className={clsx(className, 'relative flex flex-col justify-between h-full overflow-y-auto px-6 pt-8 ml-20 md:ml-0')}
+      className={clsx(className, 'relative flex flex-col justify-between h-full overflow-y-auto px-6 pt-8')}
       onScroll={onScroll}
     >
       {isOverlayShown && (
