@@ -151,8 +151,8 @@ const Campaigns = () => {
                       <Link to={`/campaigns/${campaign.id}`}>
                         <div className="flex items-center gap-2">
                           {/* bg: rgb(29, 41, 57), text-color: rgb(151, 161, 186) */}
-                          <div className="w-12 h-12 rounded-md flex items-center justify-center bg-gray-800 text-gray-400">
-                            <FaBullhorn className="w-1/3 h-1/3" />
+                          <div className="p-4 rounded-md flex items-center justify-center bg-gray-800 text-gray-400">
+                            <FaBullhorn size={16} />
                           </div>
                           <div>
                             {campaign.name}

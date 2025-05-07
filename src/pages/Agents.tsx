@@ -226,8 +226,8 @@ const Agents = () => {
                       <Link to={`/agents/${agent.id}`}>
                         <div className="flex items-center gap-2">
                           {/* bg: rgb(29, 41, 57), text-color: rgb(151, 161, 186) */}
-                          <div className="w-16 h-16 rounded-md flex items-center justify-center bg-gray-800 text-gray-400">
-                            <FaUserAlt className="w-1/2 h-1/2" />
+                          <div className="p-3 rounded-md flex items-center justify-center bg-gray-800 text-gray-400">
+                            <FaUserAlt size={24} />
                           </div>
                           <div>
                             {agent.name}
