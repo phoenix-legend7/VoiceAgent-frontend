@@ -14,6 +14,7 @@ import ImportRecordModal from "./ImportRecordsModal"
 import AddRecordModal from "./AddRecordModal"
 import ConfirmStartCampaign from "./ConfirmStart"
 import SetCallerPhone from "./SetCallerPhone"
+import PaginationComponent from "../../components/PaginationComponent"
 
 const CampaignDetails = () => {
   const { id } = useParams()
@@ -24,6 +25,8 @@ const CampaignDetails = () => {
   const [isAddRecordModalOpen, setIsAddRecordModalOpen] = useState(false)
   const [isConfirmStartModalOpen, setIsConfirmStartModalOpen] = useState(false)
   const [isSetCallerPhoneModalOpen, setIsCallerPhoneModalOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const limit = 10
 
   useEffect(() => {
     const fetchCampaign = async () => {
@@ -174,7 +177,15 @@ const CampaignDetails = () => {
               />
               <div>Include extra metadata in agent prompt</div>
             </div>
-            <div className="mt-8 rounded-xl text-sm bg-gray-900 overflow-x-auto">
+            <div className="mt-8">
+              <PaginationComponent
+                currentPage={currentPage}
+                limit={limit}
+                setPage={setCurrentPage}
+                totalCounts={campaign.records.length}
+              />
+            </div>
+            <div className="mt-3 rounded-xl text-sm bg-gray-900 overflow-x-auto">
               <Table>
                 <thead>
                   <tr className="border-b border-gray-700">
@@ -185,7 +196,7 @@ const CampaignDetails = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {campaign.records.map((record, index) => (
+                  {campaign.records.slice(currentPage * limit - limit, currentPage * limit).map((record, index) => (
                     <TableRow key={`record-${index}`}>
                       <TableCell>{record.phone}</TableCell>
                       <TableCell>
@@ -225,6 +236,14 @@ const CampaignDetails = () => {
                   </div>
                 </div>
               )}
+            </div>
+            <div className="my-3">
+              <PaginationComponent
+                currentPage={currentPage}
+                limit={limit}
+                setPage={setCurrentPage}
+                totalCounts={campaign.records.length}
+              />
             </div>
           </div>
           <ImportRecordModal
