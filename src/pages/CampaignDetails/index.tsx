@@ -5,16 +5,16 @@ import { toast } from "react-toastify"
 
 import axiosInstance from "../../core/axiosInstance"
 import { CallStatusBadge, CampaignStatusBadge } from "../../components/StatusBadge"
-import NotFound from "../error/404"
+import PaginationComponent from "../../components/PaginationComponent"
 import Content from "../../Layout/Content"
 import { SwtichWithLabel } from "../../library/FormField"
 import Table, { TableCell, TableRow } from "../../library/Table"
 import { CampaignTypeRead } from "../../models/campaign"
+import NotFound from "../error/404"
 import ImportRecordModal from "./ImportRecordsModal"
 import AddRecordModal from "./AddRecordModal"
 import ConfirmStartCampaign from "./ConfirmStart"
 import SetCallerPhone from "./SetCallerPhone"
-import PaginationComponent from "../../components/PaginationComponent"
 
 const CampaignDetails = () => {
   const { id } = useParams()
@@ -112,10 +112,10 @@ const CampaignDetails = () => {
               <div>Campaigns - List</div>
             </Link>
           </div>
-          <div className="mt-8 px-6">
-            <div className="flex flex-wrap justify-between items-center">
+          <div className="mt-8">
+            <div className="flex flex-wrap justify-between items-center gap-4">
               <div className="text-2xl font-semibold">Campaign: {campaign.name}</div>
-              <div className="flex gap-4">
+              <div className="flex gap-x-4 gap-y-2 flex-wrap">
                 <button
                   className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
                   onClick={() => setIsImportRecordModalOpen(true)}
