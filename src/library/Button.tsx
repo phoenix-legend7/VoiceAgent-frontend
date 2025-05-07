@@ -4,10 +4,11 @@ interface ButtonProps {
   children: React.ReactNode;
   className?: string;
   isActive?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
-export const GradientButton: React.FC<ButtonProps> = ({ children, className, onClick }) => {
+export const GradientButton: React.FC<ButtonProps> = ({ children, className, onClick, disabled }) => {
   return (
     <button
       className={clsx(
@@ -15,13 +16,14 @@ export const GradientButton: React.FC<ButtonProps> = ({ children, className, onC
         className
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>
   );
 };
 
-export const RoundedButton: React.FC<ButtonProps> = ({ children, className, onClick, isActive }) => {
+export const RoundedButton: React.FC<ButtonProps> = ({ children, className, onClick, isActive, disabled }) => {
   return (
     <button
       className={clsx(
@@ -30,13 +32,14 @@ export const RoundedButton: React.FC<ButtonProps> = ({ children, className, onCl
         className
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>
   );
 };
 
-export const TransparentButton: React.FC<ButtonProps> = ({ children, className, onClick }) => {
+export const TransparentButton: React.FC<ButtonProps> = ({ children, className, onClick, disabled }) => {
   return (
     <button
       className={clsx(
@@ -44,6 +47,7 @@ export const TransparentButton: React.FC<ButtonProps> = ({ children, className, 
         className
       )}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </button>

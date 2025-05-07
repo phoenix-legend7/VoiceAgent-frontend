@@ -86,6 +86,7 @@ const Modal: React.FC<ModalProps> = ({
           {!hideOKButton && (
             <RoundedButton
               onClick={onOK}
+              disabled={isLoading}
               className={clsx(isLoading && 'opacity-70 cursor-not-allowed')}
             >
               {isLoading ? (
