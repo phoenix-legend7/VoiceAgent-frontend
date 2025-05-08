@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { useState, useRef, useEffect, FC } from 'react';
 import { createPortal } from 'react-dom';
+import { FaTimes } from 'react-icons/fa';
 import { SelectOptionType } from '../models/common';
 
 interface Props {
@@ -142,7 +143,7 @@ const Select: FC<Props> = ({
         }}
       >
         {isSearchable && (
-          <div className="p-2 border-b">
+          <div className="p-2 border-b border-gray-500">
             <input
               type="text"
               className="w-full p-1 border border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
@@ -173,13 +174,6 @@ const Select: FC<Props> = ({
                 onMouseEnter={() => setHighlightedIndex(index)}
               >
                 <div className="flex items-center gap-2">
-                  {isMulti && (
-                    <input
-                      type="checkbox"
-                      checked={isSelected(option)}
-                      readOnly
-                    />
-                  )}
                   {option.icon}
                   {option.label}
                 </div>
@@ -215,16 +209,16 @@ const Select: FC<Props> = ({
             (value as SelectOptionType[]).map(option => (
               <span
                 key={option.value}
-                className="flex items-center bg-gray-900 rounded px-2 py-1 text-sm gap-1"
+                className="flex items-center bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm gap-1"
               >
                 {option.icon}
                 {option.label}
                 <button
                   type="button"
-                  className="text-gray-500 hover:text-gray-700"
+                  className="cursor-pointer text-gray-700 hover:text-gray-500"
                   onClick={(e) => removeOption(option, e)}
                 >
-                  ×
+                  <FaTimes />
                 </button>
               </span>
             ))
