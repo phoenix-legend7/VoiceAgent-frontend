@@ -243,7 +243,7 @@ const AgentKnowledge = () => {
   }, [isChanged])
 
   return (
-    <Content>
+    <Content isOverlayShown={isOverlayShow}>
       <div className="flex flex-col gap-8 h-full">
         <div className="flex justify-between flex-wrap gap-4">
           <div className="flex flex-col gap-1 justify-center">
