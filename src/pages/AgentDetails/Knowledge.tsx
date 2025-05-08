@@ -246,6 +246,12 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
                 setActivePhrase('')
               }
             }}
+            onBlur={() => {
+              if (activePhrase.trim() !== '') {
+                setPhrases([...phrases, activePhrase])
+                setActivePhrase('')
+              }
+            }}
           />
           <div className="flex items-center flex-wrap mt-4 text-sm gap-x-3 gap-y-2">
             {phrases.map((phrase, index) => (

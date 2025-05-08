@@ -19,6 +19,7 @@ import CallAgent from "./CallAgent"
 import AdvancedSettings from "./AdvancedSettings"
 import AgentActions from "./AgentActions"
 import KnowledgeCard from "./Knowledge"
+import ToolCard from "./AgentTools"
 
 const AgentDetails = () => {
   const { id } = useParams()
@@ -211,6 +212,12 @@ const AgentDetails = () => {
               <CallAgent agent={agent} />
               <KnowledgeCard
                 agent={agent}
+                setAgent={setAgent}
+                setIsOverlayShow={setIsOverlayShow}
+              />
+              <ToolCard
+                agent={agent}
+                isOverlayShow={isOverlayShow}
                 setAgent={setAgent}
                 setIsOverlayShow={setIsOverlayShow}
               />
