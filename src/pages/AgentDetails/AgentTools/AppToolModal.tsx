@@ -1,11 +1,7 @@
 import { Dispatch, FC, SetStateAction } from "react"
+import appTools from "../../../consts/appTools"
 import Modal from "../../../library/ModalProvider"
 import Table, { TableCell, TableRow } from "../../../library/Table"
-
-export const appTools = [
-  { name: 'get_available_meeting_slots', description: 'Get available meeting slots from calendar' },
-  { name: 'book_meeting_slot', description: 'Book meeting slot on calendar' }
-]
 
 interface AppToolModalProps {
   isOverlayShow: boolean

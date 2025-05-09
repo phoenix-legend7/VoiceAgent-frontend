@@ -91,12 +91,12 @@ export interface AgentConfigType {
   custom_llm_websocket: string | null
   language: LanguageType
   vad_threshold: number | null
-  llm: null | {
+  llm?: null | {
     model: LLMType
     temperature?: number
-    history_settings: null | {
-      history_message_limit: number | null
-      history_tool_result_limit: number | null
+    history_settings?: null | {
+      history_message_limit?: number | null
+      history_tool_result_limit?: number | null
     }
   }
   session_timeout: null | {

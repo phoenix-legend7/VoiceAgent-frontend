@@ -20,6 +20,7 @@ import AdvancedSettings from "./AdvancedSettings"
 import AgentActions from "./AgentActions"
 import KnowledgeCard from "./Knowledge"
 import ToolCard from "./AgentTools"
+import EditAgentModal from "./EditAgentModal"
 
 const AgentDetails = () => {
   const { id } = useParams()
@@ -28,6 +29,7 @@ const AgentDetails = () => {
   const [isOverlayShow, setIsOverlayShow] = useState(true)
   const [isEditAgentName, setIsEditAgentName] = useState(false)
   const [editAgentName, setEditAgentName] = useState('')
+  const [showEditAgentModal, setShowEditAgentModal] = useState(false)
 
   useEffect(() => {
     const fetchVoices = async () => {
@@ -151,39 +153,42 @@ const AgentDetails = () => {
             <div className="p-3 w-full xl:w-2/3">
               <div className="flex flex-wrap items-center justify-between">
                 <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
-                  <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
-                    <PiOpenAiLogo size={20} className="mr-4" />
-                    <div className="grow">
+                  <div
+                    className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1"
+                    onClick={() => setShowEditAgentModal(true)}
+                  >
+                    <PiOpenAiLogo className="mr-4 min-w-5 min-h-5" />
+                    <div className="grow shrink-0 basis-0 overflow-hidden">
                       <div className="text-sm text-gray-400 leading-[1.6]">Model</div>
-                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap">
+                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap truncate">
                         {agent.config.llm?.model || 'Millis LLM'}
                       </div>
                     </div>
-                    <FaSlidersH size={20} className="my-4 mx-2 text-gray-400" />
+                    <FaSlidersH className="my-4 mx-2 text-gray-400 min-w-5 min-h-5" />
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
                   <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
-                    <BsSoundwave size={20} className="mr-4" />
-                    <div className="grow">
+                    <BsSoundwave className="mr-4 min-w-5 min-h-5" />
+                    <div className="grow shrink-0 basis-0 overflow-hidden">
                       <div className="text-sm text-gray-400 leading-[1.6]">Voice</div>
-                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap">
+                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap truncate">
                         (Rachel) {agent.config.voice.provider || 'elevenlabs'}
                       </div>
                     </div>
-                    <FaSlidersH size={20} className="my-4 mx-2 text-gray-400" />
+                    <FaSlidersH className="my-4 mx-2 text-gray-400 min-w-5 min-h-5" />
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
                   <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
-                    <BiWorld size={20} className="mr-4" />
-                    <div className="grow">
+                    <BiWorld className="mr-4 min-w-5 min-h-5" />
+                    <div className="grow shrink-0 basis-0 overflow-hidden">
                       <div className="text-sm text-gray-400 leading-[1.6]">Language</div>
-                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap">
+                      <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap truncate">
                         {agent.config.language || 'English'}
                       </div>
                     </div>
-                    <FaSlidersH size={20} className="my-4 mx-2 text-gray-400" />
+                    <FaSlidersH className="my-4 mx-2 text-gray-400 min-w-5 min-h-5" />
                   </div>
                 </div>
               </div>
@@ -223,6 +228,14 @@ const AgentDetails = () => {
               />
             </div>
           </div>
+          <EditAgentModal
+            agent={agent}
+            isOverlayShow={isOverlayShow}
+            showEditAgentModal={showEditAgentModal}
+            setAgent={setAgent}
+            setIsOverlayShow={setIsOverlayShow}
+            setShowEditAgentModal={setShowEditAgentModal}
+          />
         </div>
       ) : (
         <NotFound />
