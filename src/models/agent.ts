@@ -2,14 +2,16 @@ import LanguageType from "./language"
 import LLMType from "./llm"
 import { SpeechToTextProvider, VoiceProvider } from "./provider"
 
+export interface AgentVoiceConfigType {
+  provider: VoiceProvider
+  voice_id?: string
+  model?: string
+  settings?: { [key: string]: string | number | boolean | null }
+}
+
 export interface AgentConfigType {
   prompt: string
-  voice: {
-    provider: VoiceProvider
-    voice_id: string | null
-    model: string | null
-    settings: { [key: string]: string | number | boolean | null } | null
-  }
+  voice: AgentVoiceConfigType
   flow: {
     user_start_first: boolean | null
     interruption: null | {
