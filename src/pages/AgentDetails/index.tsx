@@ -20,6 +20,7 @@ import AdvancedSettings from "./AdvancedSettings"
 import AgentActions from "./AgentActions"
 import KnowledgeCard from "./Knowledge"
 import ToolCard from "./AgentTools"
+import AgentVoiceModal from "./AgentVoiceModal"
 import EditAgentModal from "./EditAgentModal"
 
 const AgentDetails = () => {
@@ -30,6 +31,7 @@ const AgentDetails = () => {
   const [isEditAgentName, setIsEditAgentName] = useState(false)
   const [editAgentName, setEditAgentName] = useState('')
   const [showEditAgentModal, setShowEditAgentModal] = useState(false)
+  const [showAgentVoiceModal, setShowAgentVoiceModal] = useState(false)
 
   useEffect(() => {
     const fetchVoices = async () => {
@@ -38,9 +40,6 @@ const AgentDetails = () => {
     }
     fetchVoices()
   }, [])
-  useEffect(() => {
-    console.log(voices)
-  }, [voices])
   useEffect(() => {
     setIsOverlayShow(true)
     const fetchAgent = async () => {
@@ -168,12 +167,16 @@ const AgentDetails = () => {
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
-                  <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
+                  <div
+                    className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1"
+                    onClick={() => setShowAgentVoiceModal(true)}
+                  >
                     <BsSoundwave className="mr-4 min-w-5 min-h-5" />
                     <div className="grow shrink-0 basis-0 overflow-hidden">
                       <div className="text-sm text-gray-400 leading-[1.6]">Voice</div>
                       <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap truncate">
-                        (Rachel) {agent.config.voice.provider || 'elevenlabs'}
+                        ({voices.find(voice => voice.voice_id === agent.config.voice.voice_id)?.name || ''}){' '}
+                        {agent.config.voice.provider || 'elevenlabs'}
                       </div>
                     </div>
                     <FaSlidersH className="my-4 mx-2 text-gray-400 min-w-5 min-h-5" />
@@ -235,6 +238,15 @@ const AgentDetails = () => {
             setAgent={setAgent}
             setIsOverlayShow={setIsOverlayShow}
             setShowEditAgentModal={setShowEditAgentModal}
+          />
+          <AgentVoiceModal
+            agent={agent}
+            isOverlayShow={isOverlayShow}
+            setAgent={setAgent}
+            setIsOverlayShow={setIsOverlayShow}
+            setShowAgentVoiceModal={setShowAgentVoiceModal}
+            showAgentVoiceModal={showAgentVoiceModal}
+            voices={voices}
           />
         </div>
       ) : (

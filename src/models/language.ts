@@ -1,3 +1,5 @@
-type LanguageType = 'ln' | 'cy' | 'wo' | 'cs' | 'hy' | 'nl' | 'ceb' | 'la' | 'en-NZ' | 'ss' | 'lt' | 'ne' | 'fy' | 'oc' | 'yi' | 'tt' | 'bn' | 'fr-CA' | 'sw' | 'th' | 'ms' | 'ka' | 'pa' | 'fi' | 'ig' | 'af' | 'multi' | 'eu' | 'bs' | 'ps' | 'en-AU' | 'si' | 'ff' | 'de' | 'mt' | 'km' | 'pl' | 'nl-BE' | 'fr' | 'en-IN' | 'no' | 'gu' | 'lo' | 'sk' | 'ht' | 'tk' | 'bg' | 'mn' | 'su' | 'ko' | 'it' | 'id' | 'tl' | 'zu' | 'pt-BR' | 'jv' | 'et' | 'ca' | 'sl' | 'ja' | 'lb' | 'gl' | 'zh-TW' | 'hi' | 'ha' | 'th-TH' | 'lv' | 'ast' | 'sq' | 'tr' | 'ar' | 'sv' | 'haw' | 'tg' | 'lg' | 'ba' | 'mk' | 'vi' | 'hu' | 'el' | 'mi' | 'en-US' | 'kn' | 'az' | 'he' | 'hr' | 'ml' | 'kk' | 'es' | 'br' | 'sr' | 'xh' | 'uk' | 'as' | 'ilo' | 'ru' | 'gd' | 'yo' | 'da' | 'sa' | 'fa' | 'es-419' | 'bo' | 'ur' | 'my' | 'nn' | 'mo' | 'so' | 'mr' | 'tn' | 'sd' | 'sn' | 'uz' | 'de-CH' | 'fo' | 'en-GB' | 'zh' | 'ro' | 'pt' | 'or' | 'ga' | 'ta' | 'mg' | 'en' | 'be' | 'am' | 'te' | 'is'
+import languages from "../consts/languages"
+
+type LanguageType = typeof languages[number]
 
 export default LanguageType
