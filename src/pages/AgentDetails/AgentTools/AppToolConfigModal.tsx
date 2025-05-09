@@ -1,12 +1,12 @@
 import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from "react"
+import { toast } from "react-toastify"
+import appTools from "../../../consts/appTools"
+import axiosInstance from "../../../core/axiosInstance"
 import { InputBox } from "../../../library/FormField"
 import Modal from "../../../library/ModalProvider"
 import Select from "../../../library/Select"
 import { AgentTypeRead } from "../../../models/agent"
 import { SelectOptionType } from "../../../models/common"
-import { appTools } from "./AppToolModal"
-import axiosInstance from "../../../core/axiosInstance"
-import { toast } from "react-toastify"
 
 const contactMethodOptions = [
   { label: 'Phone', value: 'phone' },
