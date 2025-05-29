@@ -133,7 +133,6 @@ const AppToolConfigModal: FC<AppToolConfigModalProps> = ({
               value={contactMethodOptions.find((option) => option.value === contactMethod)}
               onChange={(e) => setContactMethod((e as SelectOptionType).value as 'email' | 'phone')}
               className="w-full"
-              menuPortalTarget
             />
           </div>
           <p className="text-sm text-gray-400 my-2">

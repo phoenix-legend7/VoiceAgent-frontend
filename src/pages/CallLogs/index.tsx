@@ -116,7 +116,6 @@ const CallLogs = () => {
                 setTatalLogs([])
                 setEnableNext(true)
               }}
-              menuPortalTarget
               placeholder="Select agent"
             />
           </div>

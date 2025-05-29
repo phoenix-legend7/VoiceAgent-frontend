@@ -2,12 +2,12 @@ import clsx from "clsx"
 import { Dispatch, FC, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
 import { FaCheck, FaPlay, FaRegCopy, FaStop } from "react-icons/fa"
 import { toast } from "react-toastify"
+import { languageOptions } from "../../consts/languages"
 import axiosInstance from "../../core/axiosInstance"
 import Modal from "../../library/ModalProvider"
 import { AgentTypeRead, AgentVoiceConfigType } from "../../models/agent"
 import VoiceType from "../../models/voice"
 import { VoiceProvider } from "../../models/provider"
-import { languageOptions } from "../../consts/languages"
 
 interface ListItemProps {
   selectedVoice?: AgentVoiceConfigType
@@ -128,11 +128,9 @@ const AgentVoiceModal: FC<Props> = ({
   }, [filteredVoices])
 
   useEffect(() => {
-    setSelectedCattegory(voices[0]?.provider)
-  }, [voices])
-  useEffect(() => {
     if (showAgentVoiceModal) {
       setSelectedVoice(agent.config.voice)
+      setSelectedCattegory(agent.config.voice.provider)
     } else {
       setSelectedVoice(undefined)
     }

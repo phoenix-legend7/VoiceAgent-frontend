@@ -12,6 +12,7 @@ import { AgentTypeRead } from "../../models/agent"
 import VoiceType from "../../models/voice"
 import Content from "../../Layout/Content"
 import NotFound from "../error/404"
+import { getLanguage } from "./_utils"
 import WebhookSettings from "./WebhookSettings"
 import ConversionFlow from "./ConversionFlow"
 import AgentPrompt from "./AgentPrompt"
@@ -20,6 +21,7 @@ import AdvancedSettings from "./AdvancedSettings"
 import AgentActions from "./AgentActions"
 import KnowledgeCard from "./Knowledge"
 import ToolCard from "./AgentTools"
+import AgentLanguageModal from "./AgentLanguageModal"
 import AgentVoiceModal from "./AgentVoiceModal"
 import EditAgentModal from "./EditAgentModal"
 
@@ -32,14 +34,20 @@ const AgentDetails = () => {
   const [editAgentName, setEditAgentName] = useState('')
   const [showEditAgentModal, setShowEditAgentModal] = useState(false)
   const [showAgentVoiceModal, setShowAgentVoiceModal] = useState(false)
+  const [showAgentLangModal, setShowAgentLangModal] = useState(false)
 
   useEffect(() => {
-    const fetchVoices = async () => {
-      const response = await axiosInstance.get('/voice/custom', { params: { lang_code: 'en-US' } })
+    const fetchVoices = async (lang: string) => {
+      const response = await axiosInstance.get(
+        '/voice/custom',
+         { params: { lang_code: lang } }
+      )
       setVoices(response.data)
     }
-    fetchVoices()
-  }, [])
+    if (agent) {
+      fetchVoices(agent.config.language || 'en-US')
+    }
+  }, [agent])
   useEffect(() => {
     setIsOverlayShow(true)
     const fetchAgent = async () => {
@@ -183,12 +191,15 @@ const AgentDetails = () => {
                   </div>
                 </div>
                 <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
-                  <div className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1">
+                  <div
+                    className="flex items-center justify-between cursor-pointer rounded-md bg-gray-900 px-2 py-1"
+                    onClick={() => setShowAgentLangModal(true)}
+                  >
                     <BiWorld className="mr-4 min-w-5 min-h-5" />
                     <div className="grow shrink-0 basis-0 overflow-hidden">
                       <div className="text-sm text-gray-400 leading-[1.6]">Language</div>
                       <div className="text-xs text-sky-400 leading-[2.46] uppercase text-nowrap truncate">
-                        {agent.config.language || 'English'}
+                        {getLanguage(agent)}
                       </div>
                     </div>
                     <FaSlidersH className="my-4 mx-2 text-gray-400 min-w-5 min-h-5" />
@@ -247,6 +258,16 @@ const AgentDetails = () => {
             setShowAgentVoiceModal={setShowAgentVoiceModal}
             showAgentVoiceModal={showAgentVoiceModal}
             voices={voices}
+          />
+          <AgentLanguageModal
+            agent={agent}
+            isOverlayShow={isOverlayShow}
+            showAgentLangModal={showAgentLangModal}
+            voices={voices}
+            setAgent={setAgent}
+            setIsOverlayShow={setIsOverlayShow}
+            setShowAgentLangModal={setShowAgentLangModal}
+            setVoices={setVoices}
           />
         </div>
       ) : (

@@ -31,7 +31,7 @@ const CustomLlmModal: FC<Props> = ({
   const onClose = () => {
     setIsModalOpen(false)
   }
-  const handleSave = async (websocketUrl: string | null) => {
+  const handleSave = async (websocketUrl?: string) => {
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(
@@ -79,7 +79,7 @@ const CustomLlmModal: FC<Props> = ({
       />
       <button
         className="mt-6 cursor-pointer bg-red-900/10 text-red-500 font-bold px-5 py-2 rounded-md hover:bg-red-900/20 disabled:cursor-not-allowed disabled:hover:bg-red-900/10 transition-all duration-300 w-full"
-        onClick={() => handleSave(null)}
+        onClick={() => handleSave()}
         disabled={!customLlmUrl || isOverlayShow}
       >
         Delete

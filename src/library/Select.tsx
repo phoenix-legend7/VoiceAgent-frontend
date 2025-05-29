@@ -10,7 +10,7 @@ interface Props {
   isMulti?: boolean;
   isSearchable?: boolean;
   menuClassName?: string;
-  menuPortalTarget?: boolean;
+  menuPortalTarget?: HTMLDivElement | null;
   placeholder?: string;
   value?: SelectOptionType | SelectOptionType[];
   onChange?: (e: SelectOptionType | SelectOptionType[]) => void;
@@ -20,7 +20,7 @@ const Select: FC<Props> = ({
   options,
   className = '',
   menuClassName,
-  menuPortalTarget = true,
+  menuPortalTarget = document.body,
   isMulti = false,
   isSearchable = false,
   placeholder = 'Select...',
@@ -185,7 +185,7 @@ const Select: FC<Props> = ({
     );
 
     if (menuPortalTarget) {
-      return createPortal(menuContent, document.body);
+      return createPortal(menuContent, menuPortalTarget);
     }
     return menuContent;
   }

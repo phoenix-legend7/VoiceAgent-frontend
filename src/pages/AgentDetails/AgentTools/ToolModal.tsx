@@ -57,7 +57,7 @@ const ToolModal: FC<ToolModalProps> = ({
   const [webhookExtraParams, setWebhookExtraParams] = useState<string[]>([])
   const [showAdvancedConfig, setShowAdvancedConfig] = useState(false)
   const [webFormParam, setWebFormParam] = useState<{ name: string, type: string }>({ name: '', type: '' })
-  const [preActionPhrase, setPreActionPhrase] = useState<'strict' | 'flexible' | null>(null)
+  const [preActionPhrase, setPreActionPhrase] = useState<'strict' | 'flexible'>()
   const [preActionPhraseValues, setPreActionPhraseValues] = useState<string[]>([])
   const [inputPhrase, setInputPhrase] = useState<string>('')
 
@@ -83,7 +83,7 @@ const ToolModal: FC<ToolModalProps> = ({
       setWebhookExtraParams([])
       setShowAdvancedConfig(false)
       setWebFormParam({ name: '', type: '' })
-      setPreActionPhrase(null)
+      setPreActionPhrase(undefined)
       setPreActionPhraseValues([])
       setInputPhrase('')
     }
@@ -146,7 +146,7 @@ const ToolModal: FC<ToolModalProps> = ({
           tool.description = functionDescription
           tool.name = functionName
           tool.response_mode = preActionPhrase
-          tool.messages = preActionPhrase ? preActionPhraseValues : null
+          tool.messages = preActionPhrase ? preActionPhraseValues : undefined
           tool.webhook = webhookUrl
           tool.method = webhookMethod
           tool.run_after_call = runFunctionAfterCall
@@ -164,15 +164,13 @@ const ToolModal: FC<ToolModalProps> = ({
           description: functionDescription,
           name: functionName,
           response_mode: preActionPhrase,
-          messages: preActionPhrase ? preActionPhraseValues : null,
+          messages: preActionPhrase ? preActionPhraseValues : undefined,
           webhook: webhookUrl,
           method: webhookMethod,
           run_after_call: runFunctionAfterCall,
           header: headers,
           params: webhookParams,
           timeout: webhookTimeout,
-          exclude_session_id: null,
-          execute_after_message: null,
         })
       }
       editData = { ...agent, config: { ...agent.config, tools } }
@@ -192,7 +190,7 @@ const ToolModal: FC<ToolModalProps> = ({
           func.description = functionDescription
           func.name = functionName
           func.response_mode = preActionPhrase
-          func.messages = preActionPhrase ? preActionPhraseValues : null
+          func.messages = preActionPhrase ? preActionPhraseValues : undefined
           func.data.param.name = webFormParam.name
           func.data.param.type = webFormParam.type
         }
@@ -392,7 +390,6 @@ const ToolModal: FC<ToolModalProps> = ({
                         onChange={(e) => setWebhookParams(webhookParams.map((param, i) =>
                           i === index ? { ...param, type: (e as SelectOptionType).value as string } : param
                         ))}
-                        menuPortalTarget
                       />
                     </div>
                     <label className="flex items-center gap-2 cursor-pointer">
@@ -462,7 +459,6 @@ const ToolModal: FC<ToolModalProps> = ({
                   options={extraParamsOptions}
                   value={extraParamsOptions.filter((option) => webhookExtraParams.some((param) => param === option.value))}
                   onChange={(e) => setWebhookExtraParams((e as SelectOptionType[]).map(o => o.value as string))}
-                  menuPortalTarget
                 />
               </div>
             </div>
@@ -490,7 +486,6 @@ const ToolModal: FC<ToolModalProps> = ({
                 onChange={(e) =>
                   setWebFormParam({ ...webFormParam, type: (e as SelectOptionType).value as string })
                 }
-                menuPortalTarget
               />
             </div>
           </div>
@@ -507,8 +502,8 @@ const ToolModal: FC<ToolModalProps> = ({
             <input
               type="radio"
               className="size-5 cursor-pointer"
-              checked={preActionPhrase === null}
-              onChange={() => setPreActionPhrase(null)}
+              checked={preActionPhrase === undefined}
+              onChange={() => setPreActionPhrase(undefined)}
             />
             <div className="flex flex-col w-full border-b border-gray-600 py-2">
               <div>Disable</div>
