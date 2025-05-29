@@ -118,7 +118,6 @@ const ManageSipEndpointModal: FC<Props> = ({
             options={regionOptions}
             value={regionOptions.find(option => option.value === selectedRegion)}
             onChange={(e) => setSelectedRegion((e as SelectOptionType).value as string)}
-            menuPortalTarget
           />
         </div>
         <div className="flex items-center">

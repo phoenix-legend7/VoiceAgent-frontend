@@ -100,7 +100,6 @@ const SetAgentModal: FC<SetAgentModalProps> = ({
             }
           }}
           placeholder="Select Agent"
-          menuPortalTarget
         />
         {!!selectedPhoneNumber?.agent_id && (
           <>

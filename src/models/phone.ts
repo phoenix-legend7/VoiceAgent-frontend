@@ -2,14 +2,14 @@ import { AgentConfigType } from "./agent"
 
 interface PhoneTypeBase {
   id: string
-  agent_id: string | null
-  agent_config_override: AgentConfigType | null
+  agent_id: string
+  agent_config_override: AgentConfigType
 }
 
 export interface PhoneTypeRead extends PhoneTypeBase {
   create_at: number
   status: string
-  tags: string[] | null
+  tags?: string[]
 }
 
 export default PhoneTypeBase

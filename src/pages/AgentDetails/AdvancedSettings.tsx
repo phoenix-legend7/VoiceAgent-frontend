@@ -72,7 +72,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
               onChange={(e) => {
                 setEditData({
                   ...editData,
-                  config: { ...editData.config, timezone: e.target.value || null }
+                  config: { ...editData.config, timezone: e.target.value }
                 })
               }}
             >
@@ -97,13 +97,13 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
             </div>
             <div className="flex items-center gap-2">
               <SwtichWithLabel
-                value={editData.config.vad_threshold !== null}
+                value={editData.config.vad_threshold !== undefined}
                 onChange={(value) => {
                   setEditData({
                     ...editData,
                     config: {
                       ...editData.config,
-                      vad_threshold: value ? agent.config.vad_threshold ?? 0.65 : null
+                      vad_threshold: value ? agent.config.vad_threshold ?? 0.65 : undefined
                     }
                   })
                 }}
@@ -120,7 +120,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
                   config: { ...editData.config, vad_threshold: value }
                 })
               }}
-              disabled={editData.config.vad_threshold === null}
+              disabled={editData.config.vad_threshold === undefined}
               defaultValue={0.65}
             />
           </div>
@@ -137,13 +137,13 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
             </div>
             <div className="flex items-center gap-2">
               <SwtichWithLabel
-                value={editData.config.call_settings !== null}
+                value={editData.config.call_settings !== undefined}
                 onChange={(value) => {
                   setEditData({
                     ...editData,
                     config: {
                       ...editData.config,
-                      call_settings: value ? agent.config.call_settings || { enable_recording: true } : null
+                      call_settings: value ? agent.config.call_settings || { enable_recording: true } : undefined
                     }
                   })
                 }}
@@ -171,8 +171,8 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
                           config: {
                             ...editData.config,
                             session_timeout: {
-                              max_idle: editData.config.session_timeout?.max_idle ?? null,
-                              message: editData.config.session_timeout?.message ?? null,
+                              max_idle: editData.config.session_timeout?.max_idle,
+                              message: editData.config.session_timeout?.message,
                               max_duration: value
                             }
                           }
@@ -193,8 +193,8 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
                           config: {
                             ...editData.config,
                             session_timeout: {
-                              max_duration: editData.config.session_timeout?.max_duration ?? null,
-                              message: editData.config.session_timeout?.message ?? null,
+                              max_duration: editData.config.session_timeout?.max_duration,
+                              message: editData.config.session_timeout?.message,
                               max_idle: value
                             }
                           }
@@ -216,8 +216,8 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
                           config: {
                             ...editData.config,
                             session_timeout: {
-                              max_duration: editData.config.session_timeout?.max_duration ?? null,
-                              max_idle: editData.config.session_timeout?.max_idle ?? null,
+                              max_duration: editData.config.session_timeout?.max_duration,
+                              max_idle: editData.config.session_timeout?.max_idle,
                               message: value
                             }
                           }

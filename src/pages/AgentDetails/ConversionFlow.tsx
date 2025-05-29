@@ -60,7 +60,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           ...editData.config.flow || {},
           call_transfer: {
             phone: editData.config.flow?.call_transfer?.phone || '',
-            instruction: editData.config.flow?.call_transfer?.instruction || null,
+            instruction: editData.config.flow?.call_transfer?.instruction,
             messages: agentMessages
           }
         }
@@ -95,7 +95,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
         ...editData,
         config: {
           ...editData.config,
-          flow: { ...flow, [key]: value ? agent.config.flow?.[key] || defaultValue : null }
+          flow: { ...flow, [key]: value ? agent.config.flow?.[key] || defaultValue : undefined }
         }
       })
     } else {

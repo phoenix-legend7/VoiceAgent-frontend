@@ -23,7 +23,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
   const [selectedAppTool, setSelectedAppTool] = useState<string | null>(null)
 
   const handleDeleteTool = async (name: string) => {
-    const tools = agent.config.tools?.filter((tool) => tool.name !== name) || null
+    const tools = agent.config.tools?.filter((tool) => tool.name !== name)
     const editData = {
       ...agent,
       config: { ...agent.config, tools }
@@ -41,7 +41,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
     }
   }
   const handleDeleteMillisFunc = async (name: string) => {
-    const millisFunctions = agent.config.millis_functions?.filter((tool) => tool.name !== name) || null
+    const millisFunctions = agent.config.millis_functions?.filter((tool) => tool.name !== name)
     const editData = {
       ...agent,
       config: { ...agent.config, millis_functions: millisFunctions }
@@ -59,7 +59,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
     }
   }
   const handleDeleteAppFunc = async (name: string) => {
-    const appFunctions = agent.config.app_functions?.filter((tool) => tool.name !== name) || null
+    const appFunctions = agent.config.app_functions?.filter((tool) => tool.name !== name)
     const editData = {
       ...agent,
       config: { ...agent.config, app_functions: appFunctions }

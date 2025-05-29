@@ -63,7 +63,7 @@ const EditAgentModal: FC<Props> = ({
       model = {
         model: selectedModel,
         temperature: temperature || undefined,
-        history_settings: null,
+        history_settings: undefined,
       }
       if (Object.keys(historySettings).length > 0) {
         model.history_settings = historySettings
