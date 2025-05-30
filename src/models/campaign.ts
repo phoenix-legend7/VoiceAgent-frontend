@@ -9,14 +9,22 @@ export interface CampaignRecordTypeBase {
 
 export interface CampaignRecordTypeRead extends CampaignRecordTypeBase {
   metadata: { [key: string]: string };
-  call_status: 'not_started' | 'started' | 'finished' | 'failed';
+  call_status: "not_started" | "started" | "finished" | "failed";
 }
 
 export interface CampaignTypeRead extends CampaignTypeBase {
   id: string;
-  status: 'idle' | 'started' | 'paused' | 'finished' | 'failed';
+  status: "idle" | "started" | "paused" | "finished" | "failed";
   records: Array<CampaignRecordTypeRead>;
   created_at: number;
+}
+
+export interface CampaignInfoType {
+  id: string;
+  name: string;
+  status: "idle" | "started" | "paused" | "finished" | "failed";
+  created_at: number;
+  caller?: string;
 }
 
 export default CampaignTypeBase;
