@@ -142,16 +142,24 @@ const AgentVoiceModal: FC<Props> = ({
   }
   const onSubmit = async () => {
     if (!selectedVoice) return
-    let editData: AgentTypeRead
-    editData = {
-      ...agent,
-      config: { ...agent.config, voice: selectedVoice },
+    const editData = {
+      name: agent.name,
+      config: {
+        voice: selectedVoice,
+      }
     }
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData)
       toast.success('Agent updated successfully')
-      setAgent(editData)
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          voice: selectedVoice,
+        }
+      })
+      onClose()
     } catch (error) {
       console.error(error)
       toast.error('Failed to update agent')

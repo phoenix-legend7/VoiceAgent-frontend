@@ -64,30 +64,11 @@ const ToolModal: FC<ToolModalProps> = ({
   const originTool = useMemo(() => {
     if (selectedTool?.type === 'webhook') {
       return agent.config.tools?.find((tool) => tool.name === selectedTool?.name)
-    } else if (selectedTool?.type === 'web form') {
+    } else if (selectedTool?.type === 'webform') {
       return agent.config.millis_functions?.find((tool) => tool.name === selectedTool?.name)
     }
   }, [agent.config, selectedTool?.name])
 
-  useEffect(() => {
-    return () => {
-      setFunctionName('')
-      setFunctionDescription('')
-      setFunctionType('webhook')
-      setWebhookUrl('')
-      setWebhookMethod('GET')
-      setRunFunctionAfterCall(false)
-      setWebhookHeaders([])
-      setWebhookParams([])
-      setWebhookTimeout(5)
-      setWebhookExtraParams([])
-      setShowAdvancedConfig(false)
-      setWebFormParam({ name: '', type: '' })
-      setPreActionPhrase(undefined)
-      setPreActionPhraseValues([])
-      setInputPhrase('')
-    }
-  }, [])
   useEffect(() => {
     if (selectedTool) {
       if (selectedTool.type === 'webhook') {
@@ -107,7 +88,7 @@ const ToolModal: FC<ToolModalProps> = ({
           setPreActionPhrase(tool.response_mode)
           setPreActionPhraseValues(tool.messages || [])
         }
-      } else if (selectedTool.type === 'web form') {
+      } else if (selectedTool.type === 'webform') {
         const func = agent.config.millis_functions?.find((func) => func.name === selectedTool.name)
         if (func) {
           setFunctionName(func.name)
@@ -123,13 +104,29 @@ const ToolModal: FC<ToolModalProps> = ({
 
   const onClose = () => {
     setShowModal(false)
+    setFunctionName('')
+    setFunctionDescription('')
+    setFunctionType('webhook')
+    setWebhookUrl('')
+    setWebhookMethod('GET')
+    setRunFunctionAfterCall(false)
+    setWebhookHeaders([])
+    setWebhookParams([])
+    setWebhookTimeout(5)
+    setWebhookExtraParams([])
+    setShowAdvancedConfig(false)
+    setWebFormParam({ name: '', type: '' })
+    setPreActionPhrase(undefined)
+    setPreActionPhraseValues([])
+    setInputPhrase('')
+    setSelectedTool(null)
   }
   const handleCreate = async () => {
     if (!functionName || !functionDescription) {
       toast.warning('Function Name and Description are required')
       return
     }
-    let editData: AgentTypeRead;
+    let editData: { [key: string]: any };
     const headers: { [key: string]: string } = {}
     if (functionType === 'webhook') {
       if (!webhookUrl) {
@@ -139,7 +136,7 @@ const ToolModal: FC<ToolModalProps> = ({
       webhookHeaders.forEach((header) => {
         headers[header.key] = header.value
       })
-      const tools = agent.config.tools || []
+      const tools = structuredClone(agent.config.tools || [])
       if (selectedTool && selectedTool.type === 'webhook') {
         const tool = tools.find((tool) => tool.name === selectedTool.name)
         if (tool) {
@@ -173,7 +170,10 @@ const ToolModal: FC<ToolModalProps> = ({
           timeout: webhookTimeout,
         })
       }
-      editData = { ...agent, config: { ...agent.config, tools } }
+      editData = {
+        name: agent.name,
+        config: { tools }
+      }
     } else {
       if (!webFormParam.name) {
         toast.warning('Web Form Param Name is required')
@@ -183,8 +183,8 @@ const ToolModal: FC<ToolModalProps> = ({
         toast.warning('Parameter must start with a letter or underscore and contain no spaces. Ex: email, user_email')
         return
       }
-      const functions = agent.config.millis_functions || [];
-      if (selectedTool && selectedTool.type === 'web form') {
+      const functions = structuredClone(agent.config.millis_functions || [])
+      if (selectedTool && selectedTool.type === 'webform') {
         const func = functions.find((func) => func.name === selectedTool.name)
         if (func) {
           func.description = functionDescription
@@ -215,15 +215,23 @@ const ToolModal: FC<ToolModalProps> = ({
           }
         })
       }
-      editData = { ...agent, config: { ...agent.config, millis_functions: functions } }
+      editData = {
+        name: agent.name,
+        config: { millis_functions: functions },
+      }
     }
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData)
       toast.success('Function created')
-      setAgent(editData)
-      setShowModal(false)
-      setSelectedTool(null)
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          ...editData.config,
+        }
+      })
+      onClose()
     } catch (error) {
       console.error(error)
       toast.error('Failed to create function')

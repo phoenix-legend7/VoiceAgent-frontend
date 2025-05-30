@@ -50,8 +50,7 @@ const EditAgentModal: FC<Props> = ({
     setShowAdvancedConfig(false)
   }
   const onSubmit = async () => {
-    let editData: AgentTypeRead
-    let model = agent.config.llm
+    let model: { [key: string]: any } | null = null
     if (selectedModel) {
       const historySettings: { [key: string]: number } = {}
       if (historyMessageLimit) {
@@ -69,15 +68,25 @@ const EditAgentModal: FC<Props> = ({
         model.history_settings = historySettings
       }
     }
-    editData = {
-      ...agent,
-      config: { ...agent.config, llm: model }
+    const editData = {
+      name: agent.name,
+      config: { llm: model }
     }
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData)
       toast.success('Agent updated successfully')
-      setAgent(editData)
+      if (!model) {
+        delete agent.config.llm
+      } else {
+        agent.config.llm = {
+          model: model.model,
+          temperature: model.temperature,
+          history_settings: model.history_settings,
+        }
+      }
+      setAgent(agent)
+      onClose()
     } catch (error) {
       console.error(error)
       toast.error('Failed to update agent')
