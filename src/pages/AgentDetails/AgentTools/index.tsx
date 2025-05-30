@@ -25,14 +25,20 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
   const handleDeleteTool = async (name: string) => {
     const tools = agent.config.tools?.filter((tool) => tool.name !== name)
     const editData = {
-      ...agent,
-      config: { ...agent.config, tools }
+      name: agent.name,
+      config: { tools }
     }
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData)
       toast.success('Function deleted')
-      setAgent(editData)
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          tools
+        }
+      })
     } catch (error) {
       console.error(error)
       toast.error('Failed to delte function')
@@ -43,14 +49,20 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
   const handleDeleteMillisFunc = async (name: string) => {
     const millisFunctions = agent.config.millis_functions?.filter((tool) => tool.name !== name)
     const editData = {
-      ...agent,
-      config: { ...agent.config, millis_functions: millisFunctions }
+      name: agent.name,
+      config: { millis_functions: millisFunctions }
     }
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData)
       toast.success('Function deleted')
-      setAgent(editData)
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          millis_functions: millisFunctions,
+        }
+      })
     } catch (error) {
       console.error(error)
       toast.error('Failed to delete function')
@@ -61,14 +73,20 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
   const handleDeleteAppFunc = async (name: string) => {
     const appFunctions = agent.config.app_functions?.filter((tool) => tool.name !== name)
     const editData = {
-      ...agent,
-      config: { ...agent.config, app_functions: appFunctions }
+      name: agent.name,
+      config: { app_functions: appFunctions }
     }
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData)
       toast.success('Function deleted')
-      setAgent(editData)
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          app_functions: appFunctions,
+        }
+      })
     } catch (error) {
       console.error(error)
       toast.error('Failed to delete function')
@@ -80,7 +98,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
   return (
     <>
       <Card title="Tools" className="mt-6" icon={<AiOutlineProduct />}>
-        {(!agent.config.tools?.length && !agent.config.millis_functions?.length) && (
+        {(!agent.config.tools?.length && !agent.config.millis_functions?.length && !agent.config.app_functions?.length) && (
           <div className="p-6 m-4 mt-8">
             <p className="text-gray-400 text-sm">
               Connect tools to let agent take action with external systems.
@@ -94,9 +112,9 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
             </button>
           </div>
         )}
-        {(!!agent.config.millis_functions?.length && !!agent.config.tools?.length && !!agent.config.app_functions?.length) && (
+        {(!!agent.config.millis_functions?.length || !!agent.config.tools?.length || !!agent.config.app_functions?.length) && (
           <div className="py-2">
-            {agent.config.tools.map((tool, index) => (
+            {agent.config.tools?.map((tool, index) => (
               <div
                 key={`tool-${index}`}
                 className="flex items-center justify-between gap-2 px-4 py-1"
@@ -123,7 +141,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                 </div>
               </div>
             ))}
-            {agent.config.millis_functions.map((func, index) => (
+            {agent.config.millis_functions?.map((func, index) => (
               <div
                 key={`func-${index}`}
                 className="flex items-center justify-between gap-2 px-4 py-1"
@@ -138,7 +156,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                   <button
                     className="cursor-pointer text-gray-400 hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
                     onClick={() => {
-                      setSelectedTool({ name: func.name, type: 'web form' })
+                      setSelectedTool({ name: func.name, type: 'webform' })
                       setShowToolModal(true)
                     }}
                   >
@@ -153,7 +171,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                 </div>
               </div>
             ))}
-            {agent.config.app_functions.map((func, index) => (
+            {agent.config.app_functions?.map((func, index) => (
               <div
                 key={`func-${index}`}
                 className="flex items-center justify-between gap-2 px-4 py-1"

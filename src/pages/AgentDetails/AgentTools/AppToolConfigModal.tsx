@@ -47,7 +47,6 @@ const AppToolConfigModal: FC<AppToolConfigModalProps> = ({
       toast.warning('API Key and Event Type ID are required')
       return
     }
-    let editData: AgentTypeRead;
     const tools = agent.config.app_functions || []
     if (originAppTool) {
       const tool = tools.find((tool) => tool.name === selectedAppTool)
@@ -66,12 +65,21 @@ const AppToolConfigModal: FC<AppToolConfigModalProps> = ({
         }
       })
     }
-    editData = { ...agent, config: { ...agent.config, app_functions: tools } }
+    const editData = { 
+      name: agent.name,
+      config: { app_functions: tools }
+    }
     setIsOverlayShow(true)
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData)
       toast.success('Function created')
-      setAgent(editData)
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          app_functions: tools,
+        }
+      })
       setSelectedAppTool(null)
     } catch (error) {
       console.error(error)

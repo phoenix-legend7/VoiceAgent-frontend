@@ -16,7 +16,7 @@ import Modal from "../../library/ModalProvider";
 import Select from "../../library/Select";
 import { AgentTypeRead } from "../../models/agent";
 import { SelectOptionType } from "../../models/common";
-import { SpeechToTextProvider, VoiceProvider } from "../../models/provider";
+import { SpeechToTextProvider } from "../../models/provider";
 import VoiceType from "../../models/voice";
 
 const sttProviderOptions = [
@@ -136,10 +136,13 @@ const AgentLanguageModal: FC<Props> = ({
     setTypingTerm("");
   };
   const onSubmit = async () => {
-    let editData = structuredClone(agent);
+    const editData: { [key: string]: any } = {
+      name: agent.name,
+      config: {},
+    };
     editData.config.language = selectedLanguage || "en-US";
-    editData.config.speech_to_text = undefined;
-    editData.config.switch_language = undefined;
+    editData.config.speech_to_text = null;
+    editData.config.switch_language = null;
     if (isMultiLangSupport) {
       if (multiLangOption === "en-sp") {
         editData.config.language = "multi";
@@ -174,15 +177,23 @@ const AgentLanguageModal: FC<Props> = ({
         editData.config.speech_to_text.model = undefined;
       }
     }
-    if (voices.length) {
-      editData.config.voice.provider = voices[0].provider as VoiceProvider;
-      editData.config.voice.voice_id = voices[0].voice_id;
+    if (voices.length && agent.config.language !== editData.config.language) {
+      editData.config.voice = {
+        provider: voices[0].provider,
+        voice_id: voices[0].voice_id,
+      }
     }
     setIsOverlayShow(true);
     try {
       await axiosInstance.put(`/agent/${agent.id}`, editData);
       toast.success("Agent updated successfully");
-      setAgent(editData);
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          ...editData.config,
+        }
+      });
       onClose();
     } catch (error) {
       console.error(error);
