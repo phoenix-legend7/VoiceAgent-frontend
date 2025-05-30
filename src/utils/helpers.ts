@@ -16,3 +16,14 @@ export const formatCallDuration = (duration: number) => {
   const seconds = parseInt((duration % 60).toFixed(0))
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
+
+export const formatFileSize = (size: number) => {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let unitIndex = 0
+  let sizeInBytes = size
+  while (sizeInBytes >= 1024 && unitIndex < units.length - 1) {
+    sizeInBytes /= 1024
+    unitIndex++
+  }
+  return `${sizeInBytes.toFixed(2)} ${units[unitIndex]}`
+}

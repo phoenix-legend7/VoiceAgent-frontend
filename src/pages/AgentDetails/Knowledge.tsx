@@ -1,16 +1,26 @@
-import clsx from "clsx"
-import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from "react"
-import { FaFileAlt, FaPlus, FaTrash } from "react-icons/fa"
-import Card from "../../library/Card"
-import { InputBox } from "../../library/FormField"
-import Modal from "../../library/ModalProvider"
-import Table, { TableCell, TableRow } from "../../library/Table"
-import { AgentTypeRead } from "../../models/agent"
-import KnowledgeType from "../../models/knowledge"
-import { CreateKnowledgeModal } from "../Knowledge"
+import clsx from "clsx";
+import {
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { FaFileAlt, FaPlus, FaTrash } from "react-icons/fa";
+import { toast } from "react-toastify";
+import axiosInstance from "../../core/axiosInstance";
+import Card from "../../library/Card";
+import { InputBox } from "../../library/FormField";
+import Modal from "../../library/ModalProvider";
+import Table, { TableCell, TableRow } from "../../library/Table";
+import { AgentTypeRead } from "../../models/agent";
+import { KnowledgeRead } from "../../models/knowledge";
+import { formatFileSize } from "../../utils/helpers";
+import { CreateKnowledgeModal } from "../Knowledge";
 
 interface ToolBarProps {
-  handleEdit: () => void
+  handleEdit: () => void;
 }
 
 const ToolBar: FC<ToolBarProps> = ({ handleEdit }) => {
@@ -23,67 +33,103 @@ const ToolBar: FC<ToolBarProps> = ({ handleEdit }) => {
         Edit
       </button>
     </div>
-  )
-}
+  );
+};
 
 interface EditKnowledgeModalProps {
-  showModal: boolean
-  setShowModal: Dispatch<SetStateAction<boolean>>
-  setShowDocumentModal: Dispatch<SetStateAction<boolean>>
+  agent: AgentTypeRead;
+  isOverlayShow: boolean;
+  knowledges: KnowledgeRead[];
+  showModal: boolean;
+  setAgent: Dispatch<SetStateAction<AgentTypeRead | null>>;
+  setIsOverlayShow: Dispatch<SetStateAction<boolean>>;
+  setShowModal: Dispatch<SetStateAction<boolean>>;
+  setShowDocumentModal: Dispatch<SetStateAction<boolean>>;
 }
 
-const allDocuments: KnowledgeType[] = []
-
-const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowModal, setShowDocumentModal }) => {
-  const [activeTab, setActiveTab] = useState(0)
-  const [activePhrase, setActivePhrase] = useState("")
-  const [phrases, setPhrases] = useState<string[]>([])
-  const [stagedDocuments, setStagedDocuments] = useState<KnowledgeType[]>([])
+const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
+  agent,
+  isOverlayShow,
+  knowledges,
+  showModal,
+  setAgent,
+  setIsOverlayShow,
+  setShowModal,
+  setShowDocumentModal,
+}) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [activePhrase, setActivePhrase] = useState("");
+  const [phrases, setPhrases] = useState<string[]>([]);
+  const [stagedDocuments, setStagedDocuments] = useState<KnowledgeRead[]>([]);
 
   const filteredDocuments = useMemo(() => {
-    return allDocuments.filter((document) =>
-      !stagedDocuments.some((sd) => sd.filename === document.filename)
-    )
-  }, [stagedDocuments])
+    return knowledges.filter(
+      (document) => !stagedDocuments.some((sd) => sd.id === document.id)
+    );
+  }, [stagedDocuments]);
 
   const onClose = () => {
-    setShowModal(false)
-  }
-  const formatFileSize = (size: number) => {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB']
-    let unitIndex = 0
-    let sizeInBytes = size
-    while (sizeInBytes >= 1024 && unitIndex < units.length - 1) {
-      sizeInBytes /= 1024
-      unitIndex++
+    setShowModal(false);
+    setPhrases([]);
+    setStagedDocuments([]);
+    setActiveTab(0);
+    setActivePhrase("");
+  };
+  const onSubmit = async () => {
+    const editData = {
+      name: agent.name,
+      config: {
+        knowledge_base: {
+          files: stagedDocuments.map((d) => d.id),
+        },
+      },
+    };
+    setIsOverlayShow(true);
+    try {
+      await axiosInstance.put(`/agent/${agent.id}`, editData);
+      toast.success("Agent updated successfully");
+      setAgent({
+        ...agent,
+        config: {
+          ...agent.config,
+          ...editData.config,
+        },
+      });
+      onClose();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update agent");
+    } finally {
+      setIsOverlayShow(false);
     }
-    return `${sizeInBytes.toFixed(2)} ${units[unitIndex]}`
-  }
+  };
 
   useEffect(() => {
-    return () => {
-      setPhrases([])
-      setStagedDocuments([])
-      setActiveTab(0)
-      setActivePhrase("")
-    }
-  }, [])
+    const files = knowledges.filter(
+      (file) => !!agent.config.knowledge_base?.files?.find((f) => f === file.id)
+    );
+    setStagedDocuments(files);
+  }, [agent, knowledges, showModal]);
 
   return (
     <Modal
       isOpen={showModal}
+      isLoading={isOverlayShow}
       title="Update Agent Knowledge"
       okBtnLabel="Save"
+      onOK={onSubmit}
       onClose={onClose}
       modalSize="max-w-3xl"
     >
       <div className="flex items-center">
-        {['Knowledge Base', 'Configurations'].map((tab, index) => (
+        {["Knowledge Base", "Configurations"].map((tab, index) => (
           <button
             key={index}
             className={clsx(
-              'cursor-pointer px-5 py-2 w-full',
-              activeTab === index ? "text-sky-400 border-b-2 border-sky-400" : "text-gray-400"
+              "cursor-pointer px-5 py-2 w-full",
+              activeTab === index
+                ? "text-sky-400 border-b-2 border-sky-400"
+                : "text-gray-400"
             )}
             onClick={() => setActiveTab(index)}
           >
@@ -115,7 +161,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
                     {stagedDocuments.map((document, index) => (
                       <TableRow key={`staged-document-${index}`}>
                         <TableCell>
-                          <div>{document.filename}</div>
+                          <div>{document.name}</div>
                           <div className="text-sm text-gray-400">
                             {formatFileSize(document.size)}
                           </div>
@@ -124,9 +170,9 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
                           <p
                             className="overflow-hidden"
                             style={{
-                              display: '-webkit-box',
+                              display: "-webkit-box",
                               WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
+                              WebkitBoxOrient: "vertical",
                             }}
                           >
                             {document.description}
@@ -135,7 +181,11 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
                         <TableCell>
                           <button
                             className="cursor-pointer bg-red-500/5 text-red-500 hover:text-red-400 hover:bg-red-500/20 px-4 py-1.5 rounded transition-colors duration-300"
-                            onClick={() => setStagedDocuments(stagedDocuments.splice(index, 1))}
+                            onClick={() =>
+                              setStagedDocuments(
+                                stagedDocuments.splice(index, 1)
+                              )
+                            }
                           >
                             Remove
                           </button>
@@ -177,7 +227,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
                     {filteredDocuments.map((document, index) => (
                       <TableRow key={`document-${index}`}>
                         <TableCell>
-                          <div>{document.filename}</div>
+                          <div>{document.name}</div>
                           <div className="text-sm text-gray-400">
                             {formatFileSize(document.size)}
                           </div>
@@ -186,9 +236,9 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
                           <p
                             className="overflow-hidden"
                             style={{
-                              display: '-webkit-box',
+                              display: "-webkit-box",
                               WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
+                              WebkitBoxOrient: "vertical",
                             }}
                           >
                             {document.description}
@@ -197,7 +247,9 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
                         <TableCell>
                           <button
                             className="cursor-pointer bg-sky-500/5 text-sky-500 hover:text-sky-400 hover:bg-sky-500/20 px-4 py-1.5 rounded transition-colors duration-300"
-                            onClick={() => setStagedDocuments([...stagedDocuments, document])}
+                            onClick={() =>
+                              setStagedDocuments([...stagedDocuments, document])
+                            }
                           >
                             Add
                           </button>
@@ -226,13 +278,12 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
       )}
       {activeTab === 1 && (
         <div className="my-8 flex flex-col gap-4">
-          <div className="font-semibold mb-1.5 text-xl">
-            Pre-Action Phrases
-          </div>
+          <div className="font-semibold mb-1.5 text-xl">Pre-Action Phrases</div>
           <p className="text-gray-400">
-            Define the phrases your agent will say before searching for knowledge base.
-            If left blank, the system will use pre-defined English* phrases like:
-            "Let me check", "One sec", "Let me see", "Hold on", "Checking now", "One moment please" etc.
+            Define the phrases your agent will say before searching for
+            knowledge base. If left blank, the system will use pre-defined
+            English* phrases like: "Let me check", "One sec", "Let me see",
+            "Hold on", "Checking now", "One moment please" etc.
           </p>
           <InputBox
             label="Enter phrases separated by commas or enter key"
@@ -240,27 +291,34 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
             value={activePhrase}
             onChange={(e) => setActivePhrase(e)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === 'NumpadEnter' || e.key === ',') {
-                e.preventDefault()
-                setPhrases([...phrases, activePhrase])
-                setActivePhrase('')
+              if (
+                e.key === "Enter" ||
+                e.key === "NumpadEnter" ||
+                e.key === ","
+              ) {
+                e.preventDefault();
+                setPhrases([...phrases, activePhrase]);
+                setActivePhrase("");
               }
             }}
             onBlur={() => {
-              if (activePhrase.trim() !== '') {
-                setPhrases([...phrases, activePhrase])
-                setActivePhrase('')
+              if (activePhrase.trim() !== "") {
+                setPhrases([...phrases, activePhrase]);
+                setActivePhrase("");
               }
             }}
           />
           <div className="flex items-center flex-wrap mt-4 text-sm gap-x-3 gap-y-2">
             {phrases.map((phrase, index) => (
-              <div key={`phrase-${index}`} className="flex items-center gap-2 px-3 py-1.5 rounded border border-neutral-500">
+              <div
+                key={`phrase-${index}`}
+                className="flex items-center gap-2 px-3 py-1.5 rounded border border-neutral-500"
+              >
                 <div className="text-gray-400">{phrase}</div>
                 <button
                   className="cursor-pointer text-gray-600 hover:text-gray-400 transition-colors duration-300"
                   onClick={() => {
-                    setPhrases(phrases.filter((_, i) => i !== index))
+                    setPhrases(phrases.filter((_, i) => i !== index));
                   }}
                 >
                   <FaTrash />
@@ -271,49 +329,89 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({ showModal, setShowMod
         </div>
       )}
     </Modal>
-  )
-}
+  );
+};
 
 interface Props {
-  agent: AgentTypeRead
-  setAgent: Dispatch<SetStateAction<AgentTypeRead | null>>
-  setIsOverlayShow: Dispatch<SetStateAction<boolean>>
+  agent: AgentTypeRead;
+  isOverlayShow: boolean;
+  knowledges: KnowledgeRead[];
+  setAgent: Dispatch<SetStateAction<AgentTypeRead | null>>;
+  setIsChanged: Dispatch<SetStateAction<boolean>>;
+  setIsOverlayShow: Dispatch<SetStateAction<boolean>>;
 }
 
-const KnowledgeCard: FC<Props> = () => {
-  const [showDocumentModal, setShowDocumentModal] = useState(false)
-  const [showEditKnowledgeModal, setShowEditKnowledgeModal] = useState(false)
+const KnowledgeCard: FC<Props> = ({
+  agent,
+  isOverlayShow,
+  knowledges,
+  setAgent,
+  setIsChanged,
+  setIsOverlayShow,
+}) => {
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
+  const [showEditKnowledgeModal, setShowEditKnowledgeModal] = useState(false);
 
   return (
     <>
-      <Card title="Knowledge" icon={<FaFileAlt />} toolbar={<ToolBar handleEdit={() => setShowEditKnowledgeModal(true)} />}>
-        <div className="p-6 m-4 mt-8">
-          <p className="text-gray-400 text-sm">
-            Upload documents to enrich your voice agent's knowledge base
-          </p>
-          <button
-            className="cursor-pointer flex justify-self-center items-center gap-2 border border-sky-600 text-sky-600 mt-4 px-4 py-1.5 min-w-20 rounded-md hover:border-sky-400 hover:text-sky-400 transition-colors duration-300"
-            onClick={() => setShowDocumentModal(true)}
-          >
-            <FaPlus />
-            Add Document
-          </button>
-        </div>
+      <Card
+        title="Knowledge"
+        icon={<FaFileAlt />}
+        toolbar={<ToolBar handleEdit={() => setShowEditKnowledgeModal(true)} />}
+      >
+        {agent.config.knowledge_base?.files?.length ? (
+          <div className="py-2">
+            {agent.config.knowledge_base.files.map((id) => {
+              const file = knowledges.find((f) => f.id === id);
+              if (!file) return;
+              return (
+                <div
+                  className="px-4 py-1 flex items-center gap-2 justify-between text-sm"
+                  title={file.description}
+                  key={id}
+                >
+                  <div className="my-1">{file.name}</div>
+                  <div className="text-gray-400 text-nowrap">
+                    {formatFileSize(file.size)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="p-6 m-4 mt-8">
+            <p className="text-gray-400 text-sm">
+              Upload documents to enrich your voice agent's knowledge base
+            </p>
+            <button
+              className="cursor-pointer flex justify-self-center items-center gap-2 border border-sky-600 text-sky-600 mt-4 px-4 py-1.5 min-w-20 rounded-md hover:border-sky-400 hover:text-sky-400 transition-colors duration-300"
+              onClick={() => setShowDocumentModal(true)}
+            >
+              <FaPlus />
+              Add Document
+            </button>
+          </div>
+        )}
       </Card>
       <EditKnowledgeModal
+        agent={agent}
+        isOverlayShow={isOverlayShow}
+        knowledges={knowledges}
         showModal={showEditKnowledgeModal}
+        setAgent={setAgent}
+        setIsOverlayShow={setIsOverlayShow}
         setShowModal={setShowEditKnowledgeModal}
         setShowDocumentModal={setShowDocumentModal}
       />
       <CreateKnowledgeModal
         isOpen={showDocumentModal}
         setIsOpen={setShowDocumentModal}
-        isOverlayShow={false}
-        setIsChanged={() => { }}
-        setIsOverlayShow={() => { }}
+        isOverlayShow={isOverlayShow}
+        setIsChanged={setIsChanged}
+        setIsOverlayShow={setIsOverlayShow}
       />
     </>
-  )
-}
+  );
+};
 
-export default KnowledgeCard
+export default KnowledgeCard;

@@ -7,6 +7,7 @@ import { toast } from "react-toastify"
 import axiosInstance from "../core/axiosInstance"
 import Content from "../Layout/Content"
 import Modal from "../library/ModalProvider"
+import { formatFileSize } from "../utils/helpers"
 
 interface CreateKnowledgeModalProps {
   isOpen: boolean
@@ -145,16 +146,6 @@ export const CreateKnowledgeModal: FC<CreateKnowledgeModalProps> = ({
         setFile(file)
       }
     }
-  }
-  const formatFileSize = (size: number) => {
-    const units = ['B', 'KB', 'MB', 'GB', 'TB']
-    let unitIndex = 0
-    let sizeInBytes = size
-    while (sizeInBytes >= 1024 && unitIndex < units.length - 1) {
-      sizeInBytes /= 1024
-      unitIndex++
-    }
-    return `${sizeInBytes.toFixed(2)} ${units[unitIndex]}`
   }
 
   return (

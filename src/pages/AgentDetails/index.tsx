@@ -9,6 +9,7 @@ import { toast } from "react-toastify"
 
 import axiosInstance from "../../core/axiosInstance"
 import { AgentTypeRead } from "../../models/agent"
+import { KnowledgeRead } from "../../models/knowledge"
 import VoiceType from "../../models/voice"
 import Content from "../../Layout/Content"
 import NotFound from "../error/404"
@@ -29,13 +30,22 @@ const AgentDetails = () => {
   const { id } = useParams()
   const [agent, setAgent] = useState<AgentTypeRead | null>(null)
   const [voices, setVoices] = useState<VoiceType[]>([])
+  const [knowledges, setKnowledges] = useState<KnowledgeRead[]>([])
   const [isOverlayShow, setIsOverlayShow] = useState(true)
   const [isEditAgentName, setIsEditAgentName] = useState(false)
+  const [isKnowledgeChanged, setIsKnowledgeChanged] = useState(false)
   const [editAgentName, setEditAgentName] = useState('')
   const [showEditAgentModal, setShowEditAgentModal] = useState(false)
   const [showAgentVoiceModal, setShowAgentVoiceModal] = useState(false)
   const [showAgentLangModal, setShowAgentLangModal] = useState(false)
 
+  useEffect(() => {
+    const fetchKnowledges = async () => {
+      const response = await axiosInstance.get('/knowledge/list_files')
+      setKnowledges(response.data)
+    }
+    fetchKnowledges()
+  }, [isKnowledgeChanged])
   useEffect(() => {
     const fetchVoices = async (lang: string) => {
       const response = await axiosInstance.get(
@@ -231,7 +241,10 @@ const AgentDetails = () => {
               <CallAgent agent={agent} />
               <KnowledgeCard
                 agent={agent}
+                isOverlayShow={isOverlayShow}
+                knowledges={knowledges}
                 setAgent={setAgent}
+                setIsChanged={setIsKnowledgeChanged}
                 setIsOverlayShow={setIsOverlayShow}
               />
               <ToolCard
