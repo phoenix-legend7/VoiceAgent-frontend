@@ -1,9 +1,20 @@
-import clsx from 'clsx';
-import React, { useState, useRef, useEffect, FC } from 'react';
-import { createPortal } from 'react-dom';
-import { FaTimes } from 'react-icons/fa';
-import { SelectOptionType } from '../models/common';
+import clsx from "clsx";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  FC,
+  isValidElement,
+  ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+import { FaTimes } from "react-icons/fa";
+import { SelectOptionType } from "../models/common";
 
+interface LabelProps {
+  children?: ReactNode;
+  className?: string;
+}
 interface Props {
   options: SelectOptionType[];
   className?: string;
@@ -18,26 +29,56 @@ interface Props {
 
 const Select: FC<Props> = ({
   options,
-  className = '',
+  className = "",
   menuClassName,
   menuPortalTarget = document.body,
   isMulti = false,
   isSearchable = false,
-  placeholder = 'Select...',
+  placeholder = "Select...",
   value,
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
 
   const selectRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const getTextFromLabel = (label: ReactNode): string => {
+    if (typeof label === "string") {
+      return label;
+    }
+
+    if (typeof label === "number") {
+      return label.toString();
+    }
+
+    if (isValidElement<LabelProps>(label)) {
+      // TypeScript now knows label is a ReactElement
+      const children = label.props.children;
+      if (Array.isArray(children)) {
+        return children.map((child) => getTextFromLabel(child)).join(" ");
+      }
+      return getTextFromLabel(children);
+    }
+
+    if (Array.isArray(label)) {
+      return label.map((item) => getTextFromLabel(item)).join(" ");
+    }
+
+    return "";
+  };
   // Filter options based on search term
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = options.filter((option) =>
+    getTextFromLabel(option.label)
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
   );
 
   // Calculate menu position when opening
@@ -56,16 +97,17 @@ const Select: FC<Props> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        selectRef.current && !selectRef.current.contains(event.target as Node) &&
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node) &&
         (!menuRef.current || !menuRef.current.contains(event.target as Node))
       ) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -74,30 +116,30 @@ const Select: FC<Props> = ({
     if (!isOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown') {
+      if (e.key === "ArrowDown") {
         e.preventDefault();
-        setHighlightedIndex(prev =>
+        setHighlightedIndex((prev) =>
           Math.min(prev + 1, filteredOptions.length - 1)
         );
-      } else if (e.key === 'ArrowUp') {
+      } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        setHighlightedIndex(prev => Math.max(prev - 1, 0));
-      } else if (e.key === 'Enter' && highlightedIndex >= 0) {
+        setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === "Enter" && highlightedIndex >= 0) {
         e.preventDefault();
         handleSelect(filteredOptions[highlightedIndex]);
-      } else if (e.key === 'Escape') {
+      } else if (e.key === "Escape") {
         setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, highlightedIndex, filteredOptions]);
 
   const handleSelect = (option: SelectOptionType) => {
     if (isMulti) {
       const newValue = value ? [...(value as SelectOptionType[])] : [];
-      const index = newValue.findIndex(v => v.value === option.value);
+      const index = newValue.findIndex((v) => v.value === option.value);
 
       if (index >= 0) {
         newValue.splice(index, 1);
@@ -110,21 +152,23 @@ const Select: FC<Props> = ({
       onChange?.(option);
       setIsOpen(false);
     }
-    setSearchTerm('');
+    setSearchTerm("");
     setHighlightedIndex(-1);
   };
 
   const isSelected = (option: SelectOptionType) => {
     if (!value) return false;
     return isMulti
-      ? (value as SelectOptionType[]).some(v => v.value === option.value)
+      ? (value as SelectOptionType[]).some((v) => v.value === option.value)
       : (value as SelectOptionType).value === option.value;
   };
 
   const removeOption = (option: SelectOptionType, e: React.MouseEvent) => {
     e.stopPropagation();
     if (isMulti && value) {
-      onChange?.((value as SelectOptionType[]).filter(v => v.value !== option.value));
+      onChange?.(
+        (value as SelectOptionType[]).filter((v) => v.value !== option.value)
+      );
     }
   };
 
@@ -163,13 +207,11 @@ const Select: FC<Props> = ({
                 key={option.value}
                 role="option"
                 aria-selected={isSelected(option)}
-                className={clsx(
-                  'p-2 cursor-pointer hover:bg-gray-700',
-                  {
-                    'bg-sky-800': isSelected(option),
-                    'bg-gray-900': highlightedIndex === index,
-                  }
-                )}
+                className={clsx("p-2 cursor-pointer hover:bg-gray-700 border-sky-400", {
+                  "bg-sky-800": isSelected(option),
+                  "bg-gray-900": highlightedIndex === index,
+                  "border-t": !!index,
+                })}
                 onClick={() => handleSelect(option)}
                 onMouseEnter={() => setHighlightedIndex(index)}
               >
@@ -188,17 +230,14 @@ const Select: FC<Props> = ({
       return createPortal(menuContent, menuPortalTarget);
     }
     return menuContent;
-  }
+  };
 
   return (
-    <div
-      ref={selectRef}
-      className={clsx('relative select-none', className)}
-    >
+    <div ref={selectRef} className={clsx("relative select-none", className)}>
       <div
         className={clsx(
-          'flex items-center justify-between p-2 border rounded cursor-pointer',
-          isOpen ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-600'
+          "flex items-center justify-between p-2 border rounded cursor-pointer",
+          isOpen ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-600"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -206,7 +245,7 @@ const Select: FC<Props> = ({
           {!value || (isMulti && (value as SelectOptionType[]).length === 0) ? (
             <span className="text-gray-400">{placeholder}</span>
           ) : isMulti ? (
-            (value as SelectOptionType[]).map(option => (
+            (value as SelectOptionType[]).map((option) => (
               <span
                 key={option.value}
                 className="flex items-center bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm gap-1"
@@ -223,7 +262,7 @@ const Select: FC<Props> = ({
               </span>
             ))
           ) : (
-            <span className='flex items-center gap-2'>
+            <span className="flex items-center gap-2">
               {(value as SelectOptionType).icon}
               {(value as SelectOptionType).label}
             </span>
@@ -231,14 +270,19 @@ const Select: FC<Props> = ({
         </div>
         <svg
           className={clsx(
-            'w-5 h-5 text-gray-400 transition-transform duration-200',
-            isOpen ? 'rotate-180' : ''
+            "w-5 h-5 text-gray-400 transition-transform duration-200",
+            isOpen ? "rotate-180" : ""
           )}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </div>
 
@@ -263,14 +307,18 @@ interface GroupedSelectProps {
 
 export const GroupedSelect: FC<GroupedSelectProps> = ({
   options,
-  className = '',
+  className = "",
   value,
-  placeholder = 'Select...',
+  placeholder = "Select...",
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
 
   const selectRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -291,16 +339,17 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        selectRef.current && !selectRef.current.contains(event.target as Node) &&
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node) &&
         (!menuRef.current || !menuRef.current.contains(event.target as Node))
       ) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -347,10 +396,10 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
                     role="option"
                     aria-selected={isSelected(option)}
                     className={clsx(
-                      'px-4 py-2 cursor-pointer hover:bg-gray-800',
+                      "px-4 py-2 cursor-pointer hover:bg-gray-800",
                       {
-                        'bg-sky-800': isSelected(option),
-                        'bg-gray-900': highlightedIndex === index,
+                        "bg-sky-800": isSelected(option),
+                        "bg-gray-900": highlightedIndex === index,
                       }
                     )}
                     onClick={() => handleSelect(option)}
@@ -375,17 +424,14 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
     );
 
     return createPortal(menuContent, document.body);
-  }
+  };
 
   return (
-    <div
-      ref={selectRef}
-      className={clsx('relative select-none', className)}
-    >
+    <div ref={selectRef} className={clsx("relative select-none", className)}>
       <div
         className={clsx(
-          'flex items-center justify-between p-2 border rounded cursor-pointer',
-          isOpen ? 'border-blue-500 ring-1 ring-blue-500' : 'border-gray-600'
+          "flex items-center justify-between p-2 border rounded cursor-pointer",
+          isOpen ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-600"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -393,7 +439,7 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
           {!value ? (
             <span className="text-gray-400">{placeholder}</span>
           ) : (
-            <span className='flex items-center gap-2'>
+            <span className="flex items-center gap-2">
               {(value as GroupSelectOptionType).icon}
               {(value as GroupSelectOptionType).label}
             </span>
@@ -401,20 +447,25 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
         </div>
         <svg
           className={clsx(
-            'w-5 h-5 text-gray-400 transition-transform duration-200',
-            isOpen ? 'rotate-180' : ''
+            "w-5 h-5 text-gray-400 transition-transform duration-200",
+            isOpen ? "rotate-180" : ""
           )}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </div>
 
       {isOpen && renderMenu()}
     </div>
   );
-}
+};
 
 export default Select;

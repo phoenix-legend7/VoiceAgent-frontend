@@ -1,5 +1,5 @@
 export interface SelectOptionType {
   value: string | number;
-  label: string;
+  label: React.ReactNode;
   icon?: React.ReactNode;
 }
