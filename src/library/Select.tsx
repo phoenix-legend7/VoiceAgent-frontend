@@ -207,7 +207,7 @@ const Select: FC<Props> = ({
                 key={option.value}
                 role="option"
                 aria-selected={isSelected(option)}
-                className={clsx("p-2 cursor-pointer hover:bg-gray-700 border-sky-400", {
+                className={clsx("p-2 cursor-pointer hover:bg-gray-700 border-gray-600", {
                   "bg-sky-800": isSelected(option),
                   "bg-gray-900": highlightedIndex === index,
                   "border-t": !!index,

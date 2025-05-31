@@ -76,7 +76,7 @@ const Modal: React.FC<ModalProps> = ({
           <div className="flex flex-col max-h-full w-full overflow-hidden bg-gray-900 border border-white/20 rounded-lg p-6">
             <div className="flex items-center gap-4 mb-4 relative">
               {headerIcon}
-              {title && <h2 className="text-2xl font-bold">{title}</h2>}
+              {title && <h2 className="text-lg md:text-2xl font-bold">{title}</h2>}
               {!hideCloseButton && (
                 <button
                   className="absolute right-0 top-0 p-2 rounded hover:bg-red-700/20 transition-all duration-300 cursor-pointer"
