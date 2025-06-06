@@ -1,5 +1,5 @@
 import clsx from "clsx"
-import { useEffect, useState } from "react"
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { FaAngleDown, FaAngleLeft, FaAngleRight, FaBook, FaBullhorn, FaCog, FaHistory, FaPhoneAlt, FaUsers } from "react-icons/fa"
 // import { LiaExternalLinkAltSolid } from "react-icons/lia"
@@ -79,8 +79,12 @@ export const SettingsButtonGroup = () => {
 //   )
 // }
 
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(true)
+interface Props {
+  isOpen: boolean
+  setIsOpen: Dispatch<SetStateAction<boolean>>
+}
+
+const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
     const checkIsMobile = () => {
@@ -97,6 +101,21 @@ const Navbar = () => {
     }
   }, [])
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest('#navbar') && !(event.target as HTMLElement).closest('#sidebar-toggle')) {
+        setIsOpen(false)
+      }
+    }
+    if (isOpen && isMobile) {
+      document.addEventListener('click', handleClickOutside)
+    } else {
+      document.removeEventListener('click', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [isOpen, isMobile])
+  useEffect(() => {
     if (isMobile) {
       setIsOpen(false)
     } else {
@@ -105,10 +124,15 @@ const Navbar = () => {
   }, [isMobile])
 
   return (
-    <div className={clsx(
-      "fixed md:static flex flex-col justify-between items-center bg-gray-950 p-4 top-16 left-0 bottom-0 z-50 text-white border-r border-gray-800 transition-all duration-300",
-      isOpen ? "min-w-72" : "navbar overflow-hidden"
-    )}>
+    <div
+      className={clsx(
+        "fixed md:static flex flex-col justify-between items-center bg-gray-950 left-0 bottom-0 z-50 text-white border-r border-gray-800 transition-all duration-300",
+        isOpen ? "min-w-72" : "navbar overflow-hidden",
+        isMobile ? 'top-0' : 'top-16',
+        isMobile && !isOpen ? 'w-0 p-0' : 'p-4'
+      )}
+      id="navbar"
+    >
       <div className="w-full">
         <NavLink href="/agents" icon={<FaUsers size={20} />} label="Voice Agents" />
         <NavLink href="/phones" icon={<FaPhoneAlt size={20} />} label="Phone Number" />

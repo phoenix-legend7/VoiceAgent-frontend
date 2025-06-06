@@ -37,7 +37,7 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBl
         type="text"
         className={clsx(
           inputClassName,
-          'rounded-md bg-neutral-800/50 border w-full py-2 px-3 focus:outline-none transition-all duration-300',
+          'rounded-md border w-full py-2 px-3 focus:outline-none transition-all duration-300',
           !invalidText ? 'border-gray-700 focus:border-sky-600' : 'border-red-500',
           { 'text-gray-400': disabled }
         )}

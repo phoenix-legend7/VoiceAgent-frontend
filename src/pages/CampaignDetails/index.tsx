@@ -1,46 +1,134 @@
-import { useEffect, useState } from "react"
-import { FaArrowLeft, FaPlus, FaStop } from "react-icons/fa"
-import { Link, useParams } from "react-router-dom"
-import { toast } from "react-toastify"
+import { useEffect, useMemo, useState } from "react";
+import {
+  FaArrowLeft,
+  FaEdit,
+  FaPhoneAlt,
+  FaPlus,
+  FaStop,
+  FaTrash,
+  FaUser,
+} from "react-icons/fa";
+import { MdInsertLink } from "react-icons/md";
+import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
-import axiosInstance from "../../core/axiosInstance"
-import { CallStatusBadge, CampaignStatusBadge } from "../../components/StatusBadge"
-import NotFound from "../error/404"
-import Content from "../../Layout/Content"
-import { SwtichWithLabel } from "../../library/FormField"
-import Table, { TableCell, TableRow } from "../../library/Table"
-import { CampaignTypeRead } from "../../models/campaign"
-import ImportRecordModal from "./ImportRecordsModal"
-import AddRecordModal from "./AddRecordModal"
-import ConfirmStartCampaign from "./ConfirmStart"
-import SetCallerPhone from "./SetCallerPhone"
+import axiosInstance from "../../core/axiosInstance";
+import {
+  CallStatusBadge,
+  CampaignStatusBadge,
+} from "../../components/StatusBadge";
+import PaginationComponent from "../../components/PaginationComponent";
+import Content from "../../Layout/Content";
+import { SwtichWithLabel } from "../../library/FormField";
+import Table, { TableCell, TableRow } from "../../library/Table";
+import { AgentTypeRead } from "../../models/agent";
+import { CampaignInfoType, CampaignTypeRead } from "../../models/campaign";
+import { PhoneTypeRead } from "../../models/phone";
+import NotFound from "../error/404";
+import ImportRecordModal from "./ImportRecordsModal";
+import AddRecordModal from "./AddRecordModal";
+import ConfirmStartCampaign from "./ConfirmStart";
+import SetCallerPhone from "./SetCallerPhone";
 
 const CampaignDetails = () => {
-  const { id } = useParams()
-  const [campaign, setCampaign] = useState<CampaignTypeRead | null>(null)
-  const [isChanged, setIsChanged] = useState(false)
-  const [isOverlayShow, setIsOverlayShow] = useState(true)
-  const [isImportRecordModalOpen, setIsImportRecordModalOpen] = useState(false)
-  const [isAddRecordModalOpen, setIsAddRecordModalOpen] = useState(false)
-  const [isConfirmStartModalOpen, setIsConfirmStartModalOpen] = useState(false)
-  const [isSetCallerPhoneModalOpen, setIsCallerPhoneModalOpen] = useState(false)
+  const { id } = useParams();
+  const [campaign, setCampaign] = useState<CampaignTypeRead | null>(null);
+  const [campaignInfo, setCampaignInfo] = useState<CampaignInfoType>();
+  const [phones, setPhones] = useState<PhoneTypeRead[]>([]);
+  const [agents, setAgents] = useState<AgentTypeRead[]>([]);
+  const [isChanged, setIsChanged] = useState(false);
+  const [isOverlayShow, setIsOverlayShow] = useState(true);
+  const [isImportRecordModalOpen, setIsImportRecordModalOpen] = useState(false);
+  const [isAddRecordModalOpen, setIsAddRecordModalOpen] = useState(false);
+  const [isConfirmStartModalOpen, setIsConfirmStartModalOpen] = useState(false);
+  const [isSetCallerPhoneModalOpen, setIsCallerPhoneModalOpen] =
+    useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const limit = 10;
 
   useEffect(() => {
-    const fetchCampaign = async () => {
-      setIsOverlayShow(true)
+    const fetchPhones = async () => {
       try {
-        const response = await axiosInstance.get(`/campaigns/${id}`)
-        const data = response.data
-        setCampaign(data)
+        const response = await axiosInstance.get(`/phones`);
+        const data = response.data;
+        setPhones(data);
       } catch (error) {
-        console.error(error)
-        toast.error(`Failed to fetch campaign: ${error}`)
-      } finally {
-        setIsOverlayShow(false)
+        console.error(error);
+        toast.error(`Failed to fetch phones: ${error}`);
       }
-    }
-    fetchCampaign()
-  }, [id, isChanged])
+    };
+    const fetchAgents = async () => {
+      try {
+        const response = await axiosInstance.get(`/agent`);
+        const data = response.data;
+        setAgents(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to fetch agents: ${error}`);
+      }
+    };
+    fetchPhones();
+    fetchAgents();
+  }, []);
+  useEffect(() => {
+    const fetchCampaign = async () => {
+      setIsOverlayShow(true);
+      try {
+        const response = await axiosInstance.get(`/campaigns/${id}`);
+        const data = response.data;
+        setCampaign(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to fetch campaign: ${error}`);
+      } finally {
+        setIsOverlayShow(false);
+      }
+    };
+    const fetchCampaignInfo = async () => {
+      try {
+        const response = await axiosInstance.get(`/campaigns/${id}/info`);
+        const data = response.data;
+        setCampaignInfo(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to get campaign info: ${error}`);
+      }
+    };
+    fetchCampaign();
+    fetchCampaignInfo();
+  }, [id, isChanged]);
+
+  const phoneOptions = useMemo(
+    () =>
+      phones.map((phone) => {
+        const agent = agents.find((a) => a.id === phone.agent_id);
+        return {
+          label: (
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+                <div>
+                  <FaPhoneAlt />
+                </div>
+                {phone.id}
+              </div>
+              {!!agent && (
+                <>
+                  <MdInsertLink />
+                  <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+                    <div>
+                      <FaUser />
+                    </div>
+                    {agent.name}
+                  </div>
+                </>
+              )}
+            </div>
+          ),
+          value: phone.id,
+        };
+      }),
+    [agents, phones]
+  );
 
   const handleIncludeMetaData = async () => {
     // try {
@@ -51,68 +139,78 @@ const CampaignDetails = () => {
     //   console.error(error)
     //   toast.error(`Failed to include metadata: ${error}`)
     // }
-  }
+  };
   const handleStartCampaign = async () => {
-    setIsOverlayShow(true)
+    setIsOverlayShow(true);
     try {
-      const response = await axiosInstance.post(`/campaigns/${id}/start`)
-      const data = response.data
-      if (data !== 'ok') {
-        throw new Error(data.detail)
+      const response = await axiosInstance.post(`/campaigns/${id}/start`);
+      const data = response.data;
+      if (data !== "ok") {
+        throw new Error(data.detail);
       }
-      setIsChanged(prev => !prev)
+      setIsChanged((prev) => !prev);
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to start campaign: ${error}`)
+      console.error(error);
+      toast.error(`Failed to start campaign: ${error}`);
     } finally {
-      setIsOverlayShow(false)
+      setIsOverlayShow(false);
     }
-  }
+  };
   const handleStopCampaign = async () => {
-    setIsOverlayShow(true)
+    setIsOverlayShow(true);
     try {
-      const response = await axiosInstance.post(`/campaigns/${id}/stop`)
-      const data = response.data
-      if (data !== 'ok') {
-        throw new Error(data.detail)
+      const response = await axiosInstance.post(`/campaigns/${id}/stop`);
+      const data = response.data;
+      if (data !== "ok") {
+        throw new Error(data.detail);
       }
-      setIsChanged(prev => !prev)
+      setIsChanged((prev) => !prev);
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to stop campaign: ${error}`)
+      console.error(error);
+      toast.error(`Failed to stop campaign: ${error}`);
     } finally {
-      setIsOverlayShow(false)
+      setIsOverlayShow(false);
     }
-  }
-  // const handleDeleteRecord = async (index: number) => {
-  //   if (!campaign) return
-  //   const newRecords = campaign.records.splice(index, 1)
-  //   setIsOverlayShow(true)
-  //   try {
-  //     await axiosInstance.post(`/campaigns/${campaign.id}/records`, newRecords)
-  //     setIsChanged(prev => !prev)
-  //   } catch (error) {
-  //     console.error(error)
-  //     toast.error(`Failed to delete record: ${error}`)
-  //   } finally {
-  //     setIsOverlayShow(false)
-  //   }
-  // }
+  };
+  const handleDeleteRecord = async (phone: string) => {
+    if (!campaign) return;
+    const newRecords = campaign.records.filter(
+      (record) => record.phone !== phone
+    );
+    setIsOverlayShow(true);
+    try {
+      await axiosInstance.delete(`/campaigns/${campaign.id}/records/${phone}`);
+      setCampaign({
+        ...campaign,
+        records: newRecords,
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error(`Failed to delete record: ${error}`);
+    } finally {
+      setIsOverlayShow(false);
+    }
+  };
 
   return (
     <Content isOverlayShown={isOverlayShow}>
       {campaign ? (
         <div>
           <div className="flex">
-            <Link to="/campaigns" className="flex gap-2 items-center text-sm p-2 rounded hover:bg-gray-800 transition-all duration-300">
+            <Link
+              to="/campaigns"
+              className="flex gap-2 items-center text-sm p-2 rounded hover:bg-gray-800 transition-all duration-300"
+            >
               <FaArrowLeft />
               <div>Campaigns - List</div>
             </Link>
           </div>
-          <div className="mt-8 px-6">
-            <div className="flex flex-wrap justify-between items-center">
-              <div className="text-2xl font-semibold">Campaign: {campaign.name}</div>
-              <div className="flex gap-4">
+          <div className="mt-8">
+            <div className="flex flex-wrap justify-between items-center gap-4">
+              <div className="text-2xl font-semibold">
+                Campaign: {campaign.name}
+              </div>
+              <div className="flex gap-x-4 gap-y-2 flex-wrap">
                 <button
                   className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
                   onClick={() => setIsImportRecordModalOpen(true)}
@@ -127,7 +225,7 @@ const CampaignDetails = () => {
                   <FaPlus />
                   Add Record
                 </button>
-                {campaign.status === 'started' ? (
+                {campaign.status === "started" ? (
                   <button
                     className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
                     onClick={handleStopCampaign}
@@ -148,16 +246,34 @@ const CampaignDetails = () => {
             </div>
             <div className="mt-8 rounded-xl text-sm bg-gray-900">
               <div className="flex flex-wrap">
-                <div className="p-4 w-full sm:1/2 lg:w-1/3 xl:w-1/4">
+                <div className="p-4 w-full md:w-1/2 xl:w-1/3">
                   <div className="font-bold text-gray-400 uppercase mb-2">
                     Caller
                   </div>
-                  <button
-                    className="cursor-pointer px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
-                    onClick={() => setIsCallerPhoneModalOpen(true)}
-                  >
-                    Set Caller Phone
-                  </button>
+                  {campaignInfo?.caller ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {
+                        phoneOptions.find(
+                          (p) => p.value === campaignInfo.caller
+                        )?.label
+                      }
+                      <div>
+                        <button
+                          className="text-gray-400 rounded hover:bg-gray-800/50 size-8 cursor-pointer flex items-center justify-center transition-all duration-300"
+                          onClick={() => setIsCallerPhoneModalOpen(true)}
+                        >
+                          <FaEdit />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      className="cursor-pointer px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
+                      onClick={() => setIsCallerPhoneModalOpen(true)}
+                    >
+                      Set Caller Phone
+                    </button>
+                  )}
                 </div>
                 <div className="p-4 w-full sm:1/2 lg:w-1/3 xl:w-1/4">
                   <div className="font-bold text-gray-400 uppercase mb-2">
@@ -168,13 +284,18 @@ const CampaignDetails = () => {
               </div>
             </div>
             <div className="mt-8 flex flex-wrap gap-2">
-              <SwtichWithLabel
-                onChange={handleIncludeMetaData}
-                value={false}
-              />
+              <SwtichWithLabel onChange={handleIncludeMetaData} value={false} />
               <div>Include extra metadata in agent prompt</div>
             </div>
-            <div className="mt-8 rounded-xl text-sm bg-gray-900 overflow-x-auto">
+            <div className="mt-8">
+              <PaginationComponent
+                currentPage={currentPage}
+                limit={limit}
+                setPage={setCurrentPage}
+                totalCounts={campaign.records.length}
+              />
+            </div>
+            <div className="mt-3 rounded-xl text-sm bg-gray-900 overflow-x-auto">
               <Table>
                 <thead>
                   <tr className="border-b border-gray-700">
@@ -185,30 +306,32 @@ const CampaignDetails = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {campaign.records.map((record, index) => (
-                    <TableRow key={`record-${index}`}>
-                      <TableCell>{record.phone}</TableCell>
-                      <TableCell>
-                        <CallStatusBadge status={record.call_status} />
-                      </TableCell>
-                      <TableCell>
-                        {Object.keys(record.metadata).map((key, index) => (
-                          <div key={`metadata-${index}`}>
-                            <span className="font-bold">{key}: </span>
-                            <span>{record.metadata[key]}</span>
-                          </div>
-                        ))}
-                      </TableCell>
-                      {/* <TableCell>
-                        <button
-                          className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/20 rounded-full transition-all duration-300"
-                          onClick={() => handleDeleteRecord(index)}
-                        >
-                          <FaTrash />
-                        </button>
-                      </TableCell> */}
-                    </TableRow>
-                  ))}
+                  {campaign.records
+                    .slice(currentPage * limit - limit, currentPage * limit)
+                    .map((record, index) => (
+                      <TableRow key={`record-${index}`}>
+                        <TableCell>{record.phone}</TableCell>
+                        <TableCell>
+                          <CallStatusBadge status={record.call_status} />
+                        </TableCell>
+                        <TableCell>
+                          {Object.keys(record.metadata).map((key, index) => (
+                            <div key={`metadata-${index}`}>
+                              <span className="font-bold">{key}: </span>
+                              <span>{record.metadata[key]}</span>
+                            </div>
+                          ))}
+                        </TableCell>
+                        <TableCell>
+                          <button
+                            className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/20 rounded-full transition-all duration-300"
+                            onClick={() => handleDeleteRecord(record.phone)}
+                          >
+                            <FaTrash />
+                          </button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </tbody>
               </Table>
               {campaign.records.length === 0 && (
@@ -225,6 +348,14 @@ const CampaignDetails = () => {
                   </div>
                 </div>
               )}
+            </div>
+            <div className="my-3">
+              <PaginationComponent
+                currentPage={currentPage}
+                limit={limit}
+                setPage={setCurrentPage}
+                totalCounts={campaign.records.length}
+              />
             </div>
           </div>
           <ImportRecordModal
@@ -251,8 +382,10 @@ const CampaignDetails = () => {
           />
           <SetCallerPhone
             campaign={campaign}
+            campaignInfo={campaignInfo}
             isOpen={isSetCallerPhoneModalOpen}
             isOverlayShow={isOverlayShow}
+            phoneOptions={phoneOptions}
             setIsChanged={setIsChanged}
             setIsOpen={setIsCallerPhoneModalOpen}
             setIsOverlayShow={setIsOverlayShow}
@@ -262,7 +395,7 @@ const CampaignDetails = () => {
         <NotFound />
       )}
     </Content>
-  )
-}
+  );
+};
 
-export default CampaignDetails
+export default CampaignDetails;

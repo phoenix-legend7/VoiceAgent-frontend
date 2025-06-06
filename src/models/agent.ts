@@ -2,74 +2,76 @@ import LanguageType from "./language"
 import LLMType from "./llm"
 import { SpeechToTextProvider, VoiceProvider } from "./provider"
 
+export interface AgentVoiceConfigType {
+  provider: VoiceProvider
+  voice_id?: string
+  model?: string
+  settings?: { [key: string]: string | number | boolean | null }
+}
+
 export interface AgentConfigType {
   prompt: string
-  voice: {
-    provider: VoiceProvider
-    voice_id: string | null
-    model: string | null
-    settings: { [key: string]: string | number | boolean | null } | null
-  }
+  voice: AgentVoiceConfigType
   flow: {
-    user_start_first: boolean | null
-    interruption: null | {
-      allowed: boolean | null
-      keep_interruption_message: boolean | null
-      first_messsage: boolean | null
+    user_start_first?: boolean
+    interruption?: {
+      allowed?: boolean
+      keep_interruption_message?: boolean
+      first_messsage?: boolean
     }
-    response_delay: null | {
-      generic_delay: number | null
-      number_input_delay: number | null
+    response_delay?: {
+      generic_delay?: number
+      number_input_delay?: number
     }
-    auto_fill_responses: null | {
+    auto_fill_responses?: {
       response_gap_threshold: number
       messages: string[]
     }
-    agent_terminate_call: null | {
+    agent_terminate_call?: {
       enabled: boolean
-      instruction: string | null
-      messages: string[] | null
+      instruction?: string
+      messages?: string[]
     }
-    voicemail: null | {
+    voicemail?: {
       action: "hangup" | "message"
-      message: string | null
-      continue_on_voice_activity: boolean | null
+      message?: string
+      continue_on_voice_activity?: boolean
     }
-    call_transfer: null | {
+    call_transfer?: {
       phone: string
-      instruction: string | null
-      messages: string[] | null
+      instruction?: string
+      messages?: string[]
     }
-    inactivity_handling: null | {
+    inactivity_handling?: {
       idle_time: number
       message: string
     }
-    dtmf_dial: null | {
+    dtmf_dial?: {
       enabled?: boolean
-      instruction: string | null
+      instruction?: string
     }
   }
-  first_message: string | null
-  tools: null | {
+  first_message?: string
+  tools?: {
     name: string
-    params: null | {
+    params?: {
       name: string
       required: boolean
       type: string
       description: string
     }[]
     description: string
-    webhook: string | null
-    header: null | { [key: string]: string }
-    method: string | null
-    timeout: number | null
-    run_after_call: boolean | null
-    messages: string[] | null
-    response_mode: "strict" | "flexible" | null
-    execute_after_message: boolean | null
-    exclude_session_id: boolean | null
+    webhook?: string
+    header?: { [key: string]: string }
+    method?: string
+    timeout?: number
+    run_after_call?: boolean
+    messages?: string[]
+    response_mode?: "strict" | "flexible"
+    execute_after_message?: boolean
+    exclude_session_id?: boolean
   }[]
-  millis_functions: null | {
+  millis_functions?: {
     name: string
     description: string
     data: {
@@ -81,54 +83,54 @@ export interface AgentConfigType {
       }
     }
     type: string
-    messages: string[] | null
-    response_mode: "strict" | "flexible" | null
+    messages?: string[]
+    response_mode?: "strict" | "flexible"
   }[]
-  app_functions: null | {
+  app_functions?: {
     name: string
-    credentials: { [key: string]: string } | null
+    credentials?: { [key: string]: string }
   }[]
-  custom_llm_websocket: string | null
+  custom_llm_websocket?: string
   language: LanguageType
-  vad_threshold: number | null
-  llm: null | {
+  vad_threshold?: number
+  llm?: {
     model: LLMType
     temperature?: number
-    history_settings: null | {
-      history_message_limit: number | null
-      history_tool_result_limit: number | null
+    history_settings?: {
+      history_message_limit?: number
+      history_tool_result_limit?: number
     }
   }
-  session_timeout: null | {
-    max_duration: number | null
-    max_idle: number | null
-    message: string | null
+  session_timeout?: {
+    max_duration?: number
+    max_idle?: number
+    message?: string
   }
-  session_data_webhook: string | null | {
+  session_data_webhook?: string | {
     url: string
-    headers: { [key: string]: string } | null
+    headers?: { [key: string]: string }
   }
-  privacy_settings: null | {
+  privacy_settings?: {
     opt_out_data_collection: boolean
     do_not_call_detection?: boolean
   }
-  custom_vocabulary: null | { keywords: { [key: string]: number } }
-  extra_prompt_webhook: string | null | {
+  custom_vocabulary?: { keywords: { [key: string]: number } }
+  extra_prompt_webhook?: string | {
     url: string
-    headers: { [key: string]: string } | null
+    headers?: { [key: string]: string }
   }
-  switch_language: null | { languages: string[] }
-  knowledge_base: null | {
-    files: string[] | null
-    messages: string[] | null
+  switch_language?: { languages: string[] }
+  knowledge_base?: {
+    files?: string[]
+    messages?: string[]
   }
-  speech_to_text: null | {
-    provider: SpeechToTextProvider | null
-    multilingual: boolean | null
-    model: string | null
+  speech_to_text?: {
+    provider?: SpeechToTextProvider
+    multilingual?: boolean
+    model?: string
   }
-  call_settings: { enable_recording?: boolean } | null
-  timezone: string | null
+  call_settings?: { enable_recording?: boolean }
+  timezone?: string
 }
 
 interface AgentTypeBase {
