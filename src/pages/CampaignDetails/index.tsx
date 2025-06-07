@@ -19,7 +19,7 @@ import {
 } from "../../components/StatusBadge";
 import PaginationComponent from "../../components/PaginationComponent";
 import Content from "../../Layout/Content";
-import { SwtichWithLabel } from "../../library/FormField";
+// import { SwtichWithLabel } from "../../library/FormField";
 import Table, { TableCell, TableRow } from "../../library/Table";
 import { AgentTypeRead } from "../../models/agent";
 import { CampaignInfoType, CampaignTypeRead } from "../../models/campaign";
@@ -130,16 +130,16 @@ const CampaignDetails = () => {
     [agents, phones]
   );
 
-  const handleIncludeMetaData = async () => {
-    // try {
-    //   const response = await axiosInstance.put(`/campaigns/${id}/include-metadata`)
-    //   const data = response.data
-    //   setCampaign(data)
-    // } catch (error) {
-    //   console.error(error)
-    //   toast.error(`Failed to include metadata: ${error}`)
-    // }
-  };
+  // const handleIncludeMetaData = async () => {
+  //   try {
+  //     const response = await axiosInstance.put(`/campaigns/${id}/include-metadata`)
+  //     const data = response.data
+  //     setCampaign(data)
+  //   } catch (error) {
+  //     console.error(error)
+  //     toast.error(`Failed to include metadata: ${error}`)
+  //   }
+  // };
   const handleStartCampaign = async () => {
     setIsOverlayShow(true);
     try {
@@ -283,10 +283,10 @@ const CampaignDetails = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-8 flex flex-wrap gap-2">
+            {/* <div className="mt-8 flex flex-wrap gap-2">
               <SwtichWithLabel onChange={handleIncludeMetaData} value={false} />
               <div>Include extra metadata in agent prompt</div>
-            </div>
+            </div> */}
             <div className="mt-8">
               <PaginationComponent
                 currentPage={currentPage}

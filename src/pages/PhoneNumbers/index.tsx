@@ -48,32 +48,30 @@ const PhoneAction: React.FC<ActionProps> = ({
     setSelectedPhoneNumber(phone);
     setIsSetConfigModalOpen(true);
   };
-  const handleDelete = async () => {
-    alert("Feature is coming soon.");
-    // setIsOverlayShow(true);
-    // try {
-    //   await axiosInstance.delete(`/agent/${agent.id}`);
-    //   setIsChanged((prev) => !prev);
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error(`Failed to delete agent: ${error}`);
-    // } finally {
-    //   setIsOverlayShow(false);
-    // }
-  };
-  const handleTagging = () => {
-    alert("Feature is coming soon.");
-    // setIsOverlayShow(true);
-    // try {
-    //   await axiosInstance.delete(`/agent/${agent.id}`);
-    //   setIsChanged((prev) => !prev);
-    // } catch (error) {
-    //   console.error(error);
-    //   toast.error(`Failed to delete agent: ${error}`);
-    // } finally {
-    //   setIsOverlayShow(false);
-    // }
-  };
+  // const handleDelete = async () => {
+  //   setIsOverlayShow(true);
+  //   try {
+  //     await axiosInstance.delete(`/agent/${agent.id}`);
+  //     setIsChanged((prev) => !prev);
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error(`Failed to delete agent: ${error}`);
+  //   } finally {
+  //     setIsOverlayShow(false);
+  //   }
+  // };
+  // const handleTagging = () => {
+  //   setIsOverlayShow(true);
+  //   try {
+  //     await axiosInstance.delete(`/agent/${agent.id}`);
+  //     setIsChanged((prev) => !prev);
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error(`Failed to delete agent: ${error}`);
+  //   } finally {
+  //     setIsOverlayShow(false);
+  //   }
+  // };
 
   return (
     <>
@@ -93,18 +91,18 @@ const PhoneAction: React.FC<ActionProps> = ({
               >
                 Set Agent Config
               </button>
-              <button
+              {/* <button
                 className="px-4 py-1.5 cursor-pointer text-left text-white hover:bg-gray-800"
                 onClick={handleTagging}
               >
                 Tagging
-              </button>
-              <button
+              </button> */}
+              {/* <button
                 className="px-4 py-1.5 cursor-pointer text-left text-red-300 hover:bg-gray-800"
                 onClick={handleDelete}
               >
                 Delete
-              </button>
+              </button> */}
             </div>
           </div>
         )}

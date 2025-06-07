@@ -1,6 +1,6 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { FaChevronDown } from "react-icons/fa"
-import { MdDialerSip } from "react-icons/md"
+// import { MdDialerSip } from "react-icons/md"
 import { AIAgentIcon } from "../../../consts/svgIcons"
 import { AgentTypeRead } from "../../../models/agent"
 import CustomLlmModal from "./CustomLlmModal"
@@ -61,14 +61,14 @@ const AgentActions: FC<AgentActionsProps> = ({
               <AIAgentIcon />
               Use Custom LLM
             </a>
-            <a
+            {/* <a
               href="#"
               className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
               onClick={() => setShowManageSipEndpointModal(true)}
             >
               <MdDialerSip />
               Manage SIP Endpoints
-            </a>
+            </a> */}
           </div>
         </div>
       )}
