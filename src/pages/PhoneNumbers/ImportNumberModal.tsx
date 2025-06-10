@@ -184,6 +184,7 @@ export const ImportNumberModal: FC<Props> = ({
         <div className="flex items-center">
           {["twilio", "vanage", "plivo", "exotel"].map((tab) => (
             <TabButton
+              key={tab}
               label={tab.toUpperCase()}
               onClick={() => setActiveTab(tab)}
               isActive={activeTab === tab}
