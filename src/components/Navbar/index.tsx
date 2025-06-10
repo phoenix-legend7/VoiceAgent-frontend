@@ -9,7 +9,7 @@ import NavLink from "./NavLink"
 import settingsItems from "../../consts/settings"
 import axiosInstance from "../../core/axiosInstance"
 
-export const SettingsButtonGroup = () => {
+const SettingsButtonGroup = () => {
   const [isOpen, setIsOpen] = useState(false)
   const params = useParams()
   const isActive = (href: string) => {
@@ -178,7 +178,7 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
         <NavLink href="/campaigns" icon={<FaBullhorn size={20} />} label="Campaigns" />
         <NavLink href="/knowledge" icon={<FaBook size={20} />} label="Agent Knowledge" />
         <NavLink href="/histories" icon={<FaHistory size={20} />} label="Call Logs" />
-        {/* <SettingsButtonGroup /> */}
+        <SettingsButtonGroup />
         {/* <NavLink
           href="https://millisai.mintlify.app/"
           icon={<FaFileAlt size={20} />}
