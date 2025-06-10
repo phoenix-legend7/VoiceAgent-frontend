@@ -21,6 +21,7 @@ import PaginationComponent from "../../components/PaginationComponent";
 import Content from "../../Layout/Content";
 // import { SwtichWithLabel } from "../../library/FormField";
 import Table, { TableCell, TableRow } from "../../library/Table";
+import { SwtichWithLabel } from "../../library/FormField";
 import { AgentTypeRead } from "../../models/agent";
 import { CampaignInfoType, CampaignTypeRead } from "../../models/campaign";
 import { PhoneTypeRead } from "../../models/phone";
@@ -130,16 +131,27 @@ const CampaignDetails = () => {
     [agents, phones]
   );
 
-  // const handleIncludeMetaData = async () => {
-  //   try {
-  //     const response = await axiosInstance.put(`/campaigns/${id}/include-metadata`)
-  //     const data = response.data
-  //     setCampaign(data)
-  //   } catch (error) {
-  //     console.error(error)
-  //     toast.error(`Failed to include metadata: ${error}`)
-  //   }
-  // };
+  const handleIncludeMetaData = async () => {
+    if (!campaignInfo) return;
+    try {
+      const payload = {
+        name: campaignInfo.name,
+        include_metadata_in_prompt: !campaignInfo.include_metadata_in_prompt,
+      };
+      setIsOverlayShow(true);
+      const response = await axiosInstance.put(
+        `/campaigns/${id}/info`,
+        payload
+      );
+      const data = response.data;
+      setCampaignInfo(data);
+    } catch (error) {
+      console.error(error);
+      toast.error(`Failed to include metadata: ${error}`);
+    } finally {
+      setIsOverlayShow(false);
+    }
+  };
   const handleStartCampaign = async () => {
     setIsOverlayShow(true);
     try {
@@ -283,10 +295,13 @@ const CampaignDetails = () => {
                 </div>
               </div>
             </div>
-            {/* <div className="mt-8 flex flex-wrap gap-2">
-              <SwtichWithLabel onChange={handleIncludeMetaData} value={false} />
+            <div className="mt-8 flex flex-wrap gap-2">
+              <SwtichWithLabel
+                onChange={handleIncludeMetaData}
+                value={!!campaignInfo?.include_metadata_in_prompt}
+              />
               <div>Include extra metadata in agent prompt</div>
-            </div> */}
+            </div>
             <div className="mt-8">
               <PaginationComponent
                 currentPage={currentPage}

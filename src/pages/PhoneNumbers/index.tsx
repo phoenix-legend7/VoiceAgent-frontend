@@ -1,5 +1,11 @@
 import { SetStateAction, Dispatch, useEffect, useState } from "react";
-import { FaDownload, FaEdit, FaEllipsisV, FaUserAlt } from "react-icons/fa";
+import {
+  FaDownload,
+  FaEdit,
+  FaEllipsisV,
+  FaPlus,
+  FaUserAlt,
+} from "react-icons/fa";
 import { toast } from "react-toastify";
 
 import axiosInstance from "../../core/axiosInstance";
@@ -9,8 +15,10 @@ import { AgentTypeRead } from "../../models/agent";
 import { PhoneTypeRead } from "../../models/phone";
 import { formatDateTime } from "../../utils/helpers";
 import { ImportNumberModal } from "./ImportNumberModal";
+import { PurchaseModal } from "./PurchaseModal";
 import { SetAgentModal } from "./SetAgentModal";
 import { SetAgentConfigModal } from "./SetAgentConfigModal";
+import { TaggingModal } from "./TaggingModal";
 
 interface ActionProps {
   phone: PhoneTypeRead;
@@ -18,12 +26,16 @@ interface ActionProps {
   setIsOverlayShow: Dispatch<SetStateAction<boolean>>;
   setIsSetConfigModalOpen: Dispatch<SetStateAction<boolean>>;
   setSelectedPhoneNumber: Dispatch<SetStateAction<PhoneTypeRead | null>>;
+  setTaggingModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 const PhoneAction: React.FC<ActionProps> = ({
   phone,
+  setIsChanged,
+  setIsOverlayShow,
   setIsSetConfigModalOpen,
   setSelectedPhoneNumber,
+  setTaggingModalOpen,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -44,34 +56,26 @@ const PhoneAction: React.FC<ActionProps> = ({
     };
   }, [isOpen]);
 
-  const handleSetAgentConfig = async () => {
+  const handleSetAgentConfig = () => {
     setSelectedPhoneNumber(phone);
     setIsSetConfigModalOpen(true);
   };
-  // const handleDelete = async () => {
-  //   setIsOverlayShow(true);
-  //   try {
-  //     await axiosInstance.delete(`/agent/${agent.id}`);
-  //     setIsChanged((prev) => !prev);
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error(`Failed to delete agent: ${error}`);
-  //   } finally {
-  //     setIsOverlayShow(false);
-  //   }
-  // };
-  // const handleTagging = () => {
-  //   setIsOverlayShow(true);
-  //   try {
-  //     await axiosInstance.delete(`/agent/${agent.id}`);
-  //     setIsChanged((prev) => !prev);
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error(`Failed to delete agent: ${error}`);
-  //   } finally {
-  //     setIsOverlayShow(false);
-  //   }
-  // };
+  const handleTagging = () => {
+    setSelectedPhoneNumber(phone);
+    setTaggingModalOpen(true);
+  };
+  const handleDelete = async () => {
+    setIsOverlayShow(true);
+    try {
+      await axiosInstance.delete(`/phones/${phone.id}`);
+      setIsChanged((prev) => !prev);
+    } catch (error) {
+      console.error(error);
+      toast.error(`Failed to delete phone: ${error}`);
+    } finally {
+      setIsOverlayShow(false);
+    }
+  };
 
   return (
     <>
@@ -91,18 +95,18 @@ const PhoneAction: React.FC<ActionProps> = ({
               >
                 Set Agent Config
               </button>
-              {/* <button
+              <button
                 className="px-4 py-1.5 cursor-pointer text-left text-white hover:bg-gray-800"
                 onClick={handleTagging}
               >
                 Tagging
-              </button> */}
-              {/* <button
+              </button>
+              <button
                 className="px-4 py-1.5 cursor-pointer text-left text-red-300 hover:bg-gray-800"
                 onClick={handleDelete}
               >
                 Delete
-              </button> */}
+              </button>
             </div>
           </div>
         )}
@@ -119,6 +123,8 @@ const PhoneNumbers = () => {
   const [isSetAgentModalOpen, setIsSetAgentModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isSetConfigModalOpen, setIsSetConfigModalOpen] = useState(false);
+  const [isTaggingModalOpen, setTaggingModalOpen] = useState(false);
+  const [isPurchaseModalOpen, setPurchaseModalOpen] = useState(false);
   const [selectedPhone, setSelectedPhone] = useState<PhoneTypeRead | null>(
     null
   );
@@ -168,12 +174,13 @@ const PhoneNumbers = () => {
               <FaDownload />
               Import Number
             </button>
-            {/* <button
+            <button
               className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700"
+              onClick={() => setPurchaseModalOpen(true)}
             >
               <FaPlus />
               Buy Number
-            </button> */}
+            </button>
           </div>
         </div>
         <div className="flex flex-col justify-between h-full gap-4 rounded-lg bg-gray-900/80 overflow-x-auto">
@@ -243,6 +250,7 @@ const PhoneNumbers = () => {
                         setIsOverlayShow={setIsOverlayShow}
                         setIsSetConfigModalOpen={setIsSetConfigModalOpen}
                         setSelectedPhoneNumber={setSelectedPhone}
+                        setTaggingModalOpen={setTaggingModalOpen}
                       />
                     </TableCell>
                   </tr>
@@ -253,14 +261,15 @@ const PhoneNumbers = () => {
           {!phoneNumbers.length && (
             <div className="text-center m-4 p-6">
               <div className="text-gray-400">No Active Phone Numbers Found</div>
-              {/* <div className="my-3">
+              <div className="my-3">
                 <button
                   className="flex gap-2 items-center cursor-pointer bg-transparent text-sky-600 border border-sky-600 px-4 py-2 mx-auto rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
+                  onClick={() => setPurchaseModalOpen(true)}
                 >
                   <FaPlus />
                   Buy Number
                 </button>
-              </div> */}
+              </div>
             </div>
           )}
         </div>
@@ -290,6 +299,22 @@ const PhoneNumbers = () => {
         setIsOpen={setIsSetConfigModalOpen}
         setIsOverlayShow={setIsOverlayShow}
         setSelectedPhoneNumber={setSelectedPhone}
+      />
+      <TaggingModal
+        isOpen={isTaggingModalOpen}
+        isOverlayShow={isOverlayShow}
+        phone={selectedPhone}
+        setIsChanged={setIsChanged}
+        setIsOpen={setTaggingModalOpen}
+        setIsOverlayShow={setIsOverlayShow}
+        setSelectedPhone={setSelectedPhone}
+      />
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        isOverlayShow={isOverlayShow}
+        setIsChanged={setIsChanged}
+        setIsOpen={setPurchaseModalOpen}
+        setIsOverlayShow={setIsOverlayShow}
       />
     </Content>
   );

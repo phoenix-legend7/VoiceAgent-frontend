@@ -4,8 +4,10 @@ import { Link, useParams } from "react-router-dom"
 import { FaAngleDown, FaAngleLeft, FaAngleRight, FaBook, FaBullhorn, FaCog, FaHistory, FaPhoneAlt, FaUsers } from "react-icons/fa"
 // import { LiaExternalLinkAltSolid } from "react-icons/lia"
 // import { PiSparkle } from "react-icons/pi"
+import { toast } from "react-toastify"
 import NavLink from "./NavLink"
 import settingsItems from "../../consts/settings"
+import axiosInstance from "../../core/axiosInstance"
 
 export const SettingsButtonGroup = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -79,6 +81,28 @@ export const SettingsButtonGroup = () => {
 //   )
 // }
 
+type UserDataType = {
+  user_id: string;
+  credit: number;
+  used_credit: number;
+  auto_refill: {
+    enabled: boolean;
+    threshold?: number;
+    refill_amount?: number;
+  }
+}
+
+const initialUserData: UserDataType = {
+  user_id: "<string>",
+  credit: 5,
+  used_credit: 0,
+  auto_refill: {
+    "enabled": true,
+    "threshold": 0,
+    "refill_amount": 0
+  }
+}
+
 interface Props {
   isOpen: boolean
   setIsOpen: Dispatch<SetStateAction<boolean>>
@@ -86,6 +110,8 @@ interface Props {
 
 const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
   const [isMobile, setIsMobile] = useState(false)
+  const [userData, setUserData] = useState<UserDataType>(initialUserData)
+
   useEffect(() => {
     const checkIsMobile = () => {
       if (window.innerWidth < 768) {
@@ -100,6 +126,19 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
       window.removeEventListener('resize', checkIsMobile)
     }
   }, [])
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axiosInstance.get("/user/info");
+        const data = response.data;
+        setUserData(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to fetch user data: ${error}`);
+      }
+    }
+    fetchUserData();
+  }, []);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (!(event.target as HTMLElement).closest('#navbar') && !(event.target as HTMLElement).closest('#sidebar-toggle')) {
@@ -150,21 +189,22 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
         {/* <NewsGroup /> */}
       </div>
       <div className="w-full">
-        {/* <div className="rounded bg-gray-800/40 py-5 px-6 credit-usage">
+        <div className="rounded bg-gray-800/40 py-5 px-6 credit-usage">
           <div className="text-gray-500 text-sm font-semibold">
             Credit Usage
           </div>
           <div className="text-white font-semibold">
-            $0.0082 / $5.0000
+            ${(userData.used_credit / 100).toFixed(4)}{" "}
+            / ${(userData.credit / 100).toFixed(4)}
           </div>
-          <hr className="text-gray-400 mb-1.5" />
+          {/* <hr className="text-gray-400 mb-1.5" />
           <Link
             className="rounded cursor-pointer px-2 py-1.5 text-sky-600 hover:bg-sky-600/5 transition-all duration-300"
             to="/settings/billing"
           >
             Purchase Credits
-          </Link>
-        </div> */}
+          </Link> */}
+        </div>
         <hr className="w-full h-px text-gray-800" />
         <div className="pt-2">
           <button
