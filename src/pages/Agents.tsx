@@ -201,14 +201,14 @@ const Agents = () => {
         <div className="flex justify-between flex-wrap gap-4">
           <h2 className="flex items-center gap-2 text-2xl font-bold">Voice Agents</h2>
           <button
-            className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700"
+            className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-700"
             onClick={handleOpenCreateAgentModal}
           >
             <FaPlus />
             Add
           </button>
         </div>
-        <div className="bg-gray-900/80 h-full overflow-x-auto mt-8">
+        <div className="bg-gray-900/80 h-full overflow-x-auto mt-6">
           <Table>
             <thead>
               <tr className="border-b border-gray-700">
@@ -238,9 +238,14 @@ const Agents = () => {
                         </div>
                       </Link>
                     </TableCell>
-                    <TableCell>{formatDateTime(agent.created_at)}</TableCell>
+                    <TableCell className="text-gray-400">
+                      {formatDateTime(agent.created_at)}
+                    </TableCell>
                     <TableCell>
-                      <StatusBadge status="active" color="bg-green-500" />
+                      <StatusBadge
+                        status="active"
+                        colors="border-emerald-500 bg-emerald-800/20 text-emerald-500"
+                      />
                     </TableCell>
                     <TableCell>
                       <EditAgentAction

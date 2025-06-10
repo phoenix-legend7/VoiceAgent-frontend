@@ -315,7 +315,7 @@ const CallLogs = () => {
                     className="cursor-pointer"
                     onClick={() => onTrClick(log)}
                   >
-                    <span className="border border-gray-600 rounded px-2 py-0.5 w-fit">
+                    <span className="border border-gray-600 rounded-xl px-3 py-0.5 w-fit text-gray-400 font-semibold text-sm">
                       {log.call_status}
                     </span>
                   </TableCell>

@@ -3,6 +3,7 @@ import {
   FaDownload,
   FaEdit,
   FaEllipsisV,
+  FaPhoneAlt,
   FaPlus,
   FaUserAlt,
 } from "react-icons/fa";
@@ -10,7 +11,7 @@ import { toast } from "react-toastify";
 
 import axiosInstance from "../../core/axiosInstance";
 import Content from "../../Layout/Content";
-import Table, { TableCell } from "../../library/Table";
+import Table, { TableCell, TableRow } from "../../library/Table";
 import { AgentTypeRead } from "../../models/agent";
 import { PhoneTypeRead } from "../../models/phone";
 import { formatDateTime } from "../../utils/helpers";
@@ -168,14 +169,14 @@ const PhoneNumbers = () => {
           </h2>
           <div className="flex gap-2 items-center">
             <button
-              className="flex gap-2 items-center cursor-pointer bg-transparent text-sky-600 border border-sky-600 px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
+              className="flex gap-2 items-center cursor-pointer bg-transparent text-sky-600 border border-sky-600 px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
               onClick={() => setIsImportModalOpen(true)}
             >
               <FaDownload />
               Import Number
             </button>
             <button
-              className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700"
+              className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-700"
               onClick={() => setPurchaseModalOpen(true)}
             >
               <FaPlus />
@@ -189,16 +190,24 @@ const PhoneNumbers = () => {
               <tr className="border-b border-gray-700">
                 <TableCell>Phone</TableCell>
                 <TableCell className="text-center">Agent</TableCell>
-                <TableCell>Region</TableCell>
-                <TableCell>Created</TableCell>
+                <TableCell className="text-gray-400">Region</TableCell>
+                <TableCell className="text-gray-400">Created</TableCell>
                 <TableCell />
               </tr>
             </thead>
             <tbody>
               {phoneNumbers.map((phoneNumber, index) => {
                 return (
-                  <tr key={index}>
-                    <TableCell>{phoneNumber.id}</TableCell>
+                  <TableRow key={index}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {/* bg: rgb(29, 41, 57), text-color: rgb(151, 161, 186) */}
+                        <div className="p-3 rounded-md flex items-center justify-center bg-gray-800 text-gray-400">
+                          <FaPhoneAlt size={14} />
+                        </div>
+                        <div>{phoneNumber.id}</div>
+                      </div>
+                    </TableCell>
                     <TableCell className="text-center">
                       {phoneNumber.agent_id ? (
                         <div className="flex items-center justify-center gap-2">
@@ -239,8 +248,8 @@ const PhoneNumbers = () => {
                         </button>
                       )}
                     </TableCell>
-                    <TableCell>us-west</TableCell>
-                    <TableCell>
+                    <TableCell className="text-gray-400">us-west</TableCell>
+                    <TableCell className="text-gray-400">
                       {formatDateTime(phoneNumber.create_at)}
                     </TableCell>
                     <TableCell>
@@ -253,7 +262,7 @@ const PhoneNumbers = () => {
                         setTaggingModalOpen={setTaggingModalOpen}
                       />
                     </TableCell>
-                  </tr>
+                  </TableRow>
                 );
               })}
             </tbody>

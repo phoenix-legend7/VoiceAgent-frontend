@@ -48,6 +48,9 @@ const MasterLayout = () => {
           </div>
           <Link to="/" className="flex items-center">
             <img src="https://www.elysiapartners.com/wp-content/uploads/2025/03/fav.png" alt="logo" className="h-10" />
+            <div className="font-bold text-xl">
+              Elysia Partners
+            </div>
           </Link>
         </div>
         <div className="flex items-center gap-4">
