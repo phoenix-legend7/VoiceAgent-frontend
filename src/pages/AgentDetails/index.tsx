@@ -7,6 +7,7 @@ import { FaPencil } from "react-icons/fa6"
 import { PiOpenAiLogo } from "react-icons/pi"
 import { toast } from "react-toastify"
 
+import StatusBadge from "../../components/StatusBadge"
 import axiosInstance from "../../core/axiosInstance"
 import { AgentTypeRead } from "../../models/agent"
 import { KnowledgeRead } from "../../models/knowledge"
@@ -152,10 +153,10 @@ const AgentDetails = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                Active
-              </div>
+              <StatusBadge
+                status="active"
+                colors="border-emerald-500 bg-emerald-200/20 text-emerald-500"
+              />
             </div>
             <div>
               <AgentActions

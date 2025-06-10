@@ -123,7 +123,7 @@ const Campaigns = () => {
           </div>
           <div className="flex gap-2 items-center">
             <button
-              className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700"
+              className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-700"
               onClick={handleCreateCammpaignModalOpen}
             >
               <FaPlus />

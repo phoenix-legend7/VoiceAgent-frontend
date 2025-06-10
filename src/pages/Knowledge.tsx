@@ -254,6 +254,20 @@ const KnowledgeAction: FC<KnowledgeActionProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isOpen && !(event.target as HTMLElement).closest('.agent-action-button')) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [isOpen])
+
   return (
     <div className="ml-auto mr-0 relative w-fit">
       <button
@@ -323,7 +337,7 @@ const AgentKnowledge = () => {
           </div>
           <div className="flex gap-2 items-center">
             <button
-              className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700"
+              className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-700"
               onClick={() => setIsCreateModalOpen(true)}
             >
               <FaPlus />
@@ -336,16 +350,14 @@ const AgentKnowledge = () => {
             {knowledges.map((file) => (
               <div
                 key={file.id}
-                className="rounded-lg bg-gray-900/80 px-6 py-4 flex flex-col gap-4"
+                className="rounded-lg bg-gray-900/80 px-6 py-4 flex flex-col gap-2"
               >
                 <div className="gap-3 flex justify-between">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <div className="flex items-center justify-center text-center text-nowrap size-10 overflow-hidden bg-sky-800/20 text-sky-400 font-semibold rounded">
-                        {file.file_type}
-                      </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-center w-fit px-3 py-0.5 text-xs text-center text-nowrap overflow-hidden border border-emerald-500 bg-emerald-800/20 text-emerald-500 font-bold rounded-xl">
+                      {file.file_type}
                     </div>
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col">
                       <div className="text-lg font-semibold">{file.name}</div>
                       <div className="text-gray-400">
                         {formatFileSize(file.size)}

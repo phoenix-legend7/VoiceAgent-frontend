@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { FC } from "react";
 
 interface CampaignStatusBadgeProps {
@@ -8,13 +9,17 @@ interface CallStatusBadgeProps {
 }
 interface StatusBadgeProps {
   status: string;
-  color: string;
+  colors: string;
 }
 
-const StatusBadge: FC<StatusBadgeProps> = ({ status, color }) => {
+const StatusBadge: FC<StatusBadgeProps> = ({ status, colors }) => {
   return (
-    <div className="flex items-center gap-2 capitalize">
-      <div className={`w-2 h-2 rounded-full ${color}`}></div>
+    <div
+      className={clsx(
+        "capitalize w-fit px-3 py-0.5 rounded-xl border font-bold text-xs",
+        colors
+      )}
+    >
       {status}
     </div>
   )
@@ -24,21 +29,21 @@ export const CampaignStatusBadge: FC<CampaignStatusBadgeProps> = ({ status }) =>
   const handleGetStatusColor = () => {
     switch (status) {
       case 'idle':
-        return 'bg-gray-500'
+        return 'border-gray-500 bg-gray-600/20 text-gray-400'
       case 'started':
-        return 'bg-green-500'
+        return 'border-emerald-500 bg-emerald-800/20 text-emerald-500'
       case 'paused':
-        return 'bg-yellow-500'
+        return 'border-yellow-400 bg-yellow-200/20 text-yellow-400'
       case 'finished':
-        return 'bg-blue-500'
+        return 'border-blue-500 bg-blue-800/20 text-blue-400'
       case 'failed':
-        return 'bg-red-500'
+        return 'border-red-400 bg-red-800/20 text-red-400'
       default:
-        return 'bg-gray-500'
+        return 'border-gray-500 bg-gray-600/20 text-gray-400'
     }
   }
   return (
-    <StatusBadge color={handleGetStatusColor()} status={status} />
+    <StatusBadge colors={handleGetStatusColor()} status={status} />
   )
 }
 
@@ -46,19 +51,20 @@ export const CallStatusBadge: FC<CallStatusBadgeProps> = ({ status }) => {
   const handleGetStatusColor = () => {
     switch (status) {
       case 'not_started':
-        return 'bg-gray-500'
+        return 'border-gray-500 bg-gray-600/20 text-gray-400'
       case 'started':
-        return 'bg-green-500'
+        return 'border-emerald-500 bg-emerald-800/20 text-emerald-500'
       case 'finished':
-        return 'bg-blue-500'
+        return 'border-blue-500 bg-blue-800/20 text-blue-400'
       case 'failed':
-        return 'bg-red-500'
+        return 'border-red-400 bg-red-800/20 text-red-400'
       default:
-        return 'bg-gray-500'
+        return 'border-gray-500 bg-gray-600/20 text-gray-400'
     }
   }
+
   return (
-    <StatusBadge color={handleGetStatusColor()} status={status} />
+    <StatusBadge colors={handleGetStatusColor()} status={status} />
   )
 }
 
