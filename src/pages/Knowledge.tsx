@@ -358,7 +358,9 @@ const AgentKnowledge = () => {
                       {file.file_type}
                     </div>
                     <div className="flex flex-col">
-                      <div className="text-lg font-semibold">{file.name}</div>
+                      <div className="text-lg font-semibold line-clamp-2">
+                        {file.name}
+                      </div>
                       <div className="text-gray-400">
                         {formatFileSize(file.size)}
                       </div>
@@ -369,7 +371,9 @@ const AgentKnowledge = () => {
                     handleDelete={() => handleDelete(file.id)}
                   />
                 </div>
-                <div className="text-gray-400">{file.description}</div>
+                <div className="text-gray-400 text-sm line-clamp-3">
+                  {file.description}
+                </div>
               </div>
             ))}
           </div>

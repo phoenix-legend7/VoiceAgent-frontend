@@ -15,7 +15,7 @@ const Content: FC<Props> = ({ className, isOverlayShown, children, onScroll }) =
       <div
         className={clsx(
           className,
-          'flex flex-col justify-between h-full overflow-y-auto px-2 md:px-6 pt-8'
+          'flex flex-col justify-between min-h-full overflow-y-auto px-2 md:px-6 pt-8'
         )}
         onScroll={onScroll}
       >

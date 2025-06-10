@@ -213,7 +213,7 @@ const Agents = () => {
             <thead>
               <tr className="border-b border-gray-700">
                 <TableCell>Name</TableCell>
-                <TableCell>Created</TableCell>
+                <TableCell className="text-gray-400">Created</TableCell>
                 <TableCell className="text-gray-400">Status</TableCell>
                 <TableCell />
               </tr>
@@ -231,7 +231,7 @@ const Agents = () => {
                           </div>
                           <div>
                             {agent.name}
-                            <div className="text-gray-400 text-sm">
+                            <div className="text-gray-400 text-sm mt-1">
                               {agent.config.prompt.length > 90 ? agent.config.prompt.slice(0, 90) + ' ...' : agent.config.prompt}
                             </div>
                           </div>
