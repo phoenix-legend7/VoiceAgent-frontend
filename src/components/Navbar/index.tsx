@@ -197,13 +197,13 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
             ${(userData.used_credit / 100).toFixed(4)}{" "}
             / ${(userData.credit / 100).toFixed(4)}
           </div>
-          {/* <hr className="text-gray-400 mb-1.5" />
+          <hr className="text-gray-400 mb-1.5" />
           <Link
             className="rounded cursor-pointer px-2 py-1.5 text-sky-600 hover:bg-sky-600/5 transition-all duration-300"
             to="/settings/billing"
           >
             Purchase Credits
-          </Link> */}
+          </Link>
         </div>
         <hr className="w-full h-px text-gray-800" />
         <div className="pt-2">
