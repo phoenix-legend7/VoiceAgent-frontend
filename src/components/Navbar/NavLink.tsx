@@ -17,7 +17,7 @@ const NavLink = ({ href, icon, label, rightIcon, isExternal }: Props) => {
   const current = normalize(location.pathname)
   const base = normalize(href)
   const isActive =
-    current === base || current.startsWith(base + "/")
+    current === base || (!!base && current.startsWith(base + "/"))
 
   return (
     <div className="relative">
