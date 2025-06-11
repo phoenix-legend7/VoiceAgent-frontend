@@ -79,7 +79,7 @@ body {
 }
 
 .navbar:hover {
-  @apply w-72;
+  @apply min-w-72;
 }
 
 .navbar .nav-link {
