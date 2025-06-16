@@ -131,8 +131,8 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
               <div>Cost Breakdown</div>
               <div className="flex flex-wrap items-center gap-8 mt-1">
                 <div className="flex flex-wrap items-center gap-4">
-                  {selectedLog.cost_breakdown.map((cost) => (
-                    <div className="flex items-center gap-2">
+                  {selectedLog.cost_breakdown.map((cost, index) => (
+                    <div className="flex items-center gap-2" key={index}>
                       <div className="text-sm rounded bg-gray-800 px-2 py-0.5">
                         {cost.type}
                       </div>
