@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   Bot,
@@ -39,6 +40,20 @@ interface DashboardDataType {
   total_minutes: number;
   total_cost: number;
   success_rate: number;
+  dispositions: {
+    qualified: number;
+    answering: number;
+    no_answer: number;
+    busy: number;
+  };
+  performances: Array<{
+    agent_name: string;
+    total_call: number;
+    total_minutes: number;
+    total_cost: number;
+    cost_per_minute: number;
+    success_call: number;
+  }>;
 }
 
 export default function Dashboard() {
@@ -49,6 +64,8 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardDataType | null>(
     null
   );
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -70,7 +87,7 @@ export default function Dashboard() {
         const params = {
           agent_id: selectedAgent !== "all" ? selectedAgent : undefined,
           time_period: selectedPeriod,
-        }
+        };
         const response = await axiosInstance.get("/dashboard", { params });
         const data = response.data;
         setDashboardData(data);
@@ -90,34 +107,6 @@ export default function Dashboard() {
   }, [selectedAgent, selectedPeriod]);
 
   if (!mounted) return null;
-
-  // Mock data that would change based on filters
-  const getFilteredStats = () => {
-    // This would normally fetch data based on selectedAgent and selectedCampaign
-    return {
-      totalCalls:
-        selectedAgent === "all" ? 1247 : selectedAgent === "ely" ? 687 : 560,
-      totalMinutes:
-        selectedAgent === "all" ? 8432 : selectedAgent === "ely" ? 4521 : 3911,
-      totalCost:
-        selectedAgent === "all"
-          ? 1012.45
-          : selectedAgent === "ely"
-          ? 542.52
-          : 469.93,
-      successRate:
-        selectedAgent === "all" ? 94.2 : selectedAgent === "ely" ? 96.1 : 91.8,
-      leads:
-        selectedAgent === "all" ? 342 : selectedAgent === "ely" ? 198 : 144,
-      answeringMachine:
-        selectedAgent === "all" ? 156 : selectedAgent === "ely" ? 89 : 67,
-      noAnswer:
-        selectedAgent === "all" ? 89 : selectedAgent === "ely" ? 45 : 44,
-      busy: selectedAgent === "all" ? 23 : selectedAgent === "ely" ? 12 : 11,
-    };
-  };
-
-  const stats = getFilteredStats();
 
   return (
     <div className="p-6 space-y-6">
@@ -235,7 +224,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-white">
-              <AnimatedCurrency value={(dashboardData?.total_cost || 0) / 100} />
+              <AnimatedCurrency
+                value={(dashboardData?.total_cost || 0) / 100}
+              />
             </div>
             <p className="text-xs text-cyan-400 mt-1">Campaign costs today</p>
           </CardContent>
@@ -268,43 +259,69 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-cyan-500/20">
               <div className="text-2xl font-bold text-cyan-400 mb-1">
-                <AnimatedCounter value={stats.leads} />
+                <AnimatedCounter
+                  value={dashboardData?.dispositions.qualified || 0}
+                />
               </div>
               <div className="text-sm text-slate-400">Qualified Leads</div>
               <div className="text-xs text-cyan-400 mt-1">
-                {((stats.leads / stats.totalCalls) * 100).toFixed(1)}% of calls
+                {(
+                  ((dashboardData?.dispositions.qualified || 0) /
+                    (dashboardData?.total_calls || 1)) *
+                  100
+                ).toFixed(1)}
+                % of calls
               </div>
             </div>
 
             <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-yellow-500/20">
               <div className="text-2xl font-bold text-yellow-400 mb-1">
-                <AnimatedCounter value={stats.answeringMachine} />
+                <AnimatedCounter
+                  value={dashboardData?.dispositions.answering || 0}
+                />
               </div>
               <div className="text-sm text-slate-400">Answering Machine</div>
               <div className="text-xs text-yellow-400 mt-1">
-                {((stats.answeringMachine / stats.totalCalls) * 100).toFixed(1)}
+                {(
+                  ((dashboardData?.dispositions.answering || 0) /
+                    (dashboardData?.total_calls || 1)) *
+                  100
+                ).toFixed(1)}
                 % of calls
               </div>
             </div>
 
             <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-red-500/20">
               <div className="text-2xl font-bold text-red-400 mb-1">
-                <AnimatedCounter value={stats.noAnswer} />
+                <AnimatedCounter
+                  value={dashboardData?.dispositions.no_answer || 0}
+                />
               </div>
               <div className="text-sm text-slate-400">No Answer</div>
               <div className="text-xs text-red-400 mt-1">
-                {((stats.noAnswer / stats.totalCalls) * 100).toFixed(1)}% of
-                calls
+                {(
+                  ((dashboardData?.dispositions.answering || 0) /
+                    (dashboardData?.total_calls || 1)) *
+                  100
+                ).toFixed(1)}
+                % of calls
               </div>
             </div>
 
             <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-orange-500/20">
               <div className="text-2xl font-bold text-orange-400 mb-1">
-                <AnimatedCounter value={stats.busy} />
+                <AnimatedCounter
+                  value={dashboardData?.dispositions.busy || 0}
+                />
               </div>
               <div className="text-sm text-slate-400">Busy Signal</div>
               <div className="text-xs text-orange-400 mt-1">
-                {((stats.busy / stats.totalCalls) * 100).toFixed(1)}% of calls
+                {(
+                  ((dashboardData?.dispositions.answering || 0) /
+                    (dashboardData?.total_calls || 1)) *
+                  100
+                ).toFixed(1)}
+                % of calls
               </div>
             </div>
           </div>
@@ -317,52 +334,46 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="text-cyan-400 flex items-center gap-2">
               <Users className="w-5 h-5" />
-              Campaign Performance
+              Agent Performance
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-white font-medium">
-                    Solar Lead Generation
-                  </span>
-                  <div className="text-xs text-slate-400">
-                    273/365 calls • $328.50 cost • 2,847 minutes
+            {!dashboardData?.performances.length ? (
+              <div className="text-center mt-5">There is no performances.</div>
+            ) : (
+              dashboardData.performances.map((performance, index) => (
+                <div className="space-y-3" key={index}>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="text-white font-medium">
+                        {performance.agent_name}
+                      </span>
+                      <div className="text-xs text-slate-400">
+                        {performance.success_call}/{performance.total_call}{" "}
+                        calls • ${performance.total_cost} cost •{" "}
+                        {performance.total_minutes} minutes
+                      </div>
+                    </div>
+                    <span className="text-cyan-400 font-mono">
+                      {(
+                        (performance.success_call /
+                          (performance.total_call || 1)) *
+                        100
+                      ).toFixed(0)}
+                      %
+                    </span>
                   </div>
+                  <Progress
+                    value={
+                      (performance.success_call /
+                        (performance.total_call || 1)) *
+                      100
+                    }
+                    className="h-2"
+                  />
                 </div>
-                <span className="text-cyan-400 font-mono">75%</span>
-              </div>
-              <Progress value={75} className="h-2" />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-white font-medium">B2B Outreach</span>
-                  <div className="text-xs text-slate-400">
-                    164/365 calls • $288.45 cost • 1,923 minutes
-                  </div>
-                </div>
-                <span className="text-cyan-400 font-mono">45%</span>
-              </div>
-              <Progress value={45} className="h-2" />
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-white font-medium">
-                    Customer Follow-up
-                  </span>
-                  <div className="text-xs text-slate-400">
-                    200/200 calls • $116.48 cost • 1,456 minutes
-                  </div>
-                </div>
-                <span className="text-cyan-400 font-mono">100%</span>
-              </div>
-              <Progress value={100} className="h-2" />
-            </div>
+              ))
+            )}
           </CardContent>
         </Card>
 
@@ -374,18 +385,22 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button className="w-full bg-gradient-to-r from-cyan-600 via-cyan-600 to-emerald-500 hover:from-cyan-700 hover:via-cyan-700 hover:to-emerald-600 text-white">
+            <Button
+              className="w-full bg-gradient-to-r from-cyan-600 via-cyan-600 to-emerald-500 hover:from-cyan-700 hover:via-cyan-700 hover:to-emerald-600 text-white"
+              onClick={() => navigate("/agents")}
+            >
               <Bot className="w-4 h-4 mr-2" />
               Create New Agent
             </Button>
             <Button
               variant="outline"
               className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+              onClick={() => navigate("/campaign-schedule")}
             >
               <Calendar className="w-4 h-4 mr-2" />
               Schedule Campaign
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
             >
@@ -398,7 +413,7 @@ export default function Dashboard() {
             >
               <Zap className="w-4 h-4 mr-2" />
               Open Toolbox
-            </Button>
+            </Button> */}
           </CardContent>
         </Card>
       </div>
@@ -408,38 +423,34 @@ export default function Dashboard() {
         <CardHeader>
           <CardTitle className="text-cyan-400 flex items-center gap-2">
             <DollarSign className="w-5 h-5" />
-            Cost Breakdown by Campaign
+            Cost Breakdown by Agent
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 rounded-lg bg-slate-800/50">
-              <div className="text-xl font-bold text-white mb-1">$328.50</div>
-              <div className="text-sm text-slate-400 mb-1">
-                Solar Lead Generation
+            {!dashboardData?.performances.length ? (
+              <div className="text-center md:col-span-3">
+                There is no breakdowns.
               </div>
-              <div className="text-xs text-cyan-400">
-                $0.115/min • 2,847 minutes
-              </div>
-            </div>
-
-            <div className="text-center p-4 rounded-lg bg-slate-800/50">
-              <div className="text-xl font-bold text-white mb-1">$288.45</div>
-              <div className="text-sm text-slate-400 mb-1">B2B Outreach</div>
-              <div className="text-xs text-cyan-400">
-                $0.150/min • 1,923 minutes
-              </div>
-            </div>
-
-            <div className="text-center p-4 rounded-lg bg-slate-800/50">
-              <div className="text-xl font-bold text-white mb-1">$116.48</div>
-              <div className="text-sm text-slate-400 mb-1">
-                Customer Follow-up
-              </div>
-              <div className="text-xs text-cyan-400">
-                $0.080/min • 1,456 minutes
-              </div>
-            </div>
+            ) : (
+              dashboardData.performances.map((performance, index) => (
+                <div
+                  className="text-center p-4 rounded-lg bg-slate-800/50"
+                  key={index}
+                >
+                  <div className="text-xl font-bold text-white mb-1">
+                    ${performance.total_cost}
+                  </div>
+                  <div className="text-sm text-slate-400 mb-1">
+                    {performance.agent_name}
+                  </div>
+                  <div className="text-xs text-cyan-400">
+                    ${performance.cost_per_minute}/min •{" "}
+                    {performance.total_minutes} minutes
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
