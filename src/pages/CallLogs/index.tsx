@@ -187,12 +187,14 @@ const CallLogs = () => {
       if (data.detail) {
         throw new Error(data.detail);
       }
-      if (!data.next_cursor) {
+      if (data.length < 20) {
         setEnableNext(false);
       } else {
-        setNextStartAt(data.next_cursor);
+        setNextStartAt(Math.min(
+          ...data.map((h: { ts: number }) => h.ts)
+        ));
       }
-      setTatalLogs([...totalLogs, ...data.histories]);
+      setTatalLogs([...totalLogs, ...data]);
     } catch (error) {
       console.error(error);
       toast.error(`Failed to fetch logs: ${error}`);
@@ -325,7 +327,7 @@ const CallLogs = () => {
                   >
                     $
                     {log.cost_breakdown
-                      ?.reduce((a, b) => a + b.credit, 0)
+                      ?.reduce((a, b) => a + b.credit / 100, 0)
                       .toFixed(4) || "0.0000"}
                   </TableCell>
                   <TableCell
