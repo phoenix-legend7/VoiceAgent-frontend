@@ -137,7 +137,7 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
                         {cost.type}
                       </div>
                       <div className="text-gray-400">
-                        ${cost.credit.toFixed(4)}{' '}
+                        ${(cost.credit / 100).toFixed(4)}{' '}
                         ({cost.provider})
                       </div>
                     </div>
@@ -146,7 +146,7 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
                 <div className="font-bold text-gray-400">
                   Total: $
                   {selectedLog.cost_breakdown.reduce((acc, cost) =>
-                    acc + cost.credit, 0).toFixed(4)
+                    acc + cost.credit / 100, 0).toFixed(4)
                   }
                 </div>
               </div>

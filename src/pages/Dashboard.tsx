@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   Bot,
   TrendingUp,
@@ -27,108 +28,66 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import { AnimatedCounter } from "../components/Animate/Counter";
+import { AnimatedCurrency } from "../components/Animate/Currency";
+import { AnimatedPercentage } from "../components/Animate/Percentage";
+import axiosInstance from "../core/axiosInstance";
+import { AgentTypeRead } from "../models/agent";
 
-function AnimatedCounter({
-  value,
-  duration = 2000,
-}: {
-  value: number;
-  duration?: number;
-}) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-
-      setCount(Math.floor(progress * value));
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [value, duration]);
-
-  return <span>{count.toLocaleString()}</span>;
-}
-
-function AnimatedPercentage({
-  value,
-  duration = 2000,
-}: {
-  value: number;
-  duration?: number;
-}) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-
-      setCount(progress * value);
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [value, duration]);
-
-  return <span>{count.toFixed(1)}%</span>;
-}
-
-function AnimatedCurrency({
-  value,
-  duration = 2000,
-}: {
-  value: number;
-  duration?: number;
-}) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
-      const progress = Math.min((currentTime - startTime) / duration, 1);
-
-      setCount(progress * value);
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [value, duration]);
-
-  return <span>${count.toFixed(2)}</span>;
+interface DashboardDataType {
+  total_calls: number;
+  total_minutes: number;
+  total_cost: number;
+  success_rate: number;
 }
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
+  const [agents, setAgents] = useState<AgentTypeRead[]>([]);
   const [selectedAgent, setSelectedAgent] = useState("all");
-  const [selectedCampaign, setSelectedCampaign] = useState("all");
+  const [selectedPeriod, setSelectedPeriod] = useState("today");
+  const [dashboardData, setDashboardData] = useState<DashboardDataType | null>(
+    null
+  );
 
   useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await axiosInstance.get("/agent");
+        const data = response.data;
+        setAgents(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to fetch agents: ${error}`);
+      }
+    };
+    fetchAgents();
     setMounted(true);
   }, []);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const params = {
+          agent_id: selectedAgent !== "all" ? selectedAgent : undefined,
+          time_period: selectedPeriod,
+        }
+        const response = await axiosInstance.get("/dashboard", { params });
+        const data = response.data;
+        setDashboardData(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchDashboardData();
+    const timerId = setInterval(() => {
+      fetchDashboardData();
+    }, 10000);
+    return () => {
+      if (timerId !== undefined) {
+        clearInterval(timerId);
+      }
+    };
+  }, [selectedAgent, selectedPeriod]);
 
   if (!mounted) return null;
 
@@ -191,7 +150,7 @@ export default function Dashboard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm text-slate-300">Filter by Agent</label>
               <Select value={selectedAgent} onValueChange={setSelectedAgent}>
@@ -200,9 +159,11 @@ export default function Dashboard() {
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
                   <SelectItem value="all">All Agents</SelectItem>
-                  <SelectItem value="ely">
-                    Ely - Conversational AI Specialist
-                  </SelectItem>
+                  {agents.map((agent, index) => (
+                    <SelectItem value={agent.id} key={index}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
                   <SelectItem value="jess">
                     Jess - Solar Battery Lead Generator
                   </SelectItem>
@@ -212,28 +173,11 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-slate-300">
-                Filter by Campaign
-              </label>
-              <Select
-                value={selectedCampaign}
-                onValueChange={setSelectedCampaign}
-              >
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="all">All Campaigns</SelectItem>
-                  <SelectItem value="solar">Solar Lead Generation</SelectItem>
-                  <SelectItem value="b2b">B2B Outreach Campaign</SelectItem>
-                  <SelectItem value="followup">Customer Follow-up</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
               <label className="text-sm text-slate-300">Time Period</label>
-              <Select defaultValue="today">
+              <Select
+                defaultValue="today"
+                onValueChange={(e) => setSelectedPeriod(e)}
+              >
                 <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
                   <SelectValue />
                 </SelectTrigger>
@@ -260,9 +204,8 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-white">
-              <AnimatedCounter value={stats.totalCalls} />
+              <AnimatedCounter value={dashboardData?.total_calls || 0} />
             </div>
-            <p className="text-xs text-cyan-400 mt-1">+18% from yesterday</p>
           </CardContent>
         </Card>
 
@@ -275,7 +218,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-white">
-              <AnimatedCounter value={stats.totalMinutes} />
+              <AnimatedCounter value={dashboardData?.total_minutes || 0} />
             </div>
             <p className="text-xs text-cyan-400 mt-1">
               Talk time across all calls
@@ -292,11 +235,9 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-white">
-              <AnimatedCurrency value={stats.totalCost} />
+              <AnimatedCurrency value={(dashboardData?.total_cost || 0) / 100} />
             </div>
-            <p className="text-xs text-cyan-400 mt-1">
-              Campaign costs today
-            </p>
+            <p className="text-xs text-cyan-400 mt-1">Campaign costs today</p>
           </CardContent>
         </Card>
 
@@ -309,9 +250,8 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-white">
-              <AnimatedPercentage value={stats.successRate} />
+              <AnimatedPercentage value={dashboardData?.success_rate || 0} />
             </div>
-            <p className="text-xs text-cyan-400 mt-1">+2.1% improvement</p>
           </CardContent>
         </Card>
       </div>
