@@ -150,6 +150,14 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
       }
     };
     fetchUserData();
+    const timerId = setInterval(() => {
+      fetchUserData();
+    }, 10000);
+    return () => {
+      if (timerId !== undefined) {
+        clearInterval(timerId);
+      }
+    };
   }, []);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -188,11 +196,7 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
       id="navbar"
     >
       <div className="w-full">
-        <NavLink
-          href="/"
-          icon={<FaChartBar size={20} />}
-          label="Dashboard"
-        />
+        <NavLink href="/" icon={<FaChartBar size={20} />} label="Dashboard" />
         <NavLink
           href="/agents"
           icon={<FaUsers size={20} />}
