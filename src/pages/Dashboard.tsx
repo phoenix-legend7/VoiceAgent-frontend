@@ -34,6 +34,7 @@ import { AnimatedCurrency } from "../components/Animate/Currency";
 import { AnimatedPercentage } from "../components/Animate/Percentage";
 import axiosInstance from "../core/axiosInstance";
 import { AgentTypeRead } from "../models/agent";
+import Content from "../Layout/Content";
 
 interface DashboardDataType {
   total_calls: number;
@@ -109,7 +110,7 @@ export default function Dashboard() {
   if (!mounted) return null;
 
   return (
-    <div className="p-6 space-y-6">
+    <Content className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
@@ -454,6 +455,6 @@ export default function Dashboard() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </Content>
   );
 }
