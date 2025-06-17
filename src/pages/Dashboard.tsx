@@ -154,10 +154,6 @@ export default function Dashboard() {
                       {agent.name}
                     </SelectItem>
                   ))}
-                  <SelectItem value="jess">
-                    Jess - Solar Battery Lead Generator
-                  </SelectItem>
-                  <SelectItem value="ely-b2b">Ely - B2B Agent</SelectItem>
                 </SelectContent>
               </Select>
             </div>
