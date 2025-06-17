@@ -1,12 +1,15 @@
+import { useEffect, useState } from "react";
+import DateTimePicker from "react-tailwindcss-datetimepicker";
 import {
   Calendar,
   Clock,
   Plus,
   Play,
   Pause,
-  Settings,
-  AlertCircle,
+  Trash2,
+  Square,
 } from "lucide-react";
+import { toast } from "react-toastify";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -33,61 +36,148 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
-import { Switch } from "../components/ui/switch";
+import axiosInstance from "../core/axiosInstance";
 import Content from "../Layout/Content";
-
-const scheduledCampaigns = [
-  {
-    id: "1",
-    name: "Morning Solar Leads",
-    agent: "Jess - Solar Battery Lead Generator",
-    schedule: "Daily at 9:00 AM",
-    timezone: "EST",
-    status: "active",
-    nextRun: "Tomorrow at 9:00 AM",
-    startDate: "2025-01-15",
-    endDate: "2025-03-15",
-    frequency: "daily",
-  },
-  {
-    id: "2",
-    name: "B2B Afternoon Outreach",
-    agent: "Ely - B2B Agent",
-    schedule: "Mon-Fri at 2:00 PM",
-    timezone: "PST",
-    status: "paused",
-    nextRun: "Paused",
-    startDate: "2025-01-10",
-    endDate: "2025-02-28",
-    frequency: "weekdays",
-  },
-  {
-    id: "3",
-    name: "Weekend Follow-ups",
-    agent: "Ely - Conversational AI Specialist",
-    schedule: "Sat-Sun at 10:00 AM",
-    timezone: "EST",
-    status: "scheduled",
-    nextRun: "Saturday at 10:00 AM",
-    startDate: "2025-01-20",
-    endDate: "2025-04-20",
-    frequency: "weekends",
-  },
-  {
-    id: "4",
-    name: "Special Product Launch",
-    agent: "Ely - B2B Agent",
-    schedule: "One-time on Jan 25, 2025 at 10:00 AM",
-    timezone: "EST",
-    status: "scheduled",
-    nextRun: "Jan 25, 2025 at 10:00 AM",
-    startDate: "2025-01-25",
-    endDate: "2025-01-25",
-    frequency: "one-off",
-  },
-];
+import { PhoneTypeRead } from "../models/phone";
+import {
+  CampaignScheduleFrequency,
+  ScheduledCampaignCreate,
+  ScheduledCampaignRead,
+} from "../models/scheduledCampaign";
+import { formatDateTime, formatNextRunCampaign } from "../utils/helpers";
 
 export default function CampaignScheduling() {
+  const initTimeRange = {
+    start: new Date(),
+    end: (() => {
+      const now = new Date();
+      now.setDate(now.getDate() + 1);
+      return now;
+    })(),
+  };
+  const [isLoading, setIsLoading] = useState(false);
+  const [scheduledCampaigns, setScheduledCampaigns] = useState<
+    ScheduledCampaignRead[]
+  >([]);
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneTypeRead[]>([]);
+  const [campaignName, setCampaignName] = useState("");
+  const [selectedPhone, setSelectedPhone] = useState<string>();
+  const [frequency, setFrequency] =
+    useState<CampaignScheduleFrequency>("daily");
+  const [selectedRange, setSelectedRange] = useState(initTimeRange);
+
+  useEffect(() => {
+    const fetchPhones = async () => {
+      try {
+        const response = await axiosInstance.get(`/phones`);
+        const data = response.data;
+        setPhoneNumbers(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to fetch phone numbers: ${error}`);
+      }
+    };
+    fetchPhones();
+    const fetchSchedules = async () => {
+      try {
+        const response = await axiosInstance.get(`/campaign-schedule`);
+        const data = response.data;
+        setScheduledCampaigns(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to fetch campaign schedules: ${error}`);
+      }
+    };
+    fetchSchedules();
+  }, []);
+
+  const resetForm = () => {
+    setSelectedPhone(undefined);
+    setFrequency("daily");
+    setCampaignName("");
+    setSelectedRange(initTimeRange);
+  };
+  function handleTimeRangeApply(startDate: Date, endDate: Date) {
+    setSelectedRange({ start: startDate, end: endDate });
+  }
+  const handleCreateSchedule = async () => {
+    try {
+      if (!campaignName) {
+        toast.warning("Campaign name is required.");
+        return;
+      }
+      if (!selectedPhone) {
+        toast.warning("Phone number is required.");
+        return;
+      }
+      const payload: ScheduledCampaignCreate = {
+        caller: selectedPhone,
+        campaign_name: campaignName,
+        frequency: frequency,
+      };
+      setIsLoading(true);
+      const response = await axiosInstance.post(`/campaign-schedule`, payload);
+      setScheduledCampaigns((prev) => [...prev, response.data]);
+      resetForm();
+    } catch (e) {
+      console.error("Failed to create a campaign schedule.", e);
+      toast.error("Failed to create a campaign schedule");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleDeleteCampaignSchedule = async (id: string) => {
+    try {
+      setIsLoading(true);
+      await axiosInstance.delete(`/campaign-schedule/${id}`);
+      setScheduledCampaigns(scheduledCampaigns.filter((s) => s.id !== id));
+    } catch (e) {
+      console.error("Failed to delete campaign schedule.", e);
+      toast.error("Failed to delete campaign schedule");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleStopCampaignSchedule = async (
+    id: string,
+    status: "paused" | "scheduled" = "paused"
+  ) => {
+    try {
+      setIsLoading(true);
+      await axiosInstance.post(`/campaign-schedule/${id}/pause`, undefined, {
+        params: { status },
+      });
+      const cloned = structuredClone(scheduledCampaigns);
+      const campaign = cloned.find((s) => s.id === id);
+      if (campaign) {
+        campaign.status = status;
+        setScheduledCampaigns(cloned);
+      }
+    } catch (e) {
+      console.error(`Failed to ${status} campaign schedule.`, e);
+      toast.error(`Failed to ${status} campaign schedule`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleResumeCampaignSchedule = async (id: string) => {
+    try {
+      setIsLoading(true);
+      await axiosInstance.post(`/campaign-schedule/${id}/resume`);
+      const cloned = structuredClone(scheduledCampaigns);
+      const campaign = cloned.find((s) => s.id === id);
+      if (campaign) {
+        campaign.status = "active";
+        setScheduledCampaigns(cloned);
+      }
+    } catch (e) {
+      console.error("Failed to resume campaign schedule.", e);
+      toast.error("Failed to resume campaign schedule");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Content className="space-y-6">
       <div className="flex justify-between items-center">
@@ -126,35 +216,50 @@ export default function CampaignScheduling() {
                 id="campaign-name"
                 placeholder="Enter campaign name"
                 className="bg-slate-800 border-slate-700 text-white"
+                value={campaignName}
+                onChange={(e) => setCampaignName(e.target.value)}
+                disabled={isLoading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Select Agent</Label>
-              <Select>
+              <Label className="text-slate-300">Select Caller</Label>
+              <Select
+                value={selectedPhone}
+                onValueChange={setSelectedPhone}
+                disabled={isLoading}
+              >
                 <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
-                  <SelectValue placeholder="Choose agent" />
+                  <SelectValue placeholder="Choose caller" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="ely-specialist">
-                    Ely - Conversational AI Specialist
-                  </SelectItem>
-                  <SelectItem value="jess-solar">
-                    Jess - Solar Battery Lead Generator
-                  </SelectItem>
-                  <SelectItem value="ely-b2b">Ely - B2B Agent</SelectItem>
+                  {!phoneNumbers.length && (
+                    <div className="text-gray-400 px-3 py-1">
+                      Not found phone numbers.
+                    </div>
+                  )}
+                  {phoneNumbers.map((phone, index) => (
+                    <SelectItem value={phone.id} key={index}>
+                      {phone.id}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
               <Label className="text-slate-300">Frequency</Label>
-              <Select>
+              <Select
+                value={frequency}
+                onValueChange={(e) =>
+                  setFrequency(e as CampaignScheduleFrequency)
+                }
+                disabled={isLoading}
+              >
                 <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
-                  <SelectItem value="one-off">One-off (Single Run)</SelectItem>
                   <SelectItem value="daily">Daily</SelectItem>
                   <SelectItem value="weekdays">Weekdays Only</SelectItem>
                   <SelectItem value="weekends">Weekends Only</SelectItem>
@@ -165,43 +270,57 @@ export default function CampaignScheduling() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="start-date" className="text-slate-300">
-                Start Date
-              </Label>
-              <Input
-                id="start-date"
-                type="date"
-                className="bg-slate-800 border-slate-700 text-white"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="end-date" className="text-slate-300">
-                End Date (Optional for One-off)
-              </Label>
-              <Input
-                id="end-date"
-                type="date"
-                className="bg-slate-800 border-slate-700 text-white"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="time" className="text-slate-300">
-                Time
-              </Label>
-              <Input
-                id="time"
-                type="time"
-                defaultValue="09:00"
-                className="bg-slate-800 border-slate-700 text-white"
-              />
-            </div>
+            {frequency === "custom" &&
+              (isLoading ? (
+                <button
+                  type="button"
+                  className="cursor-pointer flex flex-wrap gap-x-2 rounded-md border border-input px-3 py-2 text-base ring-offset-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-800 border-slate-700 text-white"
+                  disabled
+                >
+                  <div>{formatDateTime(selectedRange.start.getTime())}</div>
+                  <div>~</div>
+                  <div>{formatDateTime(selectedRange.end.getTime())}</div>
+                </button>
+              ) : (
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="start-date" className="text-slate-300">
+                    Time Range
+                  </Label>
+                  <DateTimePicker
+                    ranges={{}}
+                    start={selectedRange.start}
+                    end={selectedRange.end}
+                    minDate={new Date()}
+                    autoApply
+                    applyCallback={handleTimeRangeApply}
+                    classNames={{
+                      rangesContainer: "w-0 overflow-hidden",
+                      applyButton: "cursor-pointer transition-all duration-300",
+                      cancelButton:
+                        "capitalize cursor-pointer transition-all duration-300",
+                      footerContainer: "hidden sm:hidden",
+                    }}
+                    twelveHoursClock
+                  >
+                    <button
+                      type="button"
+                      className="cursor-pointer flex flex-wrap gap-x-2 rounded-md border border-input px-3 py-2 text-base ring-offset-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-800 border-slate-700 text-white"
+                    >
+                      <div>{formatDateTime(selectedRange.start.getTime())}</div>
+                      <div>~</div>
+                      <div>{formatDateTime(selectedRange.end.getTime())}</div>
+                    </button>
+                  </DateTimePicker>
+                </div>
+              ))}
           </div>
 
           <div className="flex justify-end">
-            <Button className="bg-gradient-to-r from-cyan-600 via-cyan-600 to-emerald-500 hover:from-cyan-700 hover:via-cyan-700 hover:to-emerald-600 text-white">
+            <Button
+              className="bg-gradient-to-r from-cyan-600 via-cyan-600 to-emerald-500 hover:from-cyan-700 hover:via-cyan-700 hover:to-emerald-600 text-white disabled:cursor-not-allowed"
+              onClick={handleCreateSchedule}
+              disabled={isLoading}
+            >
               Create Schedule
             </Button>
           </div>
@@ -227,8 +346,7 @@ export default function CampaignScheduling() {
                   <TableHead className="text-slate-300">
                     Campaign Name
                   </TableHead>
-                  <TableHead className="text-slate-300">Agent</TableHead>
-                  <TableHead className="text-slate-300">Schedule</TableHead>
+                  <TableHead className="text-slate-300">Caller</TableHead>
                   <TableHead className="text-slate-300">Frequency</TableHead>
                   <TableHead className="text-slate-300">Status</TableHead>
                   <TableHead className="text-slate-300">Next Run</TableHead>
@@ -236,75 +354,131 @@ export default function CampaignScheduling() {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {!scheduledCampaigns.length && (
+                  <TableRow className="border-slate-800 hover:bg-slate-800/50">
+                    <TableCell
+                      className="text-slate-400 text-center"
+                      colSpan={6}
+                    >
+                      There is no scheduled campaigns.
+                    </TableCell>
+                  </TableRow>
+                )}
                 {scheduledCampaigns.map((campaign) => (
                   <TableRow
                     key={campaign.id}
                     className="border-slate-800 hover:bg-slate-800/50"
                   >
                     <TableCell className="font-medium text-white">
-                      {campaign.name}
+                      {campaign.campaign_name}
                     </TableCell>
                     <TableCell className="text-slate-400">
-                      {campaign.agent}
-                    </TableCell>
-                    <TableCell className="text-slate-400">
-                      {campaign.schedule} ({campaign.timezone})
+                      {campaign.caller}
                     </TableCell>
                     <TableCell>
                       <Badge
                         variant="outline"
                         className={
-                          campaign.frequency === "one-off"
+                          campaign.frequency === "custom"
                             ? "border-purple-500/50 text-purple-400"
                             : "border-slate-600 text-slate-400"
                         }
                       >
                         {campaign.frequency}
                       </Badge>
+                      {!!campaign.start_time && !!campaign.end_time && (
+                        <div>
+                          {formatDateTime(campaign.start_time)} -{" "}
+                          {formatDateTime(campaign.end_time)}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={
-                          campaign.status === "active"
-                            ? "default"
-                            : campaign.status === "scheduled"
-                            ? "secondary"
-                            : "outline"
-                        }
-                        className={
-                          campaign.status === "active"
-                            ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50"
-                            : campaign.status === "scheduled"
-                            ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/50"
-                            : "bg-yellow-500/20 text-yellow-400 border-yellow-500/50"
-                        }
-                      >
-                        {campaign.status}
-                      </Badge>
+                      <div className="capitalize">
+                        <Badge
+                          variant={
+                            campaign.status === "active"
+                              ? "default"
+                              : campaign.status === "scheduled"
+                              ? "secondary"
+                              : "outline"
+                          }
+                          className={
+                            campaign.status === "active"
+                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50"
+                              : campaign.status === "scheduled"
+                              ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/50"
+                              : "bg-yellow-500/20 text-yellow-400 border-yellow-500/50"
+                          }
+                        >
+                          {campaign.status}
+                        </Badge>
+                      </div>
+                      {!!campaign.error && <div>{campaign.error}</div>}
                     </TableCell>
                     <TableCell className="text-slate-400">
-                      {campaign.nextRun}
+                      {formatNextRunCampaign(
+                        campaign.status,
+                        campaign.frequency
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-slate-400 hover:text-white"
-                        >
-                          {campaign.status === "active" ? (
+                        {campaign.status === "active" && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-slate-400 hover:text-white"
+                            disabled={isLoading}
+                            onClick={() =>
+                              handleStopCampaignSchedule(campaign.id)
+                            }
+                          >
                             <Pause className="w-4 h-4" />
-                          ) : (
+                          </Button>
+                        )}
+                        {campaign.status === "paused" && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-slate-400 hover:text-white"
+                            disabled={isLoading}
+                            onClick={() =>
+                              handleResumeCampaignSchedule(campaign.id)
+                            }
+                          >
                             <Play className="w-4 h-4" />
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-slate-400 hover:text-white"
-                        >
-                          <Settings className="w-4 h-4" />
-                        </Button>
+                          </Button>
+                        )}
+                        {campaign.status === "active" ||
+                        campaign.status === "paused" ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-slate-400 hover:text-white"
+                            disabled={isLoading}
+                            onClick={() =>
+                              handleStopCampaignSchedule(
+                                campaign.id,
+                                "scheduled"
+                              )
+                            }
+                          >
+                            <Square className="w-4 h-4" />
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-slate-400 hover:text-white"
+                            disabled={isLoading}
+                            onClick={() =>
+                              handleDeleteCampaignSchedule(campaign.id)
+                            }
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -316,7 +490,7 @@ export default function CampaignScheduling() {
       </Card>
 
       {/* Global Settings */}
-      <Card className="bg-slate-900 border-slate-800">
+      {/* <Card className="bg-slate-900 border-slate-800">
         <CardHeader>
           <CardTitle className="text-cyan-400 flex items-center gap-2">
             <AlertCircle className="w-5 h-5" />
@@ -393,7 +567,7 @@ export default function CampaignScheduling() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </Content>
   );
 }
