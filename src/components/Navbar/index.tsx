@@ -16,7 +16,6 @@ import {
 } from "react-icons/fa";
 // import { LiaExternalLinkAltSolid } from "react-icons/lia"
 // import { PiSparkle } from "react-icons/pi"
-import { toast } from "react-toastify";
 import NavLink from "./NavLink";
 import settingsItems from "../../consts/settings";
 import axiosInstance from "../../core/axiosInstance";
@@ -146,7 +145,7 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
         setUserData(data);
       } catch (error) {
         console.error(error);
-        toast.error(`Failed to fetch user data: ${error}`);
+        // toast.error(`Failed to fetch user data: ${error}`);
       }
     };
     fetchUserData();
