@@ -8,6 +8,17 @@ export interface ScheduledCampaignCreate {
   end_time?: number;
 }
 
+export interface ScheduleByExistingCampaign {
+  campaign_id: string;
+  campaign_name: string;
+  campaign_status: "paused" | "idle" | "started" | "finished" | "failed";
+  created_at: number;
+  caller: string;
+  frequency: CampaignScheduleFrequency;
+  start_time?: number;
+  end_time?: number;
+}
+
 export interface ScheduledCampaignRead extends ScheduledCampaignCreate {
   id: string;
   created_at: number;

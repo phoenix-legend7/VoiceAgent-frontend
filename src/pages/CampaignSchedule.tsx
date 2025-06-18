@@ -38,12 +38,15 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
+import { Switch } from "../components/ui/switch";
 import axiosInstance from "../core/axiosInstance";
 import Content from "../Layout/Content";
 import { AgentTypeRead } from "../models/agent";
+import { CampaignTypeRead } from "../models/campaign";
 import { PhoneTypeRead } from "../models/phone";
 import {
   CampaignScheduleFrequency,
+  ScheduleByExistingCampaign,
   ScheduledCampaignCreate,
   ScheduledCampaignRead,
 } from "../models/scheduledCampaign";
@@ -62,9 +65,12 @@ export default function CampaignScheduling() {
   const [scheduledCampaigns, setScheduledCampaigns] = useState<
     ScheduledCampaignRead[]
   >([]);
+  const [campaigns, setCampaigns] = useState<CampaignTypeRead[]>([]);
   const [agents, setAgents] = useState<AgentTypeRead[]>([]);
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneTypeRead[]>([]);
+  const [createNew, setCreateNew] = useState(true);
   const [campaignName, setCampaignName] = useState("");
+  const [selectedCampaign, setSelectedCampaign] = useState<string>();
   const [selectedPhone, setSelectedPhone] = useState<string>();
   const [frequency, setFrequency] =
     useState<CampaignScheduleFrequency>("daily");
@@ -97,7 +103,8 @@ export default function CampaignScheduling() {
       try {
         const response = await axiosInstance.get(`/campaign-schedule`);
         const data = response.data;
-        setScheduledCampaigns(data);
+        setScheduledCampaigns(data.scheduled_campaigns);
+        setCampaigns(data.not_scheduled_campaigns);
       } catch (error) {
         console.error(error);
         toast.error(`Failed to fetch campaign schedules: ${error}`);
@@ -111,28 +118,58 @@ export default function CampaignScheduling() {
     setFrequency("daily");
     setCampaignName("");
     setSelectedRange(initTimeRange);
+    setSelectedCampaign(undefined);
+    setCreateNew(true);
   };
   function handleTimeRangeApply(startDate: Date, endDate: Date) {
     setSelectedRange({ start: startDate, end: endDate });
   }
   const handleCreateSchedule = async () => {
     try {
-      if (!campaignName) {
+      if (createNew && !campaignName) {
         toast.warning("Campaign name is required.");
+        return;
+      }
+      if (!createNew && !selectedCampaign) {
+        toast.warning("You must select a campaign.");
         return;
       }
       if (!selectedPhone) {
         toast.warning("Phone number is required.");
         return;
       }
-      const payload: ScheduledCampaignCreate = {
-        caller: selectedPhone,
-        campaign_name: campaignName,
-        frequency: frequency,
-      };
-      setIsLoading(true);
-      const response = await axiosInstance.post(`/campaign-schedule`, payload);
-      setScheduledCampaigns((prev) => [...prev, response.data]);
+      if (createNew) {
+        const payload: ScheduledCampaignCreate = {
+          caller: selectedPhone,
+          campaign_name: campaignName,
+          frequency: frequency,
+        };
+        if (frequency === "custom") {
+          payload.start_time = selectedRange.start.getTime();
+          payload.end_time = selectedRange.end.getTime();
+        }
+        setIsLoading(true);
+        const response = await axiosInstance.post(`/campaign-schedule`, payload);
+        setScheduledCampaigns((prev) => [...prev, response.data]);
+      } else {
+        const campaign = campaigns.find((c) => c.id === selectedCampaign);
+        if (!campaign) return;
+        const payload: ScheduleByExistingCampaign = {
+          campaign_id: campaign.name,
+          campaign_name: campaign.name,
+          campaign_status: campaign.status,
+          created_at: campaign.created_at,
+          caller: selectedPhone,
+          frequency: frequency,
+        };
+        if (frequency === "custom") {
+          payload.start_time = selectedRange.start.getTime();
+          payload.end_time = selectedRange.end.getTime();
+        }
+        setIsLoading(true);
+        const response = await axiosInstance.post(`/campaign-schedule/exist`, payload);
+        setScheduledCampaigns((prev) => [...prev, response.data]);
+      }
       resetForm();
     } catch (e) {
       console.error("Failed to create a campaign schedule.", e);
@@ -222,19 +259,46 @@ export default function CampaignScheduling() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex items-center gap-3 mb-3">
+            <div>
+              <Label className="text-slate-300 font-medium">
+                Schedule By Existing Campaign
+              </Label>
+            </div>
+            <Switch checked={createNew} onCheckedChange={setCreateNew} />
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div className="space-y-2">
               <Label htmlFor="campaign-name" className="text-slate-300">
                 Campaign Name
               </Label>
-              <Input
-                id="campaign-name"
-                placeholder="Enter campaign name"
-                className="bg-slate-800 border-slate-700 text-white"
-                value={campaignName}
-                onChange={(e) => setCampaignName(e.target.value)}
-                disabled={isLoading}
-              />
+              {createNew ? (
+                <Input
+                  id="campaign-name"
+                  placeholder="Enter campaign name"
+                  className="bg-slate-800 border-slate-700 text-white"
+                  value={campaignName}
+                  onChange={(e) => setCampaignName(e.target.value)}
+                  disabled={isLoading}
+                />
+              ) : (
+                <Select
+                  value={selectedCampaign}
+                  onValueChange={setSelectedCampaign}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                    <SelectValue placeholder="Select campaign" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-600">
+                    {campaigns.map((campaign) => (
+                      <SelectItem key={campaign.id} value={campaign.id}>
+                        {campaign.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             <div className="space-y-2">
