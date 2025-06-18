@@ -9,6 +9,8 @@ import {
   Trash2,
   Square,
 } from "lucide-react";
+import { FaPhoneAlt, FaUser } from "react-icons/fa";
+import { MdInsertLink } from "react-icons/md";
 import { toast } from "react-toastify";
 import { Button } from "../components/ui/button";
 import {
@@ -38,6 +40,7 @@ import {
 import { Badge } from "../components/ui/badge";
 import axiosInstance from "../core/axiosInstance";
 import Content from "../Layout/Content";
+import { AgentTypeRead } from "../models/agent";
 import { PhoneTypeRead } from "../models/phone";
 import {
   CampaignScheduleFrequency,
@@ -59,6 +62,7 @@ export default function CampaignScheduling() {
   const [scheduledCampaigns, setScheduledCampaigns] = useState<
     ScheduledCampaignRead[]
   >([]);
+  const [agents, setAgents] = useState<AgentTypeRead[]>([]);
   const [phoneNumbers, setPhoneNumbers] = useState<PhoneTypeRead[]>([]);
   const [campaignName, setCampaignName] = useState("");
   const [selectedPhone, setSelectedPhone] = useState<string>();
@@ -78,6 +82,17 @@ export default function CampaignScheduling() {
       }
     };
     fetchPhones();
+    const fetchAgents = async () => {
+      try {
+        const response = await axiosInstance.get("/agent");
+        const data = response.data;
+        setAgents(data);
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to fetch agents: ${error}`);
+      }
+    };
+    fetchAgents();
     const fetchSchedules = async () => {
       try {
         const response = await axiosInstance.get(`/campaign-schedule`);
@@ -230,7 +245,10 @@ export default function CampaignScheduling() {
                 disabled={isLoading}
               >
                 <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
-                  <SelectValue placeholder="Choose caller" />
+                  <SelectValue
+                    className="bg-red-500"
+                    placeholder="Choose caller"
+                  />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-600">
                   {!phoneNumbers.length && (
@@ -238,11 +256,36 @@ export default function CampaignScheduling() {
                       Not found phone numbers.
                     </div>
                   )}
-                  {phoneNumbers.map((phone, index) => (
-                    <SelectItem value={phone.id} key={index}>
-                      {phone.id}
-                    </SelectItem>
-                  ))}
+                  {phoneNumbers.map((phone, index) => {
+                    const agent = agents.find(
+                      (agent) => agent.id === phone.agent_id
+                    );
+                    return (
+                      <SelectItem value={phone.id} key={index}>
+                        <div className="flex items-center text-nowrap gap-2">
+                          <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+                            <div>
+                              <FaPhoneAlt />
+                            </div>
+                            {phone.id}
+                          </div>
+                          {!!agent && (
+                            <>
+                              <div className="w-5">
+                                <MdInsertLink />
+                              </div>
+                              <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+                                <div>
+                                  <FaUser />
+                                </div>
+                                {agent.name}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
