@@ -1,7 +1,7 @@
 import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from "react"
 import { toast } from "react-toastify"
 
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import Card from "../../library/Card"
 import { InputBox } from "../../library/FormField"
 import { AgentTypeRead } from "../../models/agent"
@@ -70,8 +70,7 @@ const WebhookSettings: FC<WebhookSettingsProps> = ({ agent, setAgent, setIsOverl
         }
       })
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to update agent')
+      handleAxiosError('Failed to update agent', error)
     } finally {
       setIsOverlayShow(false)
     }

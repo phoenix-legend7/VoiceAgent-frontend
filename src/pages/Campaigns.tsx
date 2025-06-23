@@ -1,10 +1,9 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { FaBullhorn, FaPlus, FaTrash } from "react-icons/fa"
 import { Link } from "react-router-dom"
-import { toast } from "react-toastify"
 
 import { CampaignStatusBadge } from "../components/StatusBadge"
-import axiosInstance from "../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
 import Content from "../Layout/Content"
 import { InputBox } from "../library/FormField"
 import Modal from "../library/ModalProvider"
@@ -43,8 +42,7 @@ const CreateCampaignModal: FC<CreateCampaignModalProps> = ({
       setIsChanged(prev => !prev)
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to create a new campaign: ${error}`)
+      handleAxiosError('Failed to create a new campaign', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -86,8 +84,7 @@ const Campaigns = () => {
         }
         setCampaigns(response.data)
       } catch (error) {
-        console.error(error)
-        toast.error(`Failed to get campaigns: ${error}`)
+        handleAxiosError('Failed to get campaigns', error)
       } finally {
         setIsOverlayShow(false)
       }
@@ -104,8 +101,7 @@ const Campaigns = () => {
       await axiosInstance.delete(`/campaigns/${id}`)
       setIsChanged(prev => !prev)
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to delete campaign: ${error}`)
+      handleAxiosError('Failed to delete campaign', error)
     } finally {
       setIsOverlayShow(false)
     }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import {
   Bot,
   TrendingUp,
@@ -32,7 +31,7 @@ import {
 import { AnimatedCounter } from "../components/Animate/Counter";
 import { AnimatedCurrency } from "../components/Animate/Currency";
 import { AnimatedPercentage } from "../components/Animate/Percentage";
-import axiosInstance from "../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance";
 import { AgentTypeRead } from "../models/agent";
 import Content from "../Layout/Content";
 
@@ -75,8 +74,7 @@ export default function Dashboard() {
         const data = response.data;
         setAgents(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch agents: ${error}`);
+        handleAxiosError('Failed to fetch agents', error);
       }
     };
     fetchAgents();

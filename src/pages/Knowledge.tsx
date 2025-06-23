@@ -11,7 +11,7 @@ import {
 import { FaEllipsisV, FaFileUpload, FaPlus, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 
-import axiosInstance from "../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance";
 import Content from "../Layout/Content";
 import Modal from "../library/ModalProvider";
 import { KnowledgeRead } from "../models/knowledge";
@@ -103,8 +103,7 @@ export const CreateKnowledgeModal: FC<CreateKnowledgeModalProps> = ({
       setIsChanged((prev) => !prev);
       onClose();
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to create file: ${error}`);
+      handleAxiosError('Failed to create file', error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -306,8 +305,7 @@ const AgentKnowledge = () => {
         const response = await axiosInstance.get("/knowledge/list_files");
         setKnowledges(response.data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch files: ${error}`);
+        handleAxiosError('Failed to fetch files', error);
       } finally {
         setIsOverlayShow(false);
       }
@@ -321,8 +319,7 @@ const AgentKnowledge = () => {
       await axiosInstance.post("/knowledge/delete_file", { id });
       setKnowledges(knowledges.filter((file) => file.id !== id));
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to delete agent: ${error}`);
+      handleAxiosError('Failed to delete agent', error);
     } finally {
       setIsOverlayShow(false);
     }

@@ -3,7 +3,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { FaChevronDown, FaInfoCircle } from "react-icons/fa"
 import { toast } from "react-toastify"
 import llms, { languageModels, speechModels } from "../../consts/llm"
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import Modal from "../../library/ModalProvider"
 import { GroupedSelect } from "../../library/Select"
 import { AgentTypeRead } from "../../models/agent"
@@ -88,8 +88,7 @@ const EditAgentModal: FC<Props> = ({
       setAgent(agent)
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to update agent')
+      handleAxiosError('Failed to update agent', error)
     } finally {
       setIsOverlayShow(false)
     }

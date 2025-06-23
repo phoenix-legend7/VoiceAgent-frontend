@@ -1,7 +1,7 @@
 import { FC, Dispatch, SetStateAction, useState, useMemo } from "react"
 import { toast } from "react-toastify"
 
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import { AgentTypeRead } from "../../models/agent"
 import Card from "../../library/Card"
 import { InputBox, InputBoxWithUnit, Slider, SwtichWithLabel } from "../../library/FormField"
@@ -53,8 +53,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
       toast.success('Prompt updated successfully')
       setAgent({ ...agent, config: { ...agent.config, ...data.config } })
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to update prompt')
+      handleAxiosError('Failed to update prompt', error)
     } finally {
       setIsOverlayShow(false)
     }

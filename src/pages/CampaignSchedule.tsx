@@ -39,7 +39,7 @@ import {
 } from "../components/ui/table";
 import { Badge } from "../components/ui/badge";
 import { Switch } from "../components/ui/switch";
-import axiosInstance from "../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance";
 import Content from "../Layout/Content";
 import { AgentTypeRead } from "../models/agent";
 import { CampaignTypeRead } from "../models/campaign";
@@ -83,8 +83,7 @@ export default function CampaignScheduling() {
         const data = response.data;
         setPhoneNumbers(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch phone numbers: ${error}`);
+        handleAxiosError('Failed to fetch phone numbers', error);
       }
     };
     fetchPhones();
@@ -94,8 +93,7 @@ export default function CampaignScheduling() {
         const data = response.data;
         setAgents(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch agents: ${error}`);
+        handleAxiosError('Failed to fetch agents', error);
       }
     };
     fetchAgents();
@@ -106,8 +104,7 @@ export default function CampaignScheduling() {
         setScheduledCampaigns(data.scheduled_campaigns);
         setCampaigns(data.not_scheduled_campaigns);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch campaign schedules: ${error}`);
+        handleAxiosError('Failed to fetch campaign schedules', error);
       }
     };
     fetchSchedules();
@@ -172,8 +169,7 @@ export default function CampaignScheduling() {
       }
       resetForm();
     } catch (e) {
-      console.error("Failed to create a campaign schedule.", e);
-      toast.error("Failed to create a campaign schedule");
+      handleAxiosError('Failed to create a campaign schedule', e);
     } finally {
       setIsLoading(false);
     }
@@ -184,8 +180,7 @@ export default function CampaignScheduling() {
       await axiosInstance.delete(`/campaign-schedule/${id}`);
       setScheduledCampaigns(scheduledCampaigns.filter((s) => s.id !== id));
     } catch (e) {
-      console.error("Failed to delete campaign schedule.", e);
-      toast.error("Failed to delete campaign schedule");
+      handleAxiosError('Failed to delete campaign schedule', e);
     } finally {
       setIsLoading(false);
     }
@@ -206,8 +201,7 @@ export default function CampaignScheduling() {
         setScheduledCampaigns(cloned);
       }
     } catch (e) {
-      console.error(`Failed to ${status} campaign schedule.`, e);
-      toast.error(`Failed to ${status} campaign schedule`);
+      handleAxiosError(`Failed to ${status} campaign schedule`, e);
     } finally {
       setIsLoading(false);
     }
@@ -223,8 +217,7 @@ export default function CampaignScheduling() {
         setScheduledCampaigns(cloned);
       }
     } catch (e) {
-      console.error("Failed to resume campaign schedule.", e);
-      toast.error("Failed to resume campaign schedule");
+      handleAxiosError('Failed to resume campaign schedule', e);
     } finally {
       setIsLoading(false);
     }

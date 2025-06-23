@@ -82,7 +82,6 @@ const AppToolConfigModal: FC<AppToolConfigModalProps> = ({
       })
       setSelectedAppTool(null)
     } catch (error) {
-      console.error(error)
       toast.error('Failed to create function')
     } finally {
       setIsOverlayShow(false)

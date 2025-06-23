@@ -9,7 +9,7 @@ import {
 } from "react";
 import { FaFileAlt, FaPlus, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Card from "../../library/Card";
 import { InputBox } from "../../library/FormField";
 import Modal from "../../library/ModalProvider";
@@ -97,8 +97,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
       });
       onClose();
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to update agent");
+      handleAxiosError("Failed to update agent", error);
     } finally {
       setIsOverlayShow(false);
     }

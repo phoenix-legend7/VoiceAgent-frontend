@@ -7,9 +7,8 @@ import {
   FaPlus,
   FaUserAlt,
 } from "react-icons/fa";
-import { toast } from "react-toastify";
 
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Content from "../../Layout/Content";
 import Table, { TableCell, TableRow } from "../../library/Table";
 import { AgentTypeRead } from "../../models/agent";
@@ -71,8 +70,7 @@ const PhoneAction: React.FC<ActionProps> = ({
       await axiosInstance.delete(`/phones/${phone.id}`);
       setIsChanged((prev) => !prev);
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to delete phone: ${error}`);
+      handleAxiosError('Failed to delete phone', error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -137,8 +135,7 @@ const PhoneNumbers = () => {
         const data = response.data;
         setAgents(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch agents: ${error}`);
+        handleAxiosError('Failed to fetch agents', error);
       }
     };
     fetchAgents();
@@ -151,8 +148,7 @@ const PhoneNumbers = () => {
         const data = response.data;
         setPhoneNumbers(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch phone numbers: ${error}`);
+        handleAxiosError('Failed to fetch phone numbers', error);
       } finally {
         setIsOverlayShow(false);
       }

@@ -2,7 +2,7 @@ import { Dispatch, FC, SetStateAction, useState } from "react"
 import { AiOutlineProduct } from "react-icons/ai"
 import { FaEdit, FaPlus, FaRegCalendarPlus, FaRegTrashAlt } from "react-icons/fa"
 import { toast } from "react-toastify"
-import axiosInstance from "../../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../../core/axiosInstance"
 import Card from "../../../library/Card"
 import { AgentTypeRead } from "../../../models/agent"
 import AppToolModal from "./AppToolModal"
@@ -40,8 +40,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
         }
       })
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to delte function')
+      handleAxiosError('Failed to delte function', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -64,8 +63,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
         }
       })
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to delete function')
+      handleAxiosError('Failed to delete function', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -88,8 +86,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
         }
       })
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to delete function')
+      handleAxiosError('Failed to delete function', error)
     } finally {
       setIsOverlayShow(false)
     }

@@ -4,9 +4,8 @@ import {
   SetStateAction,
   useState,
 } from "react";
-import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import { InputBox } from "../../library/FormField";
 import Modal from "../../library/ModalProvider";
 import { PhoneTypeRead } from "../../models/phone";
@@ -51,8 +50,7 @@ export const TaggingModal: FC<Props> = ({
       await axiosInstance.put(`/phones/${phone.id}/tags`, { tags });
       setIsChanged((prev) => !prev);
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to save tags: ${error}`);
+      handleAxiosError('Failed to save tags', error);
     } finally {
       setIsOverlayShow(false);
     }

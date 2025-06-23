@@ -3,7 +3,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useMemo, useRef, useState } fr
 import { FaCheck, FaPlay, FaRegCopy, FaStop } from "react-icons/fa"
 import { toast } from "react-toastify"
 import { languageOptions } from "../../consts/languages"
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import Modal from "../../library/ModalProvider"
 import { AgentTypeRead, AgentVoiceConfigType } from "../../models/agent"
 import VoiceType from "../../models/voice"
@@ -161,8 +161,7 @@ const AgentVoiceModal: FC<Props> = ({
       })
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to update agent')
+      handleAxiosError('Failed to update agent', error)
     } finally {
       setIsOverlayShow(false)
     }
