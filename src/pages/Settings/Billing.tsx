@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { FaCreditCard, FaRegCopyright } from "react-icons/fa";
-import { toast } from "react-toastify";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Card from "../../library/Card";
 import { InputBoxWithUnit } from "../../library/FormField";
 import SettingsLayout from "./SettingsLayout";
@@ -54,8 +53,7 @@ const Billing = () => {
         setThreshold(data.auto_refill.threshold || 0);
         setRefillAmount(data.auto_refill.refill_amount || 5000);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch user data: ${error}`);
+        handleAxiosError('Failed to fetch user data', error);
       }
     };
     fetchUserData();

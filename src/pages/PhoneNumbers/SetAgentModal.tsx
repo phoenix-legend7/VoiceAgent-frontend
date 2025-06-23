@@ -7,8 +7,7 @@ import {
   useState,
 } from "react";
 import { FaUserAlt } from "react-icons/fa";
-import { toast } from "react-toastify";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Modal from "../../library/ModalProvider";
 import Select from "../../library/Select";
 import { AgentTypeRead } from "../../models/agent";
@@ -71,8 +70,7 @@ export const SetAgentModal: FC<Props> = ({
       setIsChanged((prev) => !prev);
       onClose();
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to set agent: ${error}`);
+      handleAxiosError('Failed to set agent', error);
     } finally {
       setIsOverlayShow(false);
     }

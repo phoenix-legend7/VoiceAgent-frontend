@@ -1,6 +1,6 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import { toast } from "react-toastify";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import { InputBox } from "../../library/FormField";
 import Modal from "../../library/ModalProvider";
 import Select from "../../library/Select";
@@ -89,8 +89,7 @@ export const PurchaseModal: FC<Props> = ({
       setIsChanged((prev) => !prev);
       onClose();
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to buy new number: ${error}`);
+      handleAxiosError('Failed to buy new number', error);
     } finally {
       setIsOverlayShow(false);
     }

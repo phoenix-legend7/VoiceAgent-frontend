@@ -1,7 +1,5 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Modal from "../../library/ModalProvider";
 import Select from "../../library/Select";
 import { CampaignInfoType, CampaignTypeRead } from "../../models/campaign";
@@ -49,8 +47,7 @@ const SetCallerPhone: FC<Props> = ({
       setIsChanged(true);
       onClose();
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to set caller phone: ${error}`);
+      handleAxiosError('Failed to set caller phone', error);
     } finally {
       setIsOverlayShow(false);
     }

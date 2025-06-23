@@ -1,9 +1,9 @@
 import { FC, useEffect, useState } from "react"
 import { BsMic, BsMicMute } from "react-icons/bs"
 import { FaEllipsis } from "react-icons/fa6"
-import { toast } from 'react-toastify'
 
 import msClient from "../../../core/millisAIClient"
+import { handleAxiosError } from "../../../core/axiosInstance"
 import { AgentTypeRead } from "../../../models/agent"
 
 const regions = [
@@ -30,7 +30,7 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
     })
     msClient.on("onerror", (error: Event) => {
       setIsCalling(false)
-      toast.error(`Error: ${error}`)
+      handleAxiosError('Error', error)
     })
   }, [])
 

@@ -2,7 +2,7 @@ import { Dispatch, FC, SetStateAction, useMemo, useState } from "react"
 import { MdInfoOutline } from "react-icons/md"
 import { toast } from "react-toastify"
 
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import Card from "../../library/Card"
 import { AgentTypeRead } from "../../models/agent"
 
@@ -44,8 +44,7 @@ const AgentPrompt: FC<AgentPromptProps> = ({ agent, setAgent, setIsOverlayShow }
       toast.success('Prompt updated successfully')
       setAgent({ ...agent, config: { ...agent.config, prompt } })
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to update prompt')
+      handleAxiosError('Failed to update prompt', error)
     } finally {
       setIsOverlayShow(false)
     }

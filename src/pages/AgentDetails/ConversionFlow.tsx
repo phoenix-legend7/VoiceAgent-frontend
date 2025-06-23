@@ -1,8 +1,8 @@
 import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from "react"
 import { FaTrash } from "react-icons/fa"
 import { toast } from "react-toastify"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 
-import axiosInstance from "../../core/axiosInstance"
 import Card from "../../library/Card"
 import { InputBox, InputBoxWithUnit, SwtichWithLabel, SwitchWithMessage } from "../../library/FormField"
 import { AgentTypeRead } from "../../models/agent"
@@ -78,8 +78,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
       toast.success('Agent updated successfully')
       setAgent(editData)
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to update agent')
+      handleAxiosError('Failed to update agent', error)
     } finally {
       setIsOverlayShow(false)
     }

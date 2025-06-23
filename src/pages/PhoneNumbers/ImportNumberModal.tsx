@@ -3,7 +3,7 @@ import { FaExternalLinkAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 import { countryPhoneOptions } from "../../consts/countryPhones";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Modal from "../../library/ModalProvider";
 import Select from "../../library/Select";
 import { TabButton } from "../../library/Tab";
@@ -135,8 +135,7 @@ export const ImportNumberModal: FC<Props> = ({
         setIsChanged((prev) => !prev);
         handleClose();
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to set agent: ${error}`);
+        handleAxiosError('Failed to set agent', error);
       } finally {
         setIsOverlayShow(false);
       }

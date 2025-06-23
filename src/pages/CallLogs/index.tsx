@@ -9,9 +9,8 @@ import {
 import { FaArrowRight, FaExternalLinkAlt } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Accordian from "../../library/Accordian";
 import Content from "../../Layout/Content";
 import { InputBox } from "../../library/FormField";
@@ -196,8 +195,7 @@ const CallLogs = () => {
       }
       setTatalLogs([...totalLogs, ...data]);
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to fetch logs: ${error}`);
+      handleAxiosError('Failed to fetch logs' , error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -228,8 +226,7 @@ const CallLogs = () => {
         const data = response.data;
         setAgents(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch agents: ${error}`);
+        handleAxiosError('Failed to fetch agents', error);
       }
     };
     fetchAgents();

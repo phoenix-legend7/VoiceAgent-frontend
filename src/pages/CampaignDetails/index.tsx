@@ -10,9 +10,8 @@ import {
 } from "react-icons/fa";
 import { MdInsertLink } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import {
   CallStatusBadge,
   CampaignStatusBadge,
@@ -54,8 +53,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setPhones(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch phones: ${error}`);
+        handleAxiosError('Failed to fetch phones', error);
       }
     };
     const fetchAgents = async () => {
@@ -64,8 +62,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setAgents(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch agents: ${error}`);
+        handleAxiosError('Failed to fetch agents', error);
       }
     };
     fetchPhones();
@@ -79,8 +76,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setCampaign(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch campaign: ${error}`);
+        handleAxiosError('Failed to fetch campaign', error);
       } finally {
         setIsOverlayShow(false);
       }
@@ -91,8 +87,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setCampaignInfo(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to get campaign info: ${error}`);
+        handleAxiosError('Failed to get campaign info', error);
       }
     };
     fetchCampaign();
@@ -146,8 +141,7 @@ const CampaignDetails = () => {
       const data = response.data;
       setCampaignInfo(data);
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to include metadata: ${error}`);
+      handleAxiosError('Failed to include metadata', error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -161,9 +155,8 @@ const CampaignDetails = () => {
         throw new Error(data.detail);
       }
       setIsChanged((prev) => !prev);
-    } catch (error) {
-      console.error(error);
-      toast.error(`Failed to start campaign: ${error}`);
+    } catch (e) {
+      handleAxiosError("Failed to start campaign", e);
     } finally {
       setIsOverlayShow(false);
     }
@@ -178,8 +171,7 @@ const CampaignDetails = () => {
       }
       setIsChanged((prev) => !prev);
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to stop campaign: ${error}`);
+      handleAxiosError('Failed to stop campaign', error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -197,8 +189,7 @@ const CampaignDetails = () => {
         records: newRecords,
       });
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to delete record: ${error}`);
+      handleAxiosError('Failed to delete record', error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -248,7 +239,8 @@ const CampaignDetails = () => {
                 ) : (
                   <button
                     className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
-                    onClick={() => setIsConfirmStartModalOpen(true)}
+                    onClick={campaign.status !== "finished" ? () => setIsConfirmStartModalOpen(true) : undefined}
+                    disabled={campaign.status === "finished"}
                   >
                     <FaPlus />
                     Start

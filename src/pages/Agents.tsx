@@ -1,10 +1,9 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { FaEllipsisV, FaPlus, FaUserAlt } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
 
 import StatusBadge from "../components/StatusBadge"
-import axiosInstance from "../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
 import { InputBox } from "../library/FormField"
 import Modal from "../library/ModalProvider"
 import Table, { TableCell, TableRow } from "../library/Table"
@@ -42,8 +41,7 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
       await axiosInstance.post(`/agent/${agent.id}/duplicate`)
       setIsChanged(prev => !prev)
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to duplicate agent: ${error}`)
+      handleAxiosError('Failed to duplicate agent', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -54,8 +52,7 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
       await axiosInstance.delete(`/agent/${agent.id}`)
       setIsChanged(prev => !prev)
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to delete agent: ${error}`)
+      handleAxiosError('Failed to delete agent', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -141,8 +138,7 @@ const CreateAgentModal: FC<CreateAgentModalProps> = ({
       setIsChanged(prev => !prev)
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to create a new agent: ${error}`)
+      handleAxiosError('Failed to create a new agent', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -182,8 +178,7 @@ const Agents = () => {
         const data = response.data
         setAgents(data)
       } catch (error) {
-        console.error(error)
-        toast.error(`Failed to fetch agents: ${error}`)
+        handleAxiosError('Failed to fetch agents', error)
       } finally {
         setIsOverlayShow(false)
       }

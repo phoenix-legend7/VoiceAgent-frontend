@@ -1,8 +1,7 @@
 import { Dispatch, FC, SetStateAction, useState } from "react"
 import { FaPlus, FaTrash } from "react-icons/fa"
-import { toast } from "react-toastify"
 
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import Modal from "../../library/ModalProvider"
 import { CampaignTypeRead } from "../../models/campaign"
 import { InputBox } from "../../library/FormField"
@@ -56,8 +55,7 @@ const AddRecordModal: FC<AddRecordsModalProps> = ({
       setIsChanged(prev => !prev)
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to add record: ${error}`)
+      handleAxiosError('Failed to add record', error)
     } finally {
       setIsOverlayShow(false)
     }

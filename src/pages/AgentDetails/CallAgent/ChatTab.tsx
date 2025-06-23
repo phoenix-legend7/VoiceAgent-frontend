@@ -1,8 +1,7 @@
 import { FC, useState } from "react"
-import { toast } from "react-toastify"
 import { BsSendFill } from "react-icons/bs"
 
-import axiosInstance from "../../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../../core/axiosInstance"
 import { AgentTypeRead } from "../../../models/agent"
 import { InputBox } from "../../../library/FormField"
 import Markdown from "../../../library/Markdown"
@@ -81,8 +80,7 @@ const ChatTab: FC<ChatTabProps> = ({ agent }) => {
         throw new Error("No data received from server")
       }
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to send message: ${error}`)
+      handleAxiosError('Failed to send message', error)
     } finally {
       setIsWaiting(false)
     }

@@ -2,7 +2,7 @@ import clsx from "clsx"
 import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from "react"
 import { FaChevronDown, FaInfoCircle, FaRegTrashAlt, FaTrash } from "react-icons/fa"
 import { toast } from "react-toastify"
-import axiosInstance from "../../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../../core/axiosInstance"
 import { InputBox, SwtichWithLabel } from "../../../library/FormField"
 import Modal from "../../../library/ModalProvider"
 import Select from "../../../library/Select"
@@ -233,8 +233,7 @@ const ToolModal: FC<ToolModalProps> = ({
       })
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to create function')
+      handleAxiosError('Failed to create function', error)
     } finally {
       setIsOverlayShow(false)
     }

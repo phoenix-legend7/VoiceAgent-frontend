@@ -8,7 +8,7 @@ import { PiOpenAiLogo } from "react-icons/pi"
 import { toast } from "react-toastify"
 
 import StatusBadge from "../../components/StatusBadge"
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import { AgentTypeRead } from "../../models/agent"
 import { KnowledgeRead } from "../../models/knowledge"
 import VoiceType from "../../models/voice"
@@ -67,8 +67,7 @@ const AgentDetails = () => {
         const data = response.data
         setAgent(data)
       } catch (error) {
-        console.error(error)
-        toast.error(`Failed to fetch agent: ${error}`)
+        handleAxiosError('Failed to fetch agent', error)
       } finally {
         setIsOverlayShow(false)
       }
@@ -86,8 +85,7 @@ const AgentDetails = () => {
         name: editAgentName
       })
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to edit agent name: ${error}`)
+      handleAxiosError('Failed to edit agent name', error)
     } finally {
       setIsOverlayShow(false)
       setIsEditAgentName(false)

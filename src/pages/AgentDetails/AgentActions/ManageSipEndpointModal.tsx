@@ -53,7 +53,6 @@ const ManageSipEndpointModal: FC<Props> = ({
       )
       toast.success('New SIP Endpoint generated successfully.')
     } catch (error) {
-      console.error(error)
       toast.error('Failed to generate new SIP endpoint.')
     } finally {
       setIsOverlayShow(false)
@@ -64,7 +63,6 @@ const ManageSipEndpointModal: FC<Props> = ({
     try {
       await axiosInstance.delete(`/sip/${call_id}`)
     } catch (error) {
-      console.error(error)
       toast.error('Failed to delete SIP endpoint.')
     } finally {
       setIsOverlayShow(false)
