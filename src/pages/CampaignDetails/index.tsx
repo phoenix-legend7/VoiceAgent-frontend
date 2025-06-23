@@ -215,15 +215,17 @@ const CampaignDetails = () => {
               </div>
               <div className="flex gap-x-4 gap-y-2 flex-wrap">
                 <button
-                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
+                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 disabled:cursor-not-allowed disabled:text-neutral-700 disabled:border-neutral-700 transition-all duration-300"
                   onClick={() => setIsImportRecordModalOpen(true)}
+                  disabled={campaign.status === "finished"}
                 >
                   <FaPlus />
                   Import
                 </button>
                 <button
-                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
+                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 disabled:cursor-not-allowed disabled:text-neutral-700 disabled:border-neutral-700 transition-all duration-300"
                   onClick={() => setIsAddRecordModalOpen(true)}
+                  disabled={campaign.status === "finished"}
                 >
                   <FaPlus />
                   Add Record
@@ -238,7 +240,7 @@ const CampaignDetails = () => {
                   </button>
                 ) : (
                   <button
-                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
+                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-neutral-700 transition-all duration-300"
                     onClick={campaign.status !== "finished" ? () => setIsConfirmStartModalOpen(true) : undefined}
                     disabled={campaign.status === "finished"}
                   >
