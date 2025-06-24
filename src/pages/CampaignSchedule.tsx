@@ -265,7 +265,7 @@ export default function CampaignScheduling() {
               <Label htmlFor="campaign-name" className="text-slate-300">
                 Campaign Name
               </Label>
-              {createNew ? (
+              {!createNew ? (
                 <Input
                   id="campaign-name"
                   placeholder="Enter campaign name"
