@@ -31,7 +31,7 @@ const AgentConfig: FC<AgentConfigProps> = ({ config }) => {
       <div className="flex gap-2 items-center">
         Agent Config
         <button
-          className="cursor-pointer rounded-md border border-sky-500 px-2 py-1 text-sm text-sky-500 hover:border-sky-300 hover:text-sky-300 transition-all duration-300"
+          className="cursor-pointer rounded-md border border-sky-500 px-2 py-1 text-sm text-sky-500 hover:border-sky-300 hover:text-sky-300 select-none transition-all duration-300"
           onClick={() => setIsOpen(prev => !prev)}
         >
           {isOpen ? 'Hide' : 'View'}
@@ -111,7 +111,7 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
             <div className="w-full sm:w-1/2 py-3 px-6">
               <div>Status</div>
               <div className="my-1">
-                <span className="border border-gray-600 rounded px-2 py-0.5">
+                <span className="border border-gray-600 rounded-xl px-3 py-0.5 w-fit text-gray-400 font-semibold text-sm">
                   {selectedLog.call_status}
                 </span>
               </div>
@@ -131,13 +131,13 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
               <div>Cost Breakdown</div>
               <div className="flex flex-wrap items-center gap-8 mt-1">
                 <div className="flex flex-wrap items-center gap-4">
-                  {selectedLog.cost_breakdown.map((cost) => (
-                    <div className="flex items-center gap-2">
+                  {selectedLog.cost_breakdown.map((cost, index) => (
+                    <div className="flex items-center gap-2" key={index}>
                       <div className="text-sm rounded bg-gray-800 px-2 py-0.5">
                         {cost.type}
                       </div>
                       <div className="text-gray-400">
-                        ${cost.credit.toFixed(4)}{' '}
+                        ${(cost.credit / 100).toFixed(4)}{' '}
                         ({cost.provider})
                       </div>
                     </div>
@@ -146,7 +146,7 @@ const DetailedLogModalOpen: FC<DetailedLogModalOpenProps> = ({
                 <div className="font-bold text-gray-400">
                   Total: $
                   {selectedLog.cost_breakdown.reduce((acc, cost) =>
-                    acc + cost.credit, 0).toFixed(4)
+                    acc + cost.credit / 100, 0).toFixed(4)
                   }
                 </div>
               </div>

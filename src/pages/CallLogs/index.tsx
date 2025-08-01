@@ -9,9 +9,8 @@ import {
 import { FaArrowRight, FaExternalLinkAlt } from "react-icons/fa";
 import { MdFilterList } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
 
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Accordian from "../../library/Accordian";
 import Content from "../../Layout/Content";
 import { InputBox } from "../../library/FormField";
@@ -187,15 +186,16 @@ const CallLogs = () => {
       if (data.detail) {
         throw new Error(data.detail);
       }
-      if (!data.next_cursor) {
+      if (data.length < 20) {
         setEnableNext(false);
       } else {
-        setNextStartAt(data.next_cursor);
+        setNextStartAt(Math.min(
+          ...data.map((h: { ts: number }) => h.ts)
+        ));
       }
-      setTatalLogs([...totalLogs, ...data.histories]);
+      setTatalLogs([...totalLogs, ...data]);
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to fetch logs: ${error}`);
+      handleAxiosError('Failed to fetch logs' , error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -226,8 +226,7 @@ const CallLogs = () => {
         const data = response.data;
         setAgents(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch agents: ${error}`);
+        handleAxiosError('Failed to fetch agents', error);
       }
     };
     fetchAgents();
@@ -315,7 +314,7 @@ const CallLogs = () => {
                     className="cursor-pointer"
                     onClick={() => onTrClick(log)}
                   >
-                    <span className="border border-gray-600 rounded px-2 py-0.5 w-fit">
+                    <span className="border border-gray-600 rounded-xl px-3 py-0.5 w-fit text-gray-400 font-semibold text-sm">
                       {log.call_status}
                     </span>
                   </TableCell>
@@ -325,7 +324,7 @@ const CallLogs = () => {
                   >
                     $
                     {log.cost_breakdown
-                      ?.reduce((a, b) => a + b.credit, 0)
+                      ?.reduce((a, b) => a + b.credit / 100, 0)
                       .toFixed(4) || "0.0000"}
                   </TableCell>
                   <TableCell

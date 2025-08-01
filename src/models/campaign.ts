@@ -24,6 +24,7 @@ export interface CampaignInfoType {
   name: string;
   status: "idle" | "started" | "paused" | "finished" | "failed";
   created_at: number;
+  include_metadata_in_prompt: boolean;
   caller?: string;
 }
 

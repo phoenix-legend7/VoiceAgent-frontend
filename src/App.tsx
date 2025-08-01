@@ -12,6 +12,8 @@ import CallLogs from './pages/CallLogs'
 import Credentials from './pages/Settings/Credentials'
 import Billing from './pages/Settings/Billing'
 import Transactions from './pages/Settings/Transactions'
+import Dashboard from './pages/Dashboard'
+import CampaignScheduling from './pages/CampaignSchedule'
 
 const Settings = () => {
   return (
@@ -30,12 +32,13 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* <Route path="/" element={<Home />} /> */}
-        <Route path="/" element={<Navigate to="/agents" />} />
         <Route element={<MasterLayout />}>
+          <Route path="/" element={<Dashboard />} />
           <Route path="/agents" element={<Agents />} />
           <Route path="/agents/:id" element={<AgentDetails />} />
           <Route path="/phones" element={<PhoneNumbers />} />
           <Route path="/campaigns" element={<Campaigns />} />
+          <Route path="/campaign-schedule" element={<CampaignScheduling />} />
           <Route path="/campaigns/:id" element={<CampaignDetails />} />
           <Route path="/knowledge" element={<AgentKnowledge />} />
           <Route path="/histories" element={<CallLogs />} />

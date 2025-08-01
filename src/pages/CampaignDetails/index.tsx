@@ -10,9 +10,8 @@ import {
 } from "react-icons/fa";
 import { MdInsertLink } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import {
   CallStatusBadge,
   CampaignStatusBadge,
@@ -21,6 +20,7 @@ import PaginationComponent from "../../components/PaginationComponent";
 import Content from "../../Layout/Content";
 // import { SwtichWithLabel } from "../../library/FormField";
 import Table, { TableCell, TableRow } from "../../library/Table";
+import { SwtichWithLabel } from "../../library/FormField";
 import { AgentTypeRead } from "../../models/agent";
 import { CampaignInfoType, CampaignTypeRead } from "../../models/campaign";
 import { PhoneTypeRead } from "../../models/phone";
@@ -53,8 +53,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setPhones(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch phones: ${error}`);
+        handleAxiosError('Failed to fetch phones', error);
       }
     };
     const fetchAgents = async () => {
@@ -63,8 +62,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setAgents(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch agents: ${error}`);
+        handleAxiosError('Failed to fetch agents', error);
       }
     };
     fetchPhones();
@@ -78,8 +76,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setCampaign(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to fetch campaign: ${error}`);
+        handleAxiosError('Failed to fetch campaign', error);
       } finally {
         setIsOverlayShow(false);
       }
@@ -90,8 +87,7 @@ const CampaignDetails = () => {
         const data = response.data;
         setCampaignInfo(data);
       } catch (error) {
-        console.error(error);
-        toast.error(`Failed to get campaign info: ${error}`);
+        handleAxiosError('Failed to get campaign info', error);
       }
     };
     fetchCampaign();
@@ -130,16 +126,26 @@ const CampaignDetails = () => {
     [agents, phones]
   );
 
-  // const handleIncludeMetaData = async () => {
-  //   try {
-  //     const response = await axiosInstance.put(`/campaigns/${id}/include-metadata`)
-  //     const data = response.data
-  //     setCampaign(data)
-  //   } catch (error) {
-  //     console.error(error)
-  //     toast.error(`Failed to include metadata: ${error}`)
-  //   }
-  // };
+  const handleIncludeMetaData = async () => {
+    if (!campaignInfo) return;
+    try {
+      const payload = {
+        name: campaignInfo.name,
+        include_metadata_in_prompt: !campaignInfo.include_metadata_in_prompt,
+      };
+      setIsOverlayShow(true);
+      const response = await axiosInstance.put(
+        `/campaigns/${id}/info`,
+        payload
+      );
+      const data = response.data;
+      setCampaignInfo(data);
+    } catch (error) {
+      handleAxiosError('Failed to include metadata', error);
+    } finally {
+      setIsOverlayShow(false);
+    }
+  };
   const handleStartCampaign = async () => {
     setIsOverlayShow(true);
     try {
@@ -149,9 +155,8 @@ const CampaignDetails = () => {
         throw new Error(data.detail);
       }
       setIsChanged((prev) => !prev);
-    } catch (error) {
-      console.error(error);
-      toast.error(`Failed to start campaign: ${error}`);
+    } catch (e) {
+      handleAxiosError("Failed to start campaign", e);
     } finally {
       setIsOverlayShow(false);
     }
@@ -166,8 +171,7 @@ const CampaignDetails = () => {
       }
       setIsChanged((prev) => !prev);
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to stop campaign: ${error}`);
+      handleAxiosError('Failed to stop campaign', error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -185,8 +189,7 @@ const CampaignDetails = () => {
         records: newRecords,
       });
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to delete record: ${error}`);
+      handleAxiosError('Failed to delete record', error);
     } finally {
       setIsOverlayShow(false);
     }
@@ -212,15 +215,17 @@ const CampaignDetails = () => {
               </div>
               <div className="flex gap-x-4 gap-y-2 flex-wrap">
                 <button
-                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
+                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 disabled:cursor-not-allowed disabled:text-neutral-700 disabled:border-neutral-700 transition-all duration-300"
                   onClick={() => setIsImportRecordModalOpen(true)}
+                  disabled={campaign.status === "finished"}
                 >
                   <FaPlus />
                   Import
                 </button>
                 <button
-                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 transition-all duration-300"
+                  className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold text-sky-600 hover:text-sky-500 border border-sky-600 rounded hover:border-sky-500 disabled:cursor-not-allowed disabled:text-neutral-700 disabled:border-neutral-700 transition-all duration-300"
                   onClick={() => setIsAddRecordModalOpen(true)}
+                  disabled={campaign.status === "finished"}
                 >
                   <FaPlus />
                   Add Record
@@ -235,8 +240,9 @@ const CampaignDetails = () => {
                   </button>
                 ) : (
                   <button
-                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
-                    onClick={() => setIsConfirmStartModalOpen(true)}
+                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-neutral-700 transition-all duration-300"
+                    onClick={campaign.status !== "finished" ? () => setIsConfirmStartModalOpen(true) : undefined}
+                    disabled={campaign.status === "finished"}
                   >
                     <FaPlus />
                     Start
@@ -283,10 +289,13 @@ const CampaignDetails = () => {
                 </div>
               </div>
             </div>
-            {/* <div className="mt-8 flex flex-wrap gap-2">
-              <SwtichWithLabel onChange={handleIncludeMetaData} value={false} />
+            <div className="mt-8 flex flex-wrap gap-2">
+              <SwtichWithLabel
+                onChange={handleIncludeMetaData}
+                value={!!campaignInfo?.include_metadata_in_prompt}
+              />
               <div>Include extra metadata in agent prompt</div>
-            </div> */}
+            </div>
             <div className="mt-8">
               <PaginationComponent
                 currentPage={currentPage}

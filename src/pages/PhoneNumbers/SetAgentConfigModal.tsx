@@ -1,6 +1,6 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Modal from "../../library/ModalProvider";
 import { PhoneTypeRead } from "../../models/phone";
 
@@ -59,8 +59,7 @@ export const SetAgentConfigModal: FC<Props> = ({
       setIsChanged((prev) => !prev);
       onClose();
     } catch (error) {
-      console.error(error);
-      toast.error(`Failed to set agent: ${error}`);
+      handleAxiosError('Failed to set agent', error);
     } finally {
       setIsOverlayShow(false);
     }

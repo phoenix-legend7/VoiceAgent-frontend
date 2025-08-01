@@ -4,7 +4,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react
 import { FaFileCsv } from "react-icons/fa"
 import { toast } from "react-toastify"
 
-import axiosInstance from "../../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import Modal from "../../library/ModalProvider"
 import Table, { TableCell, TableRow } from "../../library/Table"
 import { CampaignTypeRead } from "../../models/campaign"
@@ -59,8 +59,7 @@ const ImportRecordModal: FC<ImportRecordsModalProps> = ({
       setIsChanged(prev => !prev)
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to import records: ${error}`)
+      handleAxiosError('Failed to import records', error)
     } finally {
       setIsOverlayShow(false)
     }

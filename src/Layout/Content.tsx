@@ -15,7 +15,7 @@ const Content: FC<Props> = ({ className, isOverlayShown, children, onScroll }) =
       <div
         className={clsx(
           className,
-          'flex flex-col justify-between h-full overflow-y-auto px-2 md:px-6 pt-8'
+          'container mx-auto flex flex-col justify-between min-h-full px-2 md:px-6 pt-8'
         )}
         onScroll={onScroll}
       >
@@ -33,7 +33,7 @@ const Content: FC<Props> = ({ className, isOverlayShown, children, onScroll }) =
         </div>
       </div>
       {isOverlayShown && (
-        <div className="absolute inset-0 bg-gray-950/90 cursor-wait z-50">
+        <div className="absolute inset-0 bg-gray-950 cursor-wait z-50">
           <div className="flex items-center justify-center h-full">
             <div className="w-16 h-16 rounded-full border-4 border-t-transparent border-b-transparent border-r-transparent border-gray-400 animate-spin"></div>
           </div>

@@ -50,7 +50,6 @@ const CustomLlmModal: FC<Props> = ({
         }
       })
     } catch (error) {
-      console.error(error)
       toast.error('Failed to update custom websocket url')
     } finally {
       setIsOverlayShow(false)

@@ -1,10 +1,9 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { FaEllipsisV, FaPlus, FaUserAlt } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
 
 import StatusBadge from "../components/StatusBadge"
-import axiosInstance from "../core/axiosInstance"
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
 import { InputBox } from "../library/FormField"
 import Modal from "../library/ModalProvider"
 import Table, { TableCell, TableRow } from "../library/Table"
@@ -42,8 +41,7 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
       await axiosInstance.post(`/agent/${agent.id}/duplicate`)
       setIsChanged(prev => !prev)
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to duplicate agent: ${error}`)
+      handleAxiosError('Failed to duplicate agent', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -54,8 +52,7 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
       await axiosInstance.delete(`/agent/${agent.id}`)
       setIsChanged(prev => !prev)
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to delete agent: ${error}`)
+      handleAxiosError('Failed to delete agent', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -141,8 +138,7 @@ const CreateAgentModal: FC<CreateAgentModalProps> = ({
       setIsChanged(prev => !prev)
       onClose()
     } catch (error) {
-      console.error(error)
-      toast.error(`Failed to create a new agent: ${error}`)
+      handleAxiosError('Failed to create a new agent', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -182,8 +178,7 @@ const Agents = () => {
         const data = response.data
         setAgents(data)
       } catch (error) {
-        console.error(error)
-        toast.error(`Failed to fetch agents: ${error}`)
+        handleAxiosError('Failed to fetch agents', error)
       } finally {
         setIsOverlayShow(false)
       }
@@ -201,19 +196,19 @@ const Agents = () => {
         <div className="flex justify-between flex-wrap gap-4">
           <h2 className="flex items-center gap-2 text-2xl font-bold">Voice Agents</h2>
           <button
-            className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-6 py-3 rounded-md transition-all duration-300 hover:bg-sky-700"
+            className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-700"
             onClick={handleOpenCreateAgentModal}
           >
             <FaPlus />
             Add
           </button>
         </div>
-        <div className="bg-gray-900/80 h-full overflow-x-auto mt-8">
+        <div className="bg-gray-900/80 h-full overflow-x-auto mt-6">
           <Table>
             <thead>
               <tr className="border-b border-gray-700">
                 <TableCell>Name</TableCell>
-                <TableCell>Created</TableCell>
+                <TableCell className="text-gray-400">Created</TableCell>
                 <TableCell className="text-gray-400">Status</TableCell>
                 <TableCell />
               </tr>
@@ -231,16 +226,21 @@ const Agents = () => {
                           </div>
                           <div>
                             {agent.name}
-                            <div className="text-gray-400 text-sm">
+                            <div className="text-gray-400 text-sm mt-1">
                               {agent.config.prompt.length > 90 ? agent.config.prompt.slice(0, 90) + ' ...' : agent.config.prompt}
                             </div>
                           </div>
                         </div>
                       </Link>
                     </TableCell>
-                    <TableCell>{formatDateTime(agent.created_at)}</TableCell>
+                    <TableCell className="text-gray-400">
+                      {formatDateTime(agent.created_at)}
+                    </TableCell>
                     <TableCell>
-                      <StatusBadge status="active" color="bg-green-500" />
+                      <StatusBadge
+                        status="active"
+                        colors="border-emerald-500 bg-emerald-800/20 text-emerald-500"
+                      />
                     </TableCell>
                     <TableCell>
                       <EditAgentAction

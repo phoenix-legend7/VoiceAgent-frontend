@@ -1,4 +1,5 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
@@ -17,5 +18,33 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export const handleAxiosError = (msg: string, e: unknown) => {
+  const error = e as AxiosError;
+  
+  // Handle different types of error response data
+  let errorMessage = 'Unknown error occurred';
+  
+  if (error.response?.data) {
+    const data = error.response.data;
+    
+    // Check if data has a detail property (common API error format)
+    if (typeof data === 'object' && data !== null && 'detail' in data) {
+      errorMessage = (data as { detail: string }).detail;
+    } 
+    // Check if data is a string
+    else if (typeof data === 'string') {
+      errorMessage = data;
+    }
+    // Check if data has a message property
+    else if (typeof data === 'object' && data !== null && 'message' in data) {
+      errorMessage = (data as { message: string }).message;
+    }
+  } else if (error.message) {
+    errorMessage = error.message;
+  }
+  
+  toast.error(`${msg}: ${errorMessage}`);
+}
 
 export default axiosInstance;
