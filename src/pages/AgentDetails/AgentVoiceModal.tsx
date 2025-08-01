@@ -51,7 +51,7 @@ const ListItem: FC<ListItemProps> = ({
     <div
       className={clsx(
         "flex items-center justify-between pr-4 transition-all duration-300",
-        selectedVoice?.voice_id === voice.voice_id ? "text-sky-600 bg-sky-600/20 hover:bg-sky-600 hover:text-white font-bold" : "text-gray-400 hover:bg-gray-700/50"
+        selectedVoice?.voice_id === voice.voice_id ? "text-sky-600 bg-sky-600/20 hover:bg-sky-600 hover:text-white font-bold" : "text-gray-600 dark:text-gray-400 hover:bg-gray-400/50 dark:hover:bg-gray-700/50"
       )}
     >
       <div
@@ -65,11 +65,11 @@ const ListItem: FC<ListItemProps> = ({
           {getAvatarText()}
         </div>
         <div>
-          <div className="font-semibold text-white">
+          <div className="font-semibold">
             {voice.name}
           </div>
           {!!voice.category && (
-            <div className="text-sm text-gray-400 font-semibold">
+            <div className="text-sm text-gray-600 dark:text-gray-400 font-semibold">
               {voice.category}
             </div>
           )}
@@ -77,7 +77,7 @@ const ListItem: FC<ListItemProps> = ({
       </div>
       <div className="flex items-center justify-self-end">
         <button
-          className="flex items-center justify-center w-10 h-10 rounded cursor-pointer hover:bg-gray-700 transition-all duration-300"
+          className="flex items-center justify-center w-10 h-10 rounded cursor-pointer hover:bg-gray-400 dark:hover:bg-gray-700 transition-all duration-300"
           onClick={handleCopyId}
           title="Copy Voice Id"
         >
@@ -85,7 +85,7 @@ const ListItem: FC<ListItemProps> = ({
         </button>
         {!!voice.preview_url && (
           <button
-            className="flex items-center justify-center w-10 h-10 rounded cursor-pointer text-xs hover:bg-gray-700 transition-all duration-300"
+            className="flex items-center justify-center w-10 h-10 rounded cursor-pointer text-xs hover:bg-gray-400 dark:hover:bg-gray-700 transition-all duration-300"
             onClick={isPlaying ? handleStop : handlePlay}
             title="Play Voice Preview"
           >
@@ -183,17 +183,17 @@ const AgentVoiceModal: FC<Props> = ({
     >
       <div className="flex flex-col gap-4 h-full">
         <div className="flex items-center justify-between">
-          <p className="text-gray-400 text-sm font-semibold">
+          <p className="text-gray-600 dark:text-gray-400 text-sm font-semibold">
             Showing voices filtered by language:{' '}
             {languageOptions.find(language => (language.value || 'en') === agent.config.language)?.label || 'English'}
           </p>
-          <div className="flex items-center gap-3 px-4 py-3 rounded-md bg-sky-950 text-sky-200 mr-2">
-            <FaCheck className="text-sky-400" />
+          <div className="flex items-center gap-3 px-4 py-3 rounded-md bg-sky-50 dark:bg-sky-950 text-sky-800 dark:text-sky-200 mr-2">
+            <FaCheck className="text-sky-600 dark:text-sky-400" />
             {voices.find(voice => voice.voice_id === selectedVoice?.voice_id)?.name || 'Rachel'}{' '}
             ({selectedVoice?.provider || 'elevenlabs'})
           </div>
         </div>
-        <hr className="text-gray-800" />
+        <hr className="text-gray-300 dark:text-gray-800" />
         <div className="overflow-auto">
           <div className="flex justify-center h-96 max-h-full min-w-[500px] overflow-y-auto gap-3">
             <div className="h-full overflow-y-auto pl-4 pr-2 capitalize">
@@ -202,7 +202,7 @@ const AgentVoiceModal: FC<Props> = ({
                   key={`cat-${index}`}
                   className={clsx(
                     "w-full px-4 py-3 cursor-pointer transition-all duration-300",
-                    selectedCategory === cat ? "text-sky-600 bg-sky-600/20 hover:bg-sky-600 hover:text-white font-bold" : "text-gray-400 hover:bg-gray-700/20"
+                    selectedCategory === cat ? "text-sky-600 bg-sky-600/20 hover:bg-sky-600 hover:text-white font-bold" : "text-gray-600 dark:text-gray-400 hover:bg-gray-700/20"
                   )}
                   onClick={() => setSelectedCattegory(cat)}
                 >
@@ -211,7 +211,7 @@ const AgentVoiceModal: FC<Props> = ({
               ))}
             </div>
             <div className="grow overflow-y-auto">
-              <div className="px-4 py-3 sticky top-0 bg-gray-800 font-semibold">
+              <div className="px-4 py-3 sticky top-0 bg-gray-200 dark:bg-gray-800 font-semibold">
                 Standard Voices
               </div>
               {filteredVoices.filter(voice => voice.category !== 'trending').map((voice, index) => (
@@ -223,7 +223,7 @@ const AgentVoiceModal: FC<Props> = ({
                 />
               ))}
               {!!trandingVoices.length && (
-                <div className="px-4 py-3 sticky top-0 bg-gray-800 font-semibold">
+                <div className="px-4 py-3 sticky top-0 bg-gray-200 dark:bg-gray-800 font-semibold">
                   Community Trending Voices
                 </div>
               )}
@@ -238,7 +238,7 @@ const AgentVoiceModal: FC<Props> = ({
             </div>
           </div>
         </div>
-        <hr className="text-gray-800" />
+        <hr className="text-gray-300 dark:text-gray-800" />
       </div>
     </Modal>
   )

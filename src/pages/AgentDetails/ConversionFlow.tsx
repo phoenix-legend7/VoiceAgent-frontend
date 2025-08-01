@@ -22,7 +22,7 @@ interface KeyValueType {
 const ChildItem: FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="mt-6">
-      <div className="bg-gray-900 text-white shadow-md rounded-md border-l-2 border-gray-800 p-4">
+      <div className="bg-white dark:bg-gray-900 text-black dark:text-white shadow-md rounded-md border-l-2 border-gray-300 dark:border-gray-800 p-4">
         {children}
       </div>
     </div>
@@ -140,7 +140,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           value={!!editData.config.flow?.user_start_first}
           onChange={(value) => handleUpdateData('user_start_first', value)}
         />
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Agent will wait for user to start first.
         </p>
         <InputBox
@@ -156,7 +156,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           disabled={!!editData.config.flow?.user_start_first}
           placeholder="Welcome! How can I help you?"
         />
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Set the first message the agent says to start the conversation. Leave blank to disable.
         </p>
         <SwtichWithLabel
@@ -182,7 +182,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
                     />
                   </td>
                 </tr>
-                <tr className="border-t border-gray-800">
+                <tr className="border-t border-gray-300 dark:border-gray-800">
                   <td className="p-4 leading-6">
                     <div className="font-bold">Number input delay:</div>
                     Set the extra wait time when the user is providing numeric input, like an ID or phone number.
@@ -205,7 +205,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           value={!!editData.config.flow?.inactivity_handling}
           onChange={(value) => handleUpdateData('inactivity_handling', value)}
         />
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Configure the agent to prompt the user after a period of inactivity, ensuring the user is still engaged.
         </p>
         {!!editData.config.flow?.inactivity_handling && (
@@ -225,7 +225,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
                     />
                   </td>
                 </tr>
-                <tr className="border-t border-gray-800">
+                <tr className="border-t border-gray-300 dark:border-gray-800">
                   <td className="p-4 leading-6">
                     <div className="font-bold">Message:</div>
                     Message to send when user is inactive.
@@ -249,7 +249,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           onChange={(value) => handleUpdateData('agent_terminate_call', value)}
           badgeText="Beta"
         />
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Agent will be able to decide to terminate the call by itself.<br />
           Use with care: It is recommended to only use this feature with larger language models like gpt-4o.
         </p>
@@ -262,7 +262,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               onChange={(value) => handleUpdateSubData('agent_terminate_call', 'instruction', value)}
               placeholder="Only terminate the call when ..."
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Set the custom instruction for the agent to determine when to terminate the call.
             </p>
             <InputBox
@@ -273,7 +273,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               onChange={(value) => handleUpdateSubData('agent_terminate_call', 'messages', [value])}
               placeholder="I.e Call ended. Goodbye!"
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Set the message the agent will say when it decides to terminate the call.
             </p>
           </ChildItem>
@@ -285,7 +285,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           onChange={(value) => handleUpdateData('voicemail', value)}
           badgeText="Beta"
         />
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Agent will be able to detect voicemail and handle it.<br />
           Warning: The feature only works with Twilio and Plivo providers.
         </p>
@@ -309,7 +309,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               disabled={editData.config.flow?.voicemail?.action === 'hangup'}
               placeholder="Please call back at 1234567890"
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Set the message the agent will say when it detects voicemail.
             </p>
             <SwtichWithLabel
@@ -319,7 +319,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               onChange={(value) => handleUpdateSubData('voicemail', 'continue_on_voice_activity', value)}
               disabled={editData.config.flow?.voicemail?.action === 'hangup'}
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Allows the agent to pause the voicemail message and engage in conversation if it detects voice activity during playback.
             </p>
           </ChildItem>
@@ -331,7 +331,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           onChange={(value) => handleUpdateData('call_transfer', value)}
           badgeText="Beta"
         />
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Agent will be able to transfer calls to human agents.<br />
           Warning: The feature only works with Twilio phone numbers.
         </p>
@@ -344,7 +344,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               value={editData.config.flow?.call_transfer?.phone || ''}
               placeholder="+1234567890"
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Set the phone number the agent will transfer the call to when it decides to transfer the call.
             </p>
             <InputBox
@@ -354,7 +354,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               value={editData.config.flow?.call_transfer?.instruction || ''}
               placeholder="Only transfer the call when ..."
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Set the custom instruction for the agent to determine when to transfer the call.
             </p>
             <InputBox
@@ -370,7 +370,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               value={agentMessage}
               placeholder="Enter messages separated by enter key"
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Set the messages the agent will say while transfering the call.
             </p>
             <div className="flex flex-wrap gap-2 mt-2">
@@ -382,7 +382,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
                   <div className="text-sm">{message}</div>
                   <button
                     type="button"
-                    className="cursor-pointer text-gray-400 hover:text-gray-300 transition-colors duration-300"
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-300 transition-colors duration-300"
                     onClick={() => handleRemoveAgentMessage(index)}
                   >
                     <FaTrash size={12} />
@@ -399,7 +399,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
           onChange={(value) => handleUpdateData('dtmf_dial', value)}
           badgeText="Beta"
         />
-        <p className="mt-2 text-sm text-gray-400">
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Agent will be able to dial dtmf tones to navigate through IVR, voicemail systems, etc.
         </p>
         {!!editData.config.flow?.dtmf_dial && (
@@ -411,7 +411,7 @@ const ConversionFlow: FC<ConversionFlowProps> = ({ agent, setAgent, setIsOverlay
               value={editData.config.flow?.dtmf_dial?.instruction || ''}
               placeholder="Use the function to dial dtmf tones to navigate to a representative ..."
             />
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Set the phone number the agent will transfer the call to when it decides to transfer the call.
             </p>
           </ChildItem>

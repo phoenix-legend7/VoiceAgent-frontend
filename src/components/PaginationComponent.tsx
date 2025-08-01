@@ -29,7 +29,7 @@ const PaginationComponent: React.FC<Props> = ({ currentPage, totalCounts, setPag
           'flex items-center justify-center px-3 h-8 rounded-md',
           currentPage === 1
             ? 'bg-sky-700'
-            : 'bg-gray-700 hover:bg-gray-800 cursor-pointer transition-colors duration-300'
+            : 'bg-gray-400 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-300'
         )}
         onClick={() => handleClick(1)}
       >
@@ -53,7 +53,7 @@ const PaginationComponent: React.FC<Props> = ({ currentPage, totalCounts, setPag
             'flex items-center justify-center px-3 h-8 rounded-md',
             currentPage === i
               ? 'bg-sky-700'
-              : 'bg-gray-700 hover:bg-gray-800 cursor-pointer transition-colors duration-300'
+              : 'bg-gray-400 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-300'
           )}
           onClick={() => handleClick(i)}
         >
@@ -78,7 +78,7 @@ const PaginationComponent: React.FC<Props> = ({ currentPage, totalCounts, setPag
             'flex items-center justify-center px-3 h-8 rounded-md',
             currentPage === totalPages
               ? 'bg-sky-700'
-              : 'bg-gray-700 hover:bg-gray-800 cursor-pointer transition-colors duration-300'
+              : 'bg-gray-400 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-300'
           )}
           onClick={() => handleClick(totalPages)}
         >
@@ -98,8 +98,8 @@ const PaginationComponent: React.FC<Props> = ({ currentPage, totalCounts, setPag
         className={clsx(
           'flex items-center justify-center px-3 h-8 rounded-md',
           currentPage === 1
-            ? 'bg-gray-900 text-gray-700 cursor-not-allowed'
-            : 'bg-gray-700 hover:bg-gray-800 cursor-pointer transition-colors duration-300'
+            ? 'bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-700 border dark:border-0 border-gray-300 cursor-not-allowed'
+            : 'bg-gray-400 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-300'
         )}
         onClick={() => handleClick(currentPage - 1)}
       >
@@ -116,8 +116,8 @@ const PaginationComponent: React.FC<Props> = ({ currentPage, totalCounts, setPag
         className={clsx(
           'flex items-center justify-center px-3 h-8 rounded-md',
           currentPage === totalPages
-            ? 'bg-gray-900 text-gray-700 cursor-not-allowed'
-            : 'bg-gray-700 hover:bg-gray-800 cursor-pointer transition-colors duration-300'
+            ? 'bg-white dark:bg-gray-900 text-gray-400 dark:text-gray-700 border dark:border-0 border-gray-300 cursor-not-allowed'
+            : 'bg-gray-400 dark:bg-gray-700 hover:bg-gray-600 dark:hover:bg-gray-800 cursor-pointer transition-colors duration-300'
         )}
         onClick={() => handleClick(currentPage + 1)}
       >
@@ -128,7 +128,7 @@ const PaginationComponent: React.FC<Props> = ({ currentPage, totalCounts, setPag
         </a>
       </li>
 
-      <div className="ml-4 text-gray-400">
+      <div className="ml-4 text-gray-600 dark:text-gray-400">
         Total: {totalCounts}
       </div>
     </div>

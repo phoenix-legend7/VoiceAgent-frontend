@@ -97,7 +97,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
       <Card title="Tools" className="mt-6" icon={<AiOutlineProduct />}>
         {(!agent.config.tools?.length && !agent.config.millis_functions?.length && !agent.config.app_functions?.length) && (
           <div className="p-6 m-4 mt-8">
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               Connect tools to let agent take action with external systems.
             </p>
             <button
@@ -121,7 +121,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                 </div>
                 <div className="flex items-center">
                   <button
-                    className="cursor-pointer text-gray-400 hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
                     onClick={() => {
                       setSelectedTool({ name: tool.name, type: 'webhook' })
                       setShowToolModal(true)
@@ -130,7 +130,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                     <FaEdit />
                   </button>
                   <button
-                    className="cursor-pointer text-gray-400 hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
                     onClick={() => handleDeleteTool(tool.name)}
                   >
                     <FaRegTrashAlt />
@@ -147,11 +147,11 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                   <div className="truncate text-nowrap">
                     {func.name}
                   </div>
-                  <div className="text-gray-400 text-sm">{func.type}</div>
+                  <div className="text-gray-600 dark:text-gray-400 text-sm">{func.type}</div>
                 </div>
                 <div className="flex items-center">
                   <button
-                    className="cursor-pointer text-gray-400 hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
                     onClick={() => {
                       setSelectedTool({ name: func.name, type: 'webform' })
                       setShowToolModal(true)
@@ -160,7 +160,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                     <FaEdit />
                   </button>
                   <button
-                    className="cursor-pointer text-gray-400 hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
                     onClick={() => handleDeleteMillisFunc(func.name)}
                   >
                     <FaRegTrashAlt />
@@ -177,11 +177,11 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                   <div className="truncate text-nowrap">
                     {func.name}
                   </div>
-                  <div className="text-gray-400 text-sm">cal.com</div>
+                  <div className="text-gray-600 dark:text-gray-400 text-sm">cal.com</div>
                 </div>
                 <div className="flex items-center">
                   <button
-                    className="cursor-pointer text-gray-400 hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
                     onClick={() => {
                       setShowAppToolModal(true)
                     }}
@@ -189,7 +189,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                     <FaEdit />
                   </button>
                   <button
-                    className="cursor-pointer text-gray-400 hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
                     onClick={() => handleDeleteAppFunc(func.name)}
                   >
                     <FaRegTrashAlt />
@@ -199,17 +199,17 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
             ))}
           </div>
         )}
-        <hr className="text-gray-700 my-2" />
+        <hr className="text-gray-300 dark:text-gray-700 my-2" />
         <div className="my-2">
           <div
-            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-700 transition-all duration-300"
+            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 transition-all duration-300"
             onClick={() => setShowToolModal(true)}
           >
             <FaPlus />
             Add Tool
           </div>
           <div
-            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-700 transition-all duration-300"
+            className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 transition-all duration-300"
             onClick={() => setShowAppToolModal(true)}
           >
             <FaRegCalendarPlus />

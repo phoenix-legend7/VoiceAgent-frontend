@@ -258,20 +258,20 @@ const ToolModal: FC<ToolModalProps> = ({
       <div className="mt-4 mb-2">Description</div>
       <div>
         <textarea
-          className="w-full h-24 resize-none border border-gray-600 rounded-md p-2 focus:outline-none focus:border-sky-500 transition-all duration-300"
+          className="w-full h-24 resize-none border border-gray-500 dark:border-gray-600 rounded-md p-2 focus:outline-none focus:border-sky-500 transition-all duration-300"
           placeholder="Enter description of the function. Provide as many details as possible for agent to understand."
           value={functionDescription}
           onChange={(e) => setFunctionDescription(e.target.value)}
         />
       </div>
       <div className="mt-4 mb-2">Select Function Type</div>
-      <div className="flex items-center justify-self-center rounded-md overflow-hidden border border-gray-700 mb-4">
+      <div className="flex items-center justify-self-center rounded-md overflow-hidden border border-gray-400 dark:border-gray-700 mb-4">
         {['webhook', 'web form'].map((type) => (
           <button
             key={type}
             className={clsx(
-              'px-4 py-2 cursor-pointer transition-all duration-300 capitalize border-gray-700 not-last:border-r',
-              functionType === type ? 'bg-sky-800/20 hover:bg-sky-800/30 text-sky-400' : 'bg-gray-800/10 hover:bg-gray-800/20 text-gray-400'
+              'px-4 py-2 cursor-pointer transition-all duration-300 capitalize border-gray-400 dark:border-gray-700 not-last:border-r',
+              functionType === type ? 'bg-sky-800/20 hover:bg-sky-800/30 text-sky-600 dark:text-sky-400' : 'bg-gray-800/10 hover:bg-gray-800/20 text-gray-600 dark:text-gray-400'
             )}
             onClick={() => setFunctionType(type as 'webhook' | 'web form')}
           >
@@ -284,7 +284,7 @@ const ToolModal: FC<ToolModalProps> = ({
           <p className="text-center text-xs mb-4">
             Retrieve or send information to external services via webhooks
           </p>
-          <div className="p-4 border border-gray-700">
+          <div className="p-4 border border-gray-400 dark:border-gray-700">
             <InputBox
               className="my-2"
               label="Webhook URL"
@@ -294,13 +294,13 @@ const ToolModal: FC<ToolModalProps> = ({
             />
             <div className="flex items-center gap-5">
               <div>Method:</div>
-              <div className="flex items-center rounded-md overflow-hidden border border-gray-700 my-2">
+              <div className="flex items-center rounded-md overflow-hidden border border-gray-400 dark:border-gray-700 my-2">
                 {['GET', 'POST'].map((type) => (
                   <button
                     key={type}
                     className={clsx(
-                      'px-4 py-2 cursor-pointer transition-all duration-300 capitalize border-gray-700 not-last:border-r',
-                      webhookMethod === type ? 'bg-sky-800/20 hover:bg-sky-800/30 text-sky-400' : 'bg-gray-800/10 hover:bg-gray-800/20 text-gray-400'
+                      'px-4 py-2 cursor-pointer transition-all duration-300 capitalize border-gray-400 dark:border-gray-700 not-last:border-r',
+                      webhookMethod === type ? 'bg-sky-800/20 hover:bg-sky-800/30 text-sky-600 dark:text-sky-400' : 'bg-gray-800/10 hover:bg-gray-800/20 text-gray-600 dark:text-gray-400'
                     )}
                     onClick={() => setWebhookMethod(type as 'GET' | 'POST')}
                   >
@@ -309,22 +309,22 @@ const ToolModal: FC<ToolModalProps> = ({
                 ))}
               </div>
             </div>
-            <div className="border border-white px-5 py-2 flex justify-between items-center rounded-xl my-2">
+            <div className="border border-gray-800 dark:border-white px-5 py-2 flex justify-between items-center rounded-xl my-2">
               <div>
                 <div className="text-semibold">
                   Run Function After Call
                 </div>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                   Set the function to execute after the call ended.
                 </div>
               </div>
               <div className="flex items-center gap-1">
                 <div>
                   <button
-                    className="cursor-pointer rounded hover:bg-gray-700/20 p-2"
+                    className="cursor-pointer rounded hover:bg-gray-700/20 p-2 transition-all duration-300"
                     title="The function will always trigger at the end, even with incomplete data. Ensure your webhook handles these cases. Example use cases: capturing leads to CRM, saving records after the call."
                   >
-                    <FaInfoCircle className="text-gray-400" />
+                    <FaInfoCircle className="text-gray-600 dark:text-gray-400" />
                   </button>
                 </div>
                 <SwtichWithLabel
@@ -336,7 +336,7 @@ const ToolModal: FC<ToolModalProps> = ({
             <div className="my-2">
               <div className="flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-700 before:translate-y-1/2">
                 <button
-                  className="cursor-pointer px-3 py-1.5 rounded text-sky-400 hover:bg-sky-400/20 transition-all duration-300 text-nowrap"
+                  className="cursor-pointer px-3 py-1.5 rounded text-sky-600 dark:text-sky-400 hover:bg-sky-600/20 dark:hover:bg-sky-400/20 transition-all duration-300 text-nowrap"
                   onClick={() => setWebhookHeaders([...webhookHeaders, { key: '', value: '' }])}
                 >
                   Add Header
@@ -371,7 +371,7 @@ const ToolModal: FC<ToolModalProps> = ({
             <div className="my-2">
               <div className="flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-700 before:translate-y-1/2">
                 <button
-                  className="cursor-pointer px-3 py-1.5 rounded text-sky-400 hover:bg-sky-400/20 transition-all duration-300 text-nowrap"
+                  className="cursor-pointer px-3 py-1.5 rounded text-sky-600 dark:text-sky-400 hover:bg-sky-600/20 dark:hover:bg-sky-400/20 transition-all duration-300 text-nowrap"
                   onClick={() => setWebhookParams([...webhookParams, { description: '', name: '', type: 'string', required: false }])}
                 >
                   Add Parameter
@@ -422,7 +422,7 @@ const ToolModal: FC<ToolModalProps> = ({
                   <div className="mb-2">Description</div>
                   <div>
                     <textarea
-                      className="w-full resize-none border border-gray-600 rounded-md p-2 focus:outline-none focus:border-sky-500 transition-all duration-300"
+                      className="w-full resize-none border border-gray-500 dark:border-gray-600 rounded-md p-2 focus:outline-none focus:border-sky-500 transition-all duration-300"
                       placeholder="Enter description of the parameter. Provide as many details as possible for agent to understand."
                       value={param.description}
                       onChange={(e) => setWebhookParams(webhookParams.map((param, i) =>
@@ -434,8 +434,8 @@ const ToolModal: FC<ToolModalProps> = ({
               ))}
             </div>
             <div className={clsx(
-              "mt-4 shadow-black shadow-sm rounded-md p-4",
-              { 'border-t border-gray-700': !showAdvancedConfig }
+              "mt-4 dark:shadow-black shadow-gray-300 shadow-sm rounded-md p-4",
+              { 'border-t border-gray-200 dark:border-gray-700': !showAdvancedConfig }
             )}>
               <div
                 className="flex items-center justify-between gap-2 cursor-pointer"
@@ -498,9 +498,9 @@ const ToolModal: FC<ToolModalProps> = ({
           </div>
         </div>
       )}
-      <div className="border border-gray-800 px-6 py-4 mt-4 rounded-lg">
+      <div className="border border-gray-300 dark:border-gray-800 px-6 py-4 mt-4 rounded-lg">
         <div className="font-semibold">Pre-Action Phrases</div>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           Define the phrases your agent will say before calling the function.
           If left blank, the agent will autonomously come up with phrases.
         </p>
@@ -512,9 +512,9 @@ const ToolModal: FC<ToolModalProps> = ({
               checked={preActionPhrase === undefined}
               onChange={() => setPreActionPhrase(undefined)}
             />
-            <div className="flex flex-col w-full border-b border-gray-600 py-2">
+            <div className="flex flex-col w-full border-b border-gray-400 dark:border-gray-600 py-2">
               <div>Disable</div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-gray-600 dark:text-gray-400">
                 The agent will execute the action silently without saying anything.
               </div>
             </div>
@@ -526,9 +526,9 @@ const ToolModal: FC<ToolModalProps> = ({
               checked={preActionPhrase === 'flexible'}
               onChange={() => setPreActionPhrase('flexible')}
             />
-            <div className="flex flex-col w-full border-b border-gray-600 py-2">
+            <div className="flex flex-col w-full border-b border-gray-400 dark:border-gray-600 py-2">
               <div>Flexiable</div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-gray-600 dark:text-gray-400">
                 The agent will generate a phrase based on the examples provided, adjusting for context and language.
               </div>
             </div>
@@ -542,7 +542,7 @@ const ToolModal: FC<ToolModalProps> = ({
             />
             <div className="flex flex-col w-full py-2">
               <div>Strict</div>
-              <div className="text-xs text-gray-400">
+              <div className="text-xs text-gray-600 dark:text-gray-400">
                 The agent will say exactly one of the phrases provided, regardless of language.
               </div>
             </div>
@@ -571,7 +571,7 @@ const ToolModal: FC<ToolModalProps> = ({
               {preActionPhraseValues.map((value, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 text-sm border border-gray-700 rounded px-2 py-1"
+                  className="flex items-center gap-2 text-sm border border-gray-400 dark:border-gray-700 rounded px-2 py-1"
                 >
                   <div className="flex-1">{value}</div>
                   <button

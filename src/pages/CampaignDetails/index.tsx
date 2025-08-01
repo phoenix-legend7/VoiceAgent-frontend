@@ -101,7 +101,7 @@ const CampaignDetails = () => {
         return {
           label: (
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+              <div className="flex items-center p-1 gap-2 rounded bg-gray-300 dark:bg-gray-700">
                 <div>
                   <FaPhoneAlt />
                 </div>
@@ -110,7 +110,7 @@ const CampaignDetails = () => {
               {!!agent && (
                 <>
                   <MdInsertLink />
-                  <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+                  <div className="flex items-center p-1 gap-2 rounded bg-gray-300 dark:bg-gray-700">
                     <div>
                       <FaUser />
                     </div>
@@ -202,7 +202,7 @@ const CampaignDetails = () => {
           <div className="flex">
             <Link
               to="/campaigns"
-              className="flex gap-2 items-center text-sm p-2 rounded hover:bg-gray-800 transition-all duration-300"
+              className="flex gap-2 items-center text-sm p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-800 transition-all duration-300"
             >
               <FaArrowLeft />
               <div>Campaigns - List</div>
@@ -232,7 +232,7 @@ const CampaignDetails = () => {
                 </button>
                 {campaign.status === "started" ? (
                   <button
-                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
+                    className="cursor-pointer text-white flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 transition-all duration-300"
                     onClick={handleStopCampaign}
                   >
                     <FaStop />
@@ -240,7 +240,7 @@ const CampaignDetails = () => {
                   </button>
                 ) : (
                   <button
-                    className="cursor-pointer flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-neutral-700 transition-all duration-300"
+                    className="cursor-pointer text-white flex items-center gap-2 px-4 py-2 font-bold bg-sky-800 rounded hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-neutral-700 transition-all duration-300"
                     onClick={campaign.status !== "finished" ? () => setIsConfirmStartModalOpen(true) : undefined}
                     disabled={campaign.status === "finished"}
                   >
@@ -250,10 +250,10 @@ const CampaignDetails = () => {
                 )}
               </div>
             </div>
-            <div className="mt-8 rounded-xl text-sm bg-gray-900">
+            <div className="mt-8 rounded-xl text-sm border dark:border-0 border-gray-300 bg-white dark:bg-gray-900">
               <div className="flex flex-wrap">
                 <div className="p-4 w-full md:w-1/2 xl:w-1/3">
-                  <div className="font-bold text-gray-400 uppercase mb-2">
+                  <div className="font-bold text-gray-600 dark:text-gray-400 uppercase mb-2">
                     Caller
                   </div>
                   {campaignInfo?.caller ? (
@@ -265,7 +265,7 @@ const CampaignDetails = () => {
                       }
                       <div>
                         <button
-                          className="text-gray-400 rounded hover:bg-gray-800/50 size-8 cursor-pointer flex items-center justify-center transition-all duration-300"
+                          className="text-gray-600 dark:text-gray-400 rounded hover:bg-gray-800/50 size-8 cursor-pointer flex items-center justify-center transition-all duration-300"
                           onClick={() => setIsCallerPhoneModalOpen(true)}
                         >
                           <FaEdit />
@@ -282,7 +282,7 @@ const CampaignDetails = () => {
                   )}
                 </div>
                 <div className="p-4 w-full sm:1/2 lg:w-1/3 xl:w-1/4">
-                  <div className="font-bold text-gray-400 uppercase mb-2">
+                  <div className="font-bold text-gray-600 dark:text-gray-400 uppercase mb-2">
                     Status
                   </div>
                   <CampaignStatusBadge status={campaign.status} />
@@ -304,10 +304,10 @@ const CampaignDetails = () => {
                 totalCounts={campaign.records.length}
               />
             </div>
-            <div className="mt-3 rounded-xl text-sm bg-gray-900 overflow-x-auto">
+            <div className="mt-3 rounded-xl text-sm bg-white dark:bg-gray-900 border dark:border-0 border-gray-300 overflow-x-auto">
               <Table>
                 <thead>
-                  <tr className="border-b border-gray-700">
+                  <tr className="border-b border-gray-400 dark:border-gray-700">
                     <TableCell>Phone</TableCell>
                     <TableCell>Call Status</TableCell>
                     <TableCell>Metadata</TableCell>
@@ -333,7 +333,7 @@ const CampaignDetails = () => {
                         </TableCell>
                         <TableCell>
                           <button
-                            className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/20 rounded-full transition-all duration-300"
+                            className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/80 dark:hover:bg-red-500/20 rounded-full transition-all duration-300"
                             onClick={() => handleDeleteRecord(record.phone)}
                           >
                             <FaTrash />
@@ -345,7 +345,7 @@ const CampaignDetails = () => {
               </Table>
               {campaign.records.length === 0 && (
                 <div className="text-center m-4 p-6">
-                  <div className="text-gray-400">No campaign record found</div>
+                  <div className="text-gray-600 dark:text-gray-400">No campaign record found</div>
                   <div className="my-3">
                     <button
                       className="flex gap-2 items-center cursor-pointer bg-transparent text-sky-600 border border-sky-600 px-4 py-2 mx-auto rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"

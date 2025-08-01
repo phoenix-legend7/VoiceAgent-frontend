@@ -94,7 +94,7 @@ const ChatTab: FC<ChatTabProps> = ({ agent }) => {
     <div className="p-2">
       <div className="flex flex-col items-center h-[50vh]">
         <button
-          className="bg-transparent hover:bg-sky-600/10 rounded-md px-2 py-1.5 w-full text-sm cursor-pointer transition-all duration-300"
+          className="bg-sky-800/10 hover:bg-sky-600/10 rounded-md px-2 py-1.5 w-full text-sm cursor-pointer transition-all duration-300"
           onClick={handleClear}
         >
           Clear
@@ -102,8 +102,8 @@ const ChatTab: FC<ChatTabProps> = ({ agent }) => {
         <div className="flex-1 w-full overflow-auto" style={{ scrollbarWidth: 'thin' }}>
           {messages.map((message, index) => (
             <div key={index} className="px-3 py-2">
-              <div className="text-gray-400">{message.role === "user" ? "You" : "Agent"}</div>
-              <Markdown className="text-white text-sm">{message.content}</Markdown>
+              <div className="text-gray-600 dark:text-gray-400">{message.role === "user" ? "You" : "Agent"}</div>
+              <Markdown className="text-black dark:text-white text-sm">{message.content}</Markdown>
             </div>
           ))}
         </div>

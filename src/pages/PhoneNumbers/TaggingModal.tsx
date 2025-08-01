@@ -89,7 +89,7 @@ export const TaggingModal: FC<Props> = ({
                 key={`phrase-${index}`}
                 className="flex items-center gap-2 px-3 py-1.5 rounded border border-neutral-500"
               >
-                <div className="text-gray-400">{tag}</div>
+                <div className="text-gray-600 dark:text-gray-400">{tag}</div>
                 <button
                   className="cursor-pointer text-gray-600 hover:text-gray-400 transition-colors duration-300"
                   onClick={() => {

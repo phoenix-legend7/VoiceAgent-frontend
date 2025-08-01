@@ -18,7 +18,7 @@ const Table: FC<TypeWithProps> = ({ children, className, onClick }) => {
 export const TableRow: FC<TypeWithProps> = ({ children, className, onClick }) => {
   return (
     <tr
-      className={clsx(className, 'border-b border-gray-800 last:border-b-0 hover:bg-gray-800/50 transition-all duration-300')}
+      className={clsx(className, 'border-b border-gray-200 dark:border-gray-800 last:border-b-0 hover:bg-gray-200/50 dark:hover:bg-gray-800/50 transition-all duration-300')}
       onClick={onClick}
     >
       {children}

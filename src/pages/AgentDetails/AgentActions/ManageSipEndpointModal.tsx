@@ -82,7 +82,7 @@ const ManageSipEndpointModal: FC<Props> = ({
       hideOKButton
       modalSize="max-w-xl"
     >
-      <div className="text-gray-400">
+      <div className="text-gray-600 dark:text-gray-400">
         Manage SIP endpoints for your agent.
       </div>
       <div className="mt-4 py-2">
@@ -90,17 +90,17 @@ const ManageSipEndpointModal: FC<Props> = ({
           <div className="flex items-center gap-3 px-4 py-2" key={index}>
             <div className="w-[calc(100%-64px)]">
               <div className="w-full text-nowrap truncate">{sip.endpoint}</div>
-              <div className="text-sm text-gray-400">{formatDateTime(sip.created_at)}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{formatDateTime(sip.created_at)}</div>
             </div>
             <div className="flex items-center">
               <button
-                className="cursor-pointer p-2 rounded-md text-gray-600 hover:text-gray-400 hover:bg-gray-700/10 transition-all duration-300"
+                className="cursor-pointer p-2 rounded-md text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-700/10 transition-all duration-300"
                 onClick={() => handleCopySip(sip.endpoint)}
               >
                 <FaCopy />
               </button>
               <button
-                className="cursor-pointer p-2 rounded-md text-red-600 hover:text-red-400 hover:bg-red-700/10 transition-all duration-300"
+                className="cursor-pointer p-2 rounded-md text-red-400 dark:text-red-600 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-700/10 transition-all duration-300"
                 onClick={() => handleDeleteSip(sip.call_id)}
               >
                 <FaTrashAlt />

@@ -115,7 +115,7 @@ export const PurchaseModal: FC<Props> = ({
               setCountry((e as SelectOptionType).value as string)
             }
           />
-          <div className="text-gray-400 text-sm mx-3">
+          <div className="text-gray-600 dark:text-gray-400 text-sm mx-3">
             Twilio requires additional information to purchase a phone number in
             this country. Please fill out the form below.
             <br />
@@ -134,7 +134,7 @@ export const PurchaseModal: FC<Props> = ({
         )}
         {country === "AU" && (
           <div>
-            <div className="my-6 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-700 before:translate-y-1/2">
+            <div className="my-6 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-300 dark:after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-300 dark:before:border-gray-700 before:translate-y-1/2">
               <div className="px-2.5 text-center text-nowrap">
                 Additional Information
               </div>

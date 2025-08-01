@@ -239,7 +239,7 @@ const AgentLanguageModal: FC<Props> = ({
       <div className="flex items-center justify-between gap-3 p-4 my-3">
         <div>
           <div className="text-lg font-semibold">Multi Language Support</div>
-          <div className="text-gray-400 text-sm">
+          <div className="text-gray-600 dark:text-gray-400 text-sm">
             Allow agent to support multiple languages
           </div>
         </div>
@@ -251,7 +251,7 @@ const AgentLanguageModal: FC<Props> = ({
       </div>
       <div
         className={clsx(
-          "border-l-gray-700 border-b-gray-950 rounded-md mx-4 pl-3 overflow-hidden transition-all duration-300",
+          "border-l-gray-400 dark:border-l-gray-700 border-b-gray-200 dark:border-b-gray-950 rounded-md mx-4 pl-3 overflow-hidden transition-all duration-300",
           isMultiLangSupport
             ? "border-l-[0.5px] border-b-[0.5px] max-h-96 py-2"
             : "max-h-0 border-0"
@@ -259,7 +259,7 @@ const AgentLanguageModal: FC<Props> = ({
       >
         {multiLangOptionList.map((option, index) => (
           <div key={`option-${index}`}>
-            {index > 0 && <hr className="text-gray-800 my-2" />}
+            {index > 0 && <hr className="text-gray-300 dark:text-gray-800 my-2" />}
             <label
               className="flex gap-3 items-center cursor-pointer"
               onClick={() => {
@@ -271,14 +271,14 @@ const AgentLanguageModal: FC<Props> = ({
                   className={clsx(
                     "size-[18px] rounded-full",
                     option.value === multiLangOption
-                      ? "border-4 border-sky-400"
+                      ? "border-4 border-sky-600 dark:border-sky-400"
                       : "border-2 border-gray-400"
                   )}
                 />
               </div>
               <div>
                 <div className="mb-0.5">{option.title}</div>
-                <div className="text-xs text-gray-400 leading-5">
+                <div className="text-xs text-gray-600 dark:text-gray-400 leading-5">
                   {option.description}
                 </div>
               </div>
@@ -310,7 +310,7 @@ const AgentLanguageModal: FC<Props> = ({
       </div>
       <div className="my-6 mx-4">
         <div className="text-lg font-semibold">Custom Vocabulary</div>
-        <div className="text-sm text-gray-400">
+        <div className="text-sm text-gray-600 dark:text-gray-400">
           Provide a list of specialized terms or uncommon proper nouns for the
           agent to recognize, enhancing model accuracy with new vocabulary.
         </div>
@@ -336,9 +336,9 @@ const AgentLanguageModal: FC<Props> = ({
                 key={`phrase-${index}`}
                 className="flex items-center gap-2 px-3 py-1.5 rounded border border-neutral-500"
               >
-                <div className="text-gray-400">{term}</div>
+                <div className="text-gray-600 dark:text-gray-400">{term}</div>
                 <button
-                  className="cursor-pointer text-gray-600 hover:text-gray-400 transition-colors duration-300"
+                  className="cursor-pointer text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-300"
                   onClick={() => {
                     setTerms(terms.filter((_, i) => i !== index));
                   }}
@@ -350,7 +350,7 @@ const AgentLanguageModal: FC<Props> = ({
           </div>
         </div>
       </div>
-      <div className="my-4 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-700 before:translate-y-1/2">
+      <div className="my-4 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-400 dark:after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-400 dark:before:border-gray-700 before:translate-y-1/2">
         <div className="px-2.5 text-center text-nowrap text-lg">
           Advanced Settings
         </div>
@@ -385,7 +385,7 @@ const AgentLanguageModal: FC<Props> = ({
             <a
               href="https://developers.deepgram.com/docs/models-languages-overview"
               target="_blank"
-              className="text-sky-400 underline"
+              className="text-sky-600 dark:text-sky-400 underline"
             >
               Learn more about {sttProvider}'s models and language support
             </a>

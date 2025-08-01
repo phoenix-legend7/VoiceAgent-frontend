@@ -177,7 +177,7 @@ const Select: FC<Props> = ({
       <div
         ref={menuRef}
         className={clsx(
-          "absolute z-[100] w-full mt-1 bg-gray-900 border border-gray-600 rounded shadow-lg",
+          "absolute z-[100] w-full mt-1 bg-white dark:bg-gray-900 border border-gray-400 dark:border-gray-600 rounded shadow-lg",
           menuClassName
         )}
         style={{
@@ -190,7 +190,7 @@ const Select: FC<Props> = ({
           <div className="p-2 border-b border-gray-500">
             <input
               type="text"
-              className="w-full p-1 border border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full p-1 border border-gray-400 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -207,9 +207,9 @@ const Select: FC<Props> = ({
                 key={option.value}
                 role="option"
                 aria-selected={isSelected(option)}
-                className={clsx("p-2 cursor-pointer hover:bg-gray-700 border-gray-600", {
-                  "bg-sky-800": isSelected(option),
-                  "bg-gray-900": highlightedIndex === index,
+                className={clsx("p-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 border-gray-400 dark:border-gray-600", {
+                  "bg-sky-200 dark:bg-sky-800": isSelected(option),
+                  "bg-gray-100 dark:bg-gray-900": highlightedIndex === index,
                   "border-t": !!index,
                 })}
                 onClick={() => handleSelect(option)}
@@ -237,7 +237,7 @@ const Select: FC<Props> = ({
       <div
         className={clsx(
           "flex items-center justify-between p-2 border rounded cursor-pointer",
-          isOpen ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-600"
+          isOpen ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-400 dark:border-gray-600"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
@@ -248,13 +248,13 @@ const Select: FC<Props> = ({
             (value as SelectOptionType[]).map((option) => (
               <span
                 key={option.value}
-                className="flex items-center bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm gap-1"
+                className="flex items-center bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-sm gap-1"
               >
                 {option.icon}
                 {option.label}
                 <button
                   type="button"
-                  className="cursor-pointer text-gray-700 hover:text-gray-500"
+                  className="cursor-pointer text-gray-300 dark:text-gray-700 hover:text-gray-500"
                   onClick={(e) => removeOption(option, e)}
                 >
                   <FaTimes />
@@ -270,7 +270,7 @@ const Select: FC<Props> = ({
         </div>
         <svg
           className={clsx(
-            "w-5 h-5 text-gray-400 transition-transform duration-200",
+            "w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform duration-200",
             isOpen ? "rotate-180" : ""
           )}
           fill="none"
@@ -368,7 +368,7 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
     const menuContent = (
       <div
         ref={menuRef}
-        className="absolute z-[100] w-full mt-1 bg-gray-900 border border-gray-600 rounded shadow-lg"
+        className="absolute z-[100] w-full mt-1 bg-white dark:bg-gray-900 border border-gray-400 dark:border-gray-600 rounded shadow-lg"
         style={{
           top: `${menuPosition.top}px`,
           left: `${menuPosition.left}px`,
@@ -383,7 +383,7 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
               <div key={groupIndex}>
                 {groupOption.group && (
                   <div key={groupIndex} className="my-3">
-                    <div className="flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-700 before:translate-y-1/2">
+                    <div className="flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-300 after:dark:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-300 before:dark:border-gray-700 before:translate-y-1/2">
                       <div className="px-2 text-nowrap font-bold">
                         {groupOption.group}
                       </div>
@@ -396,10 +396,10 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
                     role="option"
                     aria-selected={isSelected(option)}
                     className={clsx(
-                      "px-4 py-2 cursor-pointer hover:bg-gray-800",
+                      "px-4 py-2 cursor-pointer hover:bg-green-200 hover:dark:bg-gray-800",
                       {
-                        "bg-sky-800": isSelected(option),
-                        "bg-gray-900": highlightedIndex === index,
+                        "bg-sky-200 dark:bg-sky-800": isSelected(option),
+                        "bg-gray-100 dark:bg-gray-900": highlightedIndex === index,
                       }
                     )}
                     onClick={() => handleSelect(option)}
@@ -409,7 +409,7 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
                       {option.icon}
                       {option.label}
                       {!!option.badge && (
-                        <span className="px-2 py-1 text-xs font-medium text-white bg-gray-700 rounded-lg">
+                        <span className="px-2 py-1 text-xs font-medium text-black dark:text-white bg-gray-300 dark:bg-gray-700 rounded-lg">
                           {option.badge}
                         </span>
                       )}
@@ -431,13 +431,13 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
       <div
         className={clsx(
           "flex items-center justify-between p-2 border rounded cursor-pointer",
-          isOpen ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-600"
+          isOpen ? "border-blue-500 ring-1 ring-blue-500" : "border-gray-400 dark:border-gray-600"
         )}
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex flex-wrap gap-1 flex-1">
           {!value ? (
-            <span className="text-gray-400">{placeholder}</span>
+            <span className="text-gray-600 dark:text-gray-400">{placeholder}</span>
           ) : (
             <span className="flex items-center gap-2">
               {(value as GroupSelectOptionType).icon}
@@ -447,7 +447,7 @@ export const GroupedSelect: FC<GroupedSelectProps> = ({
         </div>
         <svg
           className={clsx(
-            "w-5 h-5 text-gray-400 transition-transform duration-200",
+            "w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform duration-200",
             isOpen ? "rotate-180" : ""
           )}
           fill="none"

@@ -113,7 +113,7 @@ const Campaigns = () => {
         <div className="flex justify-between flex-wrap gap-4">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-bold">Campaigns</h2>
-            <span className="text-sm text-gray-400">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
               Manage your outbound campaigns
             </span>
           </div>
@@ -127,10 +127,10 @@ const Campaigns = () => {
             </button>
           </div>
         </div>
-        <div className="flex flex-col justify-between h-full gap-4 rounded-lg bg-gray-900/80 overflow-x-auto">
+        <div className="flex flex-col justify-between h-full gap-4 rounded-lg dark:bg-gray-900/80 bg-white border dark:border-0 border-gray-300 overflow-x-auto">
           <Table>
             <thead>
-              <tr className="border-b border-gray-700">
+              <tr className="border-b border-gray-300 dark:border-gray-700">
                 <TableCell>Campaign Name</TableCell>
                 {/* <TableCell>Caller</TableCell> */}
                 <TableCell>Num of Records</TableCell>
@@ -147,7 +147,7 @@ const Campaigns = () => {
                       <Link to={`/campaigns/${campaign.id}`}>
                         <div className="flex items-center gap-2">
                           {/* bg: rgb(29, 41, 57), text-color: rgb(151, 161, 186) */}
-                          <div className="p-4 rounded-md flex items-center justify-center bg-gray-800 text-gray-400">
+                          <div className="p-4 rounded-md flex items-center justify-center bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                             <FaBullhorn size={16} />
                           </div>
                           <div>
@@ -165,7 +165,7 @@ const Campaigns = () => {
                     <TableCell>
                       <div className="flex items-center">
                         <button
-                          className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/20 rounded-full transition-all duration-300"
+                          className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/80 dark:hover:bg-red-500/20 rounded-full transition-all duration-300"
                           onClick={() => handleDeleteCampaign(campaign.id)}
                         >
                           <FaTrash />

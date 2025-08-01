@@ -23,6 +23,7 @@ const ConfirmStartCampaign: FC<Props> = ({ isOpen, message, onConfirm, setIsOpen
       title="Confirm start"
       headerIcon={<FaExclamationCircle size={24} className="text-red-500" />}
       onOK={onOK}
+      onClose={onClose}
       okBtnLabel="Confirm"
     >
       <div>{message}</div>

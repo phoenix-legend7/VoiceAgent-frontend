@@ -52,16 +52,16 @@ const AgentPrompt: FC<AgentPromptProps> = ({ agent, setAgent, setIsOverlayShow }
 
   return (
     <Card title="Agent Prompt" toolbar={isEditted && <ToolBar handleSave={handleSave} />}>
-      <div className="relative p-5 bg-black/60">
+      <div className="relative p-5 dark:bg-black/60">
         <textarea
-          className="rounded-md text-gray-400 bg-neutral-800/50 border border-gray-700 min-h-[300px] sm:min-h-[400px] md:min-h-[500px] w-full py-2 px-3 focus:border-sky-600 focus:outline-none transition-all duration-300"
+          className="rounded-md text-gray-600 dark:text-gray-400 bg-neutral-100/50 dark:bg-neutral-800/50 border border-gray-400 dark:border-gray-700 min-h-[300px] sm:min-h-[400px] md:min-h-[500px] w-full py-2 px-3 focus:border-sky-600 focus:outline-none transition-all duration-300"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
         {!!agent.config.custom_llm_websocket && (
           <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center">
-            <div className="bg-gray-950 px-4 py-3.5 rounded-md flex justify-center gap-3">
-              <div className="text-cyan-400">
+            <div className="bg-gray-50 dark:bg-gray-950 px-4 py-3.5 rounded-md flex justify-center gap-3">
+              <div className="text-cyan-600 dark:text-cyan-400">
                 <MdInfoOutline size={22} />
               </div>
               <div>

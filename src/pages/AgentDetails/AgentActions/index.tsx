@@ -43,7 +43,7 @@ const AgentActions: FC<AgentActionsProps> = ({
         <FaChevronDown />
       </button>
       {isOpen && (
-        <div className="absolute top-full right-0 bg-gray-800 text-white rounded-md py-2">
+        <div className="absolute top-full right-0 bg-white dark:bg-gray-800 border dark:border-0 border-gray-300 text-black dark:text-white rounded-md py-2">
           <div className="flex flex-col rounded-md text-nowrap">
             {/* <a
                 href="#"
@@ -55,7 +55,7 @@ const AgentActions: FC<AgentActionsProps> = ({
               </a> */}
             <a
               href="#"
-              className="flex items-center gap-8 px-4 py-2 hover:bg-gray-700 transition-all duration-300"
+              className="flex items-center gap-8 px-4 py-2 hover:bg-gray-300 dark:hover:bg-gray-700 transition-all duration-300"
               onClick={() => setShowCustomLlmModal(true)}
             >
               <AIAgentIcon />

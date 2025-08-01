@@ -88,7 +88,7 @@ export const SetAgentConfigModal: FC<Props> = ({
       okBtnLabel="Set"
     >
       <div>
-        <div className="text-gray-400 mb-6">
+        <div className="text-gray-600 dark:text-gray-400 mb-6">
           Customize the voice agent's behavior for this phone number by
           overriding its agent config. Simply provide the config that you want
           to override in JSON format.
@@ -97,7 +97,7 @@ export const SetAgentConfigModal: FC<Props> = ({
           <div>Override Agent Config (JSON)</div>
           <div className="mt-2">
             <textarea
-              className="w-full resize-none border border-gray-600 rounded-md p-2 focus:outline-none focus:border-sky-500 transition-all duration-300"
+              className="w-full resize-none border border-gray-500 dark:border-gray-600 rounded-md p-2 focus:outline-none focus:border-sky-500 transition-all duration-300"
               placeholder={configPlaceholder}
               value={config}
               onChange={(e) => setConfig(e.target.value)}
@@ -106,7 +106,7 @@ export const SetAgentConfigModal: FC<Props> = ({
           </div>
           <div className="text-end">
             <span
-              className="cursor-pointer text-sky-600 hover:text-sky-400 transition-colors duration-300"
+              className="cursor-pointer text-sky-600 hover:text-sky-800 dark:hover:text-sky-400 transition-colors duration-300"
               onClick={handleBeautify}
             >
               Beautify

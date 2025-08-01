@@ -27,7 +27,7 @@ const ToolBar: FC<ToolBarProps> = ({ handleEdit }) => {
   return (
     <div>
       <button
-        className="cursor-pointer border border-sky-600 text-white px-5 py-1.5 rounded-md hover:border-sky-700 hover:text-sky-400 transition-colors duration-300"
+        className="cursor-pointer border border-sky-600 text-sky-600 dark:text-white px-5 py-1.5 rounded-md hover:border-sky-700 hover:text-sky-400 transition-colors duration-300"
         onClick={handleEdit}
       >
         Edit
@@ -127,8 +127,8 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
             className={clsx(
               "cursor-pointer px-5 py-2 w-full",
               activeTab === index
-                ? "text-sky-400 border-b-2 border-sky-400"
-                : "text-gray-400"
+                ? "text-sky-600 dark:text-sky-400 border-b-2 border-sky-600 dark:border-sky-400"
+                : "text-gray-600 dark:text-gray-400"
             )}
             onClick={() => setActiveTab(index)}
           >
@@ -136,13 +136,13 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
           </button>
         ))}
       </div>
-      <hr className="text-gray-800" />
+      <hr className="text-gray-300 dark:text-gray-800" />
       {activeTab === 0 && (
         <div>
-          <div className="my-10 rounded-xl border border-gray-800 overflow-hidden">
+          <div className="my-10 rounded-xl border border-gray-300 dark:border-gray-800 overflow-hidden">
             <div className="px-6 py-4">
               <div className="font-semibold text-lg">Added Documents</div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Documents that the agent has already added as knowledge
               </p>
             </div>
@@ -150,7 +150,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
               <div className="overflow-x-auto">
                 <Table>
                   <thead>
-                    <tr className="text-gray-400 border-b border-t border-gray-800">
+                    <tr className="text-gray-600 dark:text-gray-400 border-b border-t border-gray-300 dark:border-gray-800">
                       <th className="p-4 w-[40%]">Document</th>
                       <th className="p-4">Description</th>
                       <th />
@@ -161,11 +161,11 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
                       <TableRow key={`staged-document-${index}`}>
                         <TableCell>
                           <div>{document.name}</div>
-                          <div className="text-sm text-gray-400">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
                             {formatFileSize(document.size)}
                           </div>
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-gray-600 dark:text-gray-400">
                           <p
                             className="overflow-hidden"
                             style={{
@@ -179,7 +179,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
                         </TableCell>
                         <TableCell>
                           <button
-                            className="cursor-pointer bg-red-500/5 text-red-500 hover:text-red-400 hover:bg-red-500/20 px-4 py-1.5 rounded transition-colors duration-300"
+                            className="cursor-pointer bg-red-500/5 text-red-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/20 px-4 py-1.5 rounded transition-colors duration-300"
                             onClick={() =>
                               setStagedDocuments(
                                 stagedDocuments.splice(index, 1)
@@ -195,12 +195,12 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
                 </Table>
               </div>
             ) : (
-              <div className="p-6 mt-4 text-center text-gray-400 border-t border-gray-800">
+              <div className="p-6 mt-4 text-center text-gray-600 dark:text-gray-400 border-t border-gray-300 dark:border-gray-800">
                 No files selected
               </div>
             )}
           </div>
-          <hr className="text-gray-800" />
+          <hr className="text-gray-300 dark:text-gray-800" />
           <div>
             <div className="px-6 py-4 flex items-center justify-between">
               <div className="font-semibold text-lg">Available Documents</div>
@@ -216,7 +216,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
               <div className="overflow-x-auto">
                 <Table>
                   <thead>
-                    <tr className="text-gray-400 border-b border-gray-800">
+                    <tr className="text-gray-600 dark:text-gray-400 border-b border-gray-300 dark:border-gray-800">
                       <th className="p-4 w-[40%]">Document</th>
                       <th className="p-4">Description</th>
                       <th />
@@ -227,11 +227,11 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
                       <TableRow key={`document-${index}`}>
                         <TableCell>
                           <div>{document.name}</div>
-                          <div className="text-sm text-gray-400">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
                             {formatFileSize(document.size)}
                           </div>
                         </TableCell>
-                        <TableCell className="text-gray-400">
+                        <TableCell className="text-gray-600 dark:text-gray-400">
                           <p
                             className="overflow-hidden"
                             style={{
@@ -260,7 +260,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
               </div>
             ) : (
               <div className="p-6">
-                <div className="my-4 text-gray-400 text-center">
+                <div className="my-4 text-gray-600 dark:text-gray-400 text-center">
                   No documents available
                 </div>
                 <button
@@ -278,7 +278,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
       {activeTab === 1 && (
         <div className="my-8 flex flex-col gap-4">
           <div className="font-semibold mb-1.5 text-xl">Pre-Action Phrases</div>
-          <p className="text-gray-400">
+          <p className="text-gray-600 dark:text-gray-400">
             Define the phrases your agent will say before searching for
             knowledge base. If left blank, the system will use pre-defined
             English* phrases like: "Let me check", "One sec", "Let me see",
@@ -313,7 +313,7 @@ const EditKnowledgeModal: FC<EditKnowledgeModalProps> = ({
                 key={`phrase-${index}`}
                 className="flex items-center gap-2 px-3 py-1.5 rounded border border-neutral-500"
               >
-                <div className="text-gray-400">{phrase}</div>
+                <div className="text-gray-600 dark:text-gray-400">{phrase}</div>
                 <button
                   className="cursor-pointer text-gray-600 hover:text-gray-400 transition-colors duration-300"
                   onClick={() => {
@@ -370,7 +370,7 @@ const KnowledgeCard: FC<Props> = ({
                   key={id}
                 >
                   <div className="my-1">{file.name}</div>
-                  <div className="text-gray-400 text-nowrap">
+                  <div className="text-gray-600 dark:text-gray-400 text-nowrap">
                     {formatFileSize(file.size)}
                   </div>
                 </div>
@@ -379,7 +379,7 @@ const KnowledgeCard: FC<Props> = ({
           </div>
         ) : (
           <div className="p-6 m-4 mt-8">
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               Upload documents to enrich your voice agent's knowledge base
             </p>
             <button

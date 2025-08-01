@@ -107,17 +107,17 @@ const AppToolConfigModal: FC<AppToolConfigModalProps> = ({
     >
       <div className="flex flex-col gap-2 my-2 text-gray-500 font-semibold">
         <div>Name</div>
-        <div className="px-3 py-1.5 rounded bg-gray-800">{selectedAppTool}</div>
+        <div className="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-800">{selectedAppTool}</div>
       </div>
       <div className="flex flex-col gap-2 my-2 text-gray-500 font-semibold">
         <div>Description</div>
-        <div className="px-3 py-1.5 rounded bg-gray-800">
+        <div className="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-800">
           {appTools.find((appTool) => appTool.name === selectedAppTool)?.description}
         </div>
       </div>
       <div className="flex flex-col gap-2 my-2 text-gray-500 font-semibold">
         <div>App</div>
-        <div className="px-3 py-1.5 rounded bg-gray-800">cal.com</div>
+        <div className="px-3 py-1.5 rounded bg-gray-200 dark:bg-gray-800">cal.com</div>
       </div>
       <InputBox
         value={apiKey}
@@ -142,12 +142,12 @@ const AppToolConfigModal: FC<AppToolConfigModalProps> = ({
               className="w-full"
             />
           </div>
-          <p className="text-sm text-gray-400 my-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 my-2">
             Choose preferred contact method during scheduling meeting, either a phone number or an email address.
           </p>
         </div>
       )}
-      <p className="text-sm text-gray-400 my-2">
+      <p className="text-sm text-gray-600 dark:text-gray-400 my-2">
         Some functions may require the agent timezone to be set. Make sure to set it.
       </p>
     </Modal>

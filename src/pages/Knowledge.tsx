@@ -206,7 +206,7 @@ export const CreateKnowledgeModal: FC<CreateKnowledgeModalProps> = ({
       ) : (
         <div>
           <div className="flex items-center gap-4">
-            <FaFileUpload className="text-4xl text-gray-400" />
+            <FaFileUpload className="text-4xl text-gray-600 dark:text-gray-400" />
             <div>
               <div className="text-lg">{file.name}</div>
               <div className="text-gray-500">{formatFileSize(file.size)}</div>
@@ -216,7 +216,7 @@ export const CreateKnowledgeModal: FC<CreateKnowledgeModalProps> = ({
                 className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/20 rounded-full transition-all duration-300"
                 onClick={() => setFile(null)}
               >
-                <FaTrash className="text-red-500" size={24} />
+                <FaTrash className="text-red-500" size={16} />
               </button>
             </div>
           </div>
@@ -270,16 +270,16 @@ const KnowledgeAction: FC<KnowledgeActionProps> = ({
   return (
     <div className="ml-auto mr-0 relative w-fit">
       <button
-        className="cursor-pointer hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
+        className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
         onClick={() => setIsOpen(true)}
       >
         <FaEllipsisV />
       </button>
       {isOpen && (
-        <div className="absolute right-full top-1/2 -translate-y-[66%] bg-gray-950 rounded-md shadow-md py-2 z-50">
+        <div className="absolute right-full top-1/2 -translate-y-[66%] bg-white dark:bg-gray-950 rounded-md shadow-md py-2 z-50">
           <div className="flex flex-col">
             <button
-              className="px-4 py-1.5 cursor-pointer text-left text-white hover:bg-gray-800"
+              className="px-4 py-1.5 cursor-pointer text-left text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800"
               disabled={isOverlayShow}
               onClick={handleDelete}
             >
@@ -347,18 +347,18 @@ const AgentKnowledge = () => {
             {knowledges.map((file) => (
               <div
                 key={file.id}
-                className="rounded-lg bg-gray-900/80 px-6 py-4 flex flex-col gap-2"
+                className="rounded-lg bg-white dark:bg-gray-950/80 border dark:border-0 border-gray-300 px-6 py-4 flex flex-col gap-2"
               >
                 <div className="gap-3 flex justify-between">
                   <div className="flex flex-col gap-1">
-                    <div className="flex items-center justify-center w-fit px-3 py-0.5 text-xs text-center text-nowrap overflow-hidden border border-emerald-500 bg-emerald-800/20 text-emerald-500 font-bold rounded-xl">
+                    <div className="flex items-center justify-center w-fit px-3 py-0.5 text-xs text-center text-nowrap overflow-hidden border border-emerald-500 bg-emerald-200/20 dark:bg-emerald-800/20 text-emerald-500 font-bold rounded-xl">
                       {file.file_type}
                     </div>
                     <div className="flex flex-col">
                       <div className="text-lg font-semibold line-clamp-2">
                         {file.name}
                       </div>
-                      <div className="text-gray-400">
+                      <div className="text-gray-600 dark:text-gray-400">
                         {formatFileSize(file.size)}
                       </div>
                     </div>
@@ -368,16 +368,16 @@ const AgentKnowledge = () => {
                     handleDelete={() => handleDelete(file.id)}
                   />
                 </div>
-                <div className="text-gray-400 text-sm line-clamp-3">
+                <div className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3">
                   {file.description}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-wrap justify-between h-full gap-4 rounded-lg bg-gray-900/80 overflow-x-auto">
+          <div className="flex flex-wrap justify-between h-full gap-4 rounded-lg bg-white dark:bg-gray-950/80 overflow-x-auto">
             <div className="w-full mt-6 text-center m-4 p-6">
-              <div className="text-gray-400">No documents found</div>
+              <div className="text-gray-600 dark:text-gray-400">No documents found</div>
               <div className="my-3">
                 <button
                   className="flex gap-2 items-center cursor-pointer bg-transparent text-sky-600 border border-sky-600 px-4 py-2 mx-auto rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"

@@ -33,7 +33,7 @@ const AppToolModal: FC<AppToolModalProps> = ({
       <div className="my-3 overflow-x-auto">
         <Table>
           <thead>
-            <tr className="border-b border-gray-700">
+            <tr className="border-b border-gray-300 dark:border-gray-700">
               <th className="p-4 text-start">Name</th>
               <th className="p-4 text-start">Description</th>
               <th className="p-4">App</th>

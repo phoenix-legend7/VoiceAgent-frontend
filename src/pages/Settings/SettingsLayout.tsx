@@ -13,7 +13,7 @@ const TabLink = ({ to, children }: { to: string, children: React.ReactNode }) =>
     <Link
       to={to}
       className={clsx(
-        "px-4 py-3 text-gray-400",
+        "px-4 py-3 text-gray-600 dark:text-gray-400",
         isActive && "text-sky-600 border-b-2 border-sky-600"
       )}
     >
@@ -27,7 +27,7 @@ const SettingsLayout = ({ children, isOverlayShown }: SettingsLayoutProps) => {
     <Content isOverlayShown={isOverlayShown}>
       <div className="flex flex-col h-full">
         <div className="text-2xl font-bold">Settings</div>
-        <div className="flex gap-4 mt-4 border-b border-gray-700">
+        <div className="flex gap-4 mt-4 border-b border-gray-300 dark:border-gray-700">
           <TabLink to="/settings/credentials">Credentials</TabLink>
           <TabLink to="/settings/billing">Billing</TabLink>
           <TabLink to="/settings/transactions">Transactions</TabLink>

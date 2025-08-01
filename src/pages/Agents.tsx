@@ -71,22 +71,22 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
         <FaEllipsisV />
       </button>
       {isOpen && (
-        <div className="absolute right-full top-1/2 -translate-y-[66%] bg-gray-950 rounded-md shadow-md py-2 z-50">
+        <div className="absolute right-full top-1/2 -translate-y-[66%] bg-gray-50 dark:bg-gray-950 rounded-md shadow-md py-2 z-50">
           <div className="flex flex-col">
             <button
-              className="px-4 py-1.5 cursor-pointer text-left text-white hover:bg-gray-800"
+              className="px-4 py-1.5 cursor-pointer text-left text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800"
               onClick={handleDuplicate}
             >
               Duplicate
             </button>
             <button
-              className="px-4 py-1.5 cursor-pointer text-left text-white hover:bg-gray-800"
+              className="px-4 py-1.5 cursor-pointer text-left text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800"
               onClick={handleEdit}
             >
               Edit
             </button>
             <button
-              className="px-4 py-1.5 cursor-pointer text-left text-white hover:bg-gray-800"
+              className="px-4 py-1.5 cursor-pointer text-left text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800"
               onClick={handleDelete}
             >
               Delete
@@ -203,13 +203,13 @@ const Agents = () => {
             Add
           </button>
         </div>
-        <div className="bg-gray-900/80 h-full overflow-x-auto mt-6">
+        <div className="dark:bg-gray-900/80 bg-white border dark:border-0 border-gray-300 rounded-lg h-full overflow-x-auto mt-6">
           <Table>
             <thead>
-              <tr className="border-b border-gray-700">
+              <tr className="border-b border-gray-300 dark:border-gray-700">
                 <TableCell>Name</TableCell>
-                <TableCell className="text-gray-400">Created</TableCell>
-                <TableCell className="text-gray-400">Status</TableCell>
+                <TableCell className="text-gray-600 dark:text-gray-400">Created</TableCell>
+                <TableCell className="text-gray-600 dark:text-gray-400">Status</TableCell>
                 <TableCell />
               </tr>
             </thead>
@@ -221,25 +221,25 @@ const Agents = () => {
                       <Link to={`/agents/${agent.id}`}>
                         <div className="flex items-center gap-2">
                           {/* bg: rgb(29, 41, 57), text-color: rgb(151, 161, 186) */}
-                          <div className="p-3 rounded-md flex items-center justify-center bg-gray-800 text-gray-400">
+                          <div className="p-3 rounded-md flex items-center justify-center bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                             <FaUserAlt size={24} />
                           </div>
                           <div>
                             {agent.name}
-                            <div className="text-gray-400 text-sm mt-1">
+                            <div className="text-gray-600 dark:text-gray-400 text-sm mt-1">
                               {agent.config.prompt.length > 90 ? agent.config.prompt.slice(0, 90) + ' ...' : agent.config.prompt}
                             </div>
                           </div>
                         </div>
                       </Link>
                     </TableCell>
-                    <TableCell className="text-gray-400">
+                    <TableCell className="text-gray-600 dark:text-gray-400">
                       {formatDateTime(agent.created_at)}
                     </TableCell>
                     <TableCell>
                       <StatusBadge
                         status="active"
-                        colors="border-emerald-500 bg-emerald-800/20 text-emerald-500"
+                        colors="border-emerald-500 bg-emerald-200/20 dark:bg-emerald-800/20 text-emerald-500"
                       />
                     </TableCell>
                     <TableCell>

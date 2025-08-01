@@ -131,7 +131,7 @@ const FilterBar: FC<FilterBarProps> = ({
       </div>
       <div className="flex items-center gap-6 justify-end px-4 py-3">
         <button
-          className="cursor-pointer border border-sky-600 text-white px-5 py-1.5 rounded-md hover:border-sky-700 hover:text-sky-400 transition-colors duration-300"
+          className="cursor-pointer border border-sky-600 text-sky-600 dark:text-white px-5 py-1.5 rounded-md hover:border-sky-700 hover:text-sky-400 transition-colors duration-300"
           onClick={handleClickClear}
         >
           Clear All
@@ -255,10 +255,10 @@ const CallLogs = () => {
             setTatalLogs={setTatalLogs}
           />
         </Accordian>
-        <div className="flex flex-col justify-between grow gap-4 rounded-lg bg-gray-900/80 overflow-auto">
+        <div className="flex flex-col justify-between grow gap-4 rounded-lg bg-white dark:bg-gray-900/80 border dark:border-0 border-gray-300 overflow-auto">
           <Table className="text-nowrap text-sm">
             <thead>
-              <tr className="border-b border-gray-700">
+              <tr className="border-b border-gray-300 dark:border-gray-700">
                 <TableCell>ID</TableCell>
                 <TableCell>Agent</TableCell>
                 <TableCell>Phone #</TableCell>
@@ -270,7 +270,7 @@ const CallLogs = () => {
             </thead>
             <tbody>
               {totalLogs.map((log, index) => (
-                <TableRow key={index} className="hover:bg-gray-700/50">
+                <TableRow key={index} className="hover:bg-gray-300/50 dark:hover:bg-gray-700/50">
                   <TableCell
                     className="cursor-pointer"
                     onClick={() => onTrClick(log)}
@@ -286,7 +286,7 @@ const CallLogs = () => {
                       return (
                         <Link
                           to={`/agents/${log.agent_id}`}
-                          className="flex items-center gap-3 rounded w-fit bg-gray-700 px-2 py-1"
+                          className="flex items-center gap-3 rounded w-fit bg-gray-300 dark:bg-gray-700 px-2 py-1"
                         >
                           {agent.name}
                           <FaExternalLinkAlt size={12} />
@@ -300,11 +300,11 @@ const CallLogs = () => {
                   >
                     {!!log.voip && (
                       <div className="flex flex-col gap-1">
-                        <div className="border border-gray-600 rounded px-2 py-0.5 w-fit">
+                        <div className="border border-gray-400 dark:border-gray-600 rounded px-2 py-0.5 w-fit">
                           {log.voip.from}
                         </div>
                         <FaArrowRight size={14} className="mx-2" />
-                        <div className="border border-gray-600 rounded px-2 py-0.5 w-fit">
+                        <div className="border border-gray-400 dark:border-gray-600 rounded px-2 py-0.5 w-fit">
                           {log.voip.to}
                         </div>
                       </div>
@@ -314,7 +314,7 @@ const CallLogs = () => {
                     className="cursor-pointer"
                     onClick={() => onTrClick(log)}
                   >
-                    <span className="border border-gray-600 rounded-xl px-3 py-0.5 w-fit text-gray-400 font-semibold text-sm">
+                    <span className="border border-gray-400 dark:border-gray-600 rounded-xl px-3 py-0.5 w-fit text-gray-600 dark:text-gray-400 font-semibold text-sm">
                       {log.call_status}
                     </span>
                   </TableCell>
@@ -352,7 +352,7 @@ const CallLogs = () => {
           </Table>
           {!totalLogs.length && !isOverlayShow && (
             <div className="w-full mt-6 text-center my-4 p-6">
-              <div className="text-gray-400">No call logs found</div>
+              <div className="text-gray-600 dark:text-gray-400">No call logs found</div>
             </div>
           )}
         </div>

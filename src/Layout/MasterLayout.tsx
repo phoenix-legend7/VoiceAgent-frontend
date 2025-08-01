@@ -39,12 +39,12 @@ const ThemeModeSwitch = () => {
   }, []);
   useEffect(() => {
     if (theme === "light") {
-      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark");
     } else if (theme === "dark") {
-      document.documentElement.classList.add("dark");
+      document.body.classList.add("dark");
     } else {
       const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.classList.toggle("dark", isDarkMode);
+      document.body.classList.toggle("dark", isDarkMode);
     }
     localStorage.setItem("theme", theme);
   }, [theme]);
@@ -72,27 +72,27 @@ const ThemeModeSwitch = () => {
       </button>
       {/* Show menu when clicked with animation */}
       <div className={clsx(
-        "absolute top-full right-0 w-40 rounded-md overflow-hidden transition-all duration-300 bg-gray-900 border border-gray-700 z-50",
+        "absolute top-full right-0 w-40 rounded-md overflow-hidden transition-all duration-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 z-50",
         isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
       )}>
-        <div className="flex flex-col gap-2 p-1.5">
-          <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col p-1.5">
+          <div className="flex flex-col items-center">
             <button
-              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-800 rounded transition-all duration-300"
+              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-all duration-300"
               onClick={() => handleThemeChange("light")}
             >
               <Sun size={20} className="inline-block mr-2" />
               Light
             </button>
             <button
-              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-800 rounded transition-all duration-300"
+              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-all duration-300"
               onClick={() => handleThemeChange("dark")}
             >
               <MoonStar size={20} className="inline-block mr-2" />
               Dark
             </button>
             <button
-              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-800 rounded transition-all duration-300"
+              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-all duration-300"
               onClick={() => handleThemeChange("system")}
             >
               <Laptop size={20} className="inline-block mr-2" />
@@ -110,7 +110,7 @@ const MasterLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="flex justify-between min-h-16 pr-6 pl-3 md:pl-6 bg-gray-950 border-b border-gray-700 text-white">
+      <div className="flex justify-between min-h-16 pr-6 pl-3 md:pl-6 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-700 text-gray-600 dark:text-white">
         <div className="flex items-center">
           <div
             className="flex items-center px-3 hover:text-sky-600 transition-all duration-300 cursor-pointer md:hidden"

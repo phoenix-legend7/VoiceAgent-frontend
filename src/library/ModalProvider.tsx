@@ -60,7 +60,7 @@ const Modal: React.FC<ModalProps> = ({
   const renderMenu = () => {
     const modalContent = (
       <div
-        className="fixed inset-0 w-full h-full bg-gray-950/70 py-7"
+        className="fixed inset-0 w-full h-full bg-gray-950/30 dark:bg-gray-950/70 py-7"
         onClick={handleBackdropClick}
         style={{ zIndex }}
         ref={ref}
@@ -73,7 +73,7 @@ const Modal: React.FC<ModalProps> = ({
           )}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex flex-col max-h-full w-full overflow-hidden bg-gray-900 border border-white/20 rounded-lg p-6">
+          <div className="flex flex-col max-h-full w-full overflow-hidden bg-gray-50 dark:bg-gray-900 border border-black/60 dark:border-white/20 rounded-lg p-6">
             <div className="flex items-center gap-4 mb-4 relative">
               {headerIcon}
               {title && <h2 className="text-lg md:text-2xl font-bold">{title}</h2>}
@@ -110,7 +110,7 @@ const Modal: React.FC<ModalProps> = ({
                   {isLoading ? (
                     <span className="flex items-center gap-2">
                       <svg
-                        className="animate-spin h-4 w-4 text-white"
+                        className="animate-spin h-4 w-4 text-black dark:text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

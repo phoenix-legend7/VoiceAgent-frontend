@@ -112,7 +112,7 @@ export const SetAgentModal: FC<Props> = ({
         />
         {!!selectedPhoneNumber?.agent_id && (
           <>
-            <div className="my-6 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-700 before:translate-y-1/2">
+            <div className="my-6 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-300 dark:after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-300 dark:before:border-gray-700 before:translate-y-1/2">
               <div className="px-2.5 text-center text-nowrap">OR</div>
             </div>
             <button

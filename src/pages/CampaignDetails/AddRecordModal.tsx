@@ -97,7 +97,7 @@ const AddRecordModal: FC<AddRecordsModalProps> = ({
       isLoading={isOverlayShow}
     >
       <div>
-        <div className="text-gray-400">
+        <div className="text-gray-600 dark:text-gray-400">
           Please enter the phone number and metadata for the campaign record.
         </div>
         <InputBox
@@ -123,7 +123,7 @@ const AddRecordModal: FC<AddRecordsModalProps> = ({
                 disabled
               />
               <button
-                className="cursor-pointer p-3 rounded-lg hover:bg-gray-800/50 transition-all duration-300"
+                className="cursor-pointer p-3 rounded-lg hover:bg-gray-300/50 dark:hover:bg-gray-800/50 transition-all duration-300"
                 onClick={() => handleDeleteMetadata(key)}
               >
                 <FaTrash />
@@ -146,7 +146,7 @@ const AddRecordModal: FC<AddRecordsModalProps> = ({
               inputClassName="bg-transparent"
             />
             <button
-              className="cursor-pointer p-3 rounded-lg hover:bg-gray-800/50 transition-all duration-300"
+              className="cursor-pointer p-3 rounded-lg hover:bg-gray-300/50 dark:hover:bg-gray-800/50 transition-all duration-300"
               onClick={handleAddMetadata}
             >
               <FaPlus />

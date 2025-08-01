@@ -186,16 +186,16 @@ const ImportRecordModal: FC<ImportRecordsModalProps> = ({
       ) : (
         <div>
           <div className="flex items-center gap-3">
-            <div className="text-gray-400 uppercase">Select Phone Column</div>
+            <div className="text-gray-600 dark:text-gray-400 uppercase">Select Phone Column</div>
             <div className="w-full">
               <select
-                className="rounded-md text-gray-400 bg-neutral-800/50 border border-gray-700 w-full py-2 px-3 my-1 focus:border-sky-600 focus:outline-none transition-all duration-300"
+                className="rounded-md text-gray-600 dark:text-gray-400 bg-neutral-200/50 dark:bg-neutral-800/50 border border-gray-300 dark:border-gray-700 w-full py-2 px-3 my-1 focus:border-sky-600 focus:outline-none transition-all duration-300"
                 value={selectedPhoneColumn || ''}
                 onChange={(e) => setSelectedPhoneColumn(e.target.value)}
               >
-                <option className="bg-neutral-800" value="">Select a column</option>
+                <option className="bg-neutral-200 dark:bg-neutral-800" value="">Select a column</option>
                 {headers.map((header) => (
-                  <option key={header} className="bg-neutral-800" value={header}>
+                  <option key={header} className="bg-neutral-200 dark:bg-neutral-800" value={header}>
                     {header}
                   </option>
                 ))}
@@ -210,13 +210,13 @@ const ImportRecordModal: FC<ImportRecordsModalProps> = ({
               )}
             </div>
           </div>
-          <div className="mt-4 text-gray-400 uppercase">
+          <div className="mt-4 text-gray-600 dark:text-gray-400 uppercase">
             CSV Preview ({fileData.length} records)
           </div>
           <div className="overflow-x-auto mt-4">
             <Table>
               <thead>
-                <tr className="text-gray-400 border-b border-gray-700">
+                <tr className="text-gray-600 dark:text-gray-400 border-b border-gray-300 dark:border-gray-700">
                   {headers.map((header) => (
                     <th key={header} className="text-left font-normal p-4 text-nowrap">
                       {header}

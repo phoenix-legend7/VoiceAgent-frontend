@@ -114,25 +114,25 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
             Dashboard
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Welcome back to your AI call platform
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Badge
             variant="outline"
-            className="border-cyan-500/50 text-cyan-400 animate-pulse"
+            className="border-cyan-500/50 text-cyan-600 dark:text-cyan-400 animate-pulse"
           >
-            <div className="w-2 h-2 bg-cyan-400 rounded-full mr-2" />
+            <div className="w-2 h-2 bg-cyan-600 dark:bg-cyan-400 rounded-full mr-2" />
             All Systems Operational
           </Badge>
         </div>
       </div>
 
       {/* Filters */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader>
-          <CardTitle className="text-cyan-400 flex items-center gap-2">
+          <CardTitle className="text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
             <Target className="w-5 h-5" />
             Analytics Filters
           </CardTitle>
@@ -140,12 +140,12 @@ export default function Dashboard() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm text-slate-300">Filter by Agent</label>
+              <label className="text-sm text-slate-700 dark:text-slate-300">Filter by Agent</label>
               <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                <SelectTrigger className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-black dark:text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
+                <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600">
                   <SelectItem value="all">All Agents</SelectItem>
                   {agents.map((agent, index) => (
                     <SelectItem value={agent.id} key={index}>
@@ -157,15 +157,15 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-slate-300">Time Period</label>
+              <label className="text-sm text-slate-700 dark:text-slate-300">Time Period</label>
               <Select
                 defaultValue="today"
                 onValueChange={(e) => setSelectedPeriod(e)}
               >
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                <SelectTrigger className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-black dark:text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
+                <SelectContent className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600">
                   <SelectItem value="today">Today</SelectItem>
                   <SelectItem value="week">This Week</SelectItem>
                   <SelectItem value="month">This Month</SelectItem>
@@ -179,87 +179,50 @@ export default function Dashboard() {
 
       {/* Main Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="bg-slate-900 border-slate-800 hover:border-cyan-500/50 transition-all duration-300 group">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400 flex items-center justify-between">
-              Total Calls
-              <PhoneCall className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              <AnimatedCounter value={dashboardData?.total_calls || 0} />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-slate-900 border-slate-800 hover:border-cyan-500/50 transition-all duration-300 group">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400 flex items-center justify-between">
-              Total Minutes
-              <Clock className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              <AnimatedCounter value={dashboardData?.total_minutes || 0} />
-            </div>
-            <p className="text-xs text-cyan-400 mt-1">
-              Talk time across all calls
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-slate-900 border-slate-800 hover:border-cyan-500/50 transition-all duration-300 group">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400 flex items-center justify-between">
-              Total Cost
-              <DollarSign className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              <AnimatedCurrency
-                value={(dashboardData?.total_cost || 0) / 100}
-              />
-            </div>
-            <p className="text-xs text-cyan-400 mt-1">Campaign costs today</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-slate-900 border-slate-800 hover:border-cyan-500/50 transition-all duration-300 group">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400 flex items-center justify-between">
-              Success Rate
-              <TrendingUp className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white">
-              <AnimatedPercentage value={dashboardData?.success_rate || 0} />
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard
+          title="Total Calls"
+          icon={PhoneCall}
+          value={<AnimatedCounter value={dashboardData?.total_calls || 0} />}
+        />
+        <StatCard
+          title="Total Minutes"
+          icon={Clock}
+          value={<AnimatedCounter value={dashboardData?.total_minutes || 0} />}
+          description="Talk time across all calls"
+        />
+        <StatCard
+          title="Total Cost"
+          icon={DollarSign}
+          value={
+            <AnimatedCurrency value={(dashboardData?.total_cost || 0) / 100} />
+          }
+          description="Campaign costs today"
+        />
+        <StatCard
+          title="Success Rate"
+          icon={TrendingUp}
+          value={<AnimatedPercentage value={dashboardData?.success_rate || 0} />}
+        />
       </div>
 
       {/* Call Dispositions */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader>
-          <CardTitle className="text-cyan-400 flex items-center gap-2">
+          <CardTitle className="text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Call Dispositions
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-cyan-500/20">
-              <div className="text-2xl font-bold text-cyan-400 mb-1">
+            <div className="text-center p-4 rounded-lg bg-slate-100/50 dark:bg-slate-800/50 border border-cyan-500/80 dark:border-cyan-500/20">
+              <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">
                 <AnimatedCounter
                   value={dashboardData?.dispositions.qualified || 0}
                 />
               </div>
-              <div className="text-sm text-slate-400">Qualified Leads</div>
-              <div className="text-xs text-cyan-400 mt-1">
+              <div className="text-sm text-slate-600 dark:text-slate-400">Qualified Leads</div>
+              <div className="text-xs text-cyan-600 dark:text-cyan-400 mt-1">
                 {(
                   ((dashboardData?.dispositions.qualified || 0) /
                     (dashboardData?.total_calls || 1)) *
@@ -269,14 +232,14 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-yellow-500/20">
+            <div className="text-center p-4 rounded-lg bg-slate-100/50 dark:bg-slate-800/50 border border-yellow-500/80 dark:border-yellow-500/20">
               <div className="text-2xl font-bold text-yellow-400 mb-1">
                 <AnimatedCounter
                   value={dashboardData?.dispositions.answering || 0}
                 />
               </div>
-              <div className="text-sm text-slate-400">Answering Machine</div>
-              <div className="text-xs text-yellow-400 mt-1">
+              <div className="text-sm text-slate-600 dark:text-slate-400">Answering Machine</div>
+              <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">
                 {(
                   ((dashboardData?.dispositions.answering || 0) /
                     (dashboardData?.total_calls || 1)) *
@@ -286,14 +249,14 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-red-500/20">
+            <div className="text-center p-4 rounded-lg bg-slate-100/50 dark:bg-slate-800/50 border border-red-500/80 dark:border-red-500/20">
               <div className="text-2xl font-bold text-red-400 mb-1">
                 <AnimatedCounter
                   value={dashboardData?.dispositions.no_answer || 0}
                 />
               </div>
-              <div className="text-sm text-slate-400">No Answer</div>
-              <div className="text-xs text-red-400 mt-1">
+              <div className="text-sm text-slate-600 dark:text-slate-400">No Answer</div>
+              <div className="text-xs text-red-400 dark:text-red-600 mt-1">
                 {(
                   ((dashboardData?.dispositions.answering || 0) /
                     (dashboardData?.total_calls || 1)) *
@@ -303,14 +266,14 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="text-center p-4 rounded-lg bg-slate-800/50 border border-orange-500/20">
+            <div className="text-center p-4 rounded-lg bg-slate-100/50 dark:bg-slate-800/50 border border-orange-500/80 dark:border-orange-500/20">
               <div className="text-2xl font-bold text-orange-400 mb-1">
                 <AnimatedCounter
                   value={dashboardData?.dispositions.busy || 0}
                 />
               </div>
-              <div className="text-sm text-slate-400">Busy Signal</div>
-              <div className="text-xs text-orange-400 mt-1">
+              <div className="text-sm text-slate-600 dark:text-slate-400">Busy Signal</div>
+              <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
                 {(
                   ((dashboardData?.dispositions.answering || 0) /
                     (dashboardData?.total_calls || 1)) *
@@ -325,9 +288,9 @@ export default function Dashboard() {
 
       {/* Campaign Performance & Quick Actions */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="bg-slate-900 border-slate-800 lg:col-span-2">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-cyan-400 flex items-center gap-2">
+            <CardTitle className="text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
               <Users className="w-5 h-5" />
               Agent Performance
             </CardTitle>
@@ -340,7 +303,7 @@ export default function Dashboard() {
                 <div className="space-y-3" key={index}>
                   <div className="flex justify-between items-center">
                     <div>
-                      <span className="text-white font-medium">
+                      <span className="text-black dark:text-white font-medium">
                         {performance.agent_name}
                       </span>
                       <div className="text-xs text-slate-400">
@@ -372,9 +335,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <CardHeader>
-            <CardTitle className="text-cyan-400 flex items-center gap-2">
+            <CardTitle className="text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
               <Zap className="w-5 h-5" />
               Quick Actions
             </CardTitle>
@@ -389,7 +352,7 @@ export default function Dashboard() {
             </Button>
             <Button
               variant="outline"
-              className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10"
+              className="w-full border-cyan-500/50 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10"
               onClick={() => navigate("/campaign-schedule")}
             >
               <Calendar className="w-4 h-4 mr-2" />
@@ -414,9 +377,9 @@ export default function Dashboard() {
       </div>
 
       {/* Cost Breakdown */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader>
-          <CardTitle className="text-cyan-400 flex items-center gap-2">
+          <CardTitle className="text-cyan-600 dark:text-cyan-400 flex items-center gap-2">
             <DollarSign className="w-5 h-5" />
             Cost Breakdown by Agent
           </CardTitle>
@@ -430,7 +393,7 @@ export default function Dashboard() {
             ) : (
               dashboardData.performances.map((performance, index) => (
                 <div
-                  className="text-center p-4 rounded-lg bg-slate-800/50"
+                  className="text-center p-4 rounded-lg dark:bg-slate-800/50"
                   key={index}
                 >
                   <div className="text-xl font-bold text-white mb-1">
@@ -450,5 +413,38 @@ export default function Dashboard() {
         </CardContent>
       </Card>
     </Content>
+  );
+}
+
+function StatCard({
+  title,
+  icon: Icon,
+  value,
+  description,
+}: {
+  title: string;
+  icon: any;
+  value: React.ReactNode;
+  description?: string;
+}) {
+  return (
+    <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-500/50 transition-all duration-300 group">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-slate-700 dark:text-slate-400 flex items-center justify-between">
+          {title}
+          <Icon className="w-4 h-4 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold text-slate-900 dark:text-white">
+          {value}
+        </div>
+        {description && (
+          <p className="text-xs text-cyan-600 dark:text-cyan-400 mt-1">
+            {description}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 }

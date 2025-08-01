@@ -85,20 +85,20 @@ const WebhookSettings: FC<WebhookSettingsProps> = ({ agent, setAgent, setIsOverl
           onChange={setPrefetchDataWebhook}
           placeholder="https://example.com/prefetch_data_webhook"
         />
-        <p className="mt-2 text-xs text-gray-400">
+        <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
           Set a webhook URL for prefetching data before the conversation starts. The webhook will be called with a GET request. &nbsp;&nbsp;
           <a href="https://docs.millis.ai/core-concepts/webhooks#1-prefetch-data-webhook" className="text-blue-700 underline decoration-1">
             Learn more
           </a>
         </p>
-        <hr className="my-4 text-gray-700" />
+        <hr className="my-4 text-gray-400 dark:text-gray-700" />
         <InputBox
           label="End-of-Call Webhook"
           value={endOfCallWebhook}
           onChange={setEndOfCallWebhook}
           placeholder="https://example.com/session_data_webhook"
         />
-        <p className="mt-2 text-xs text-gray-400">
+        <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
           Set a webhook URL to receive conversation data after each session. The webhook will be called with a POST request. &nbsp;&nbsp;
           <a href="https://docs.millis.ai/core-concepts/webhooks#2-end-of-call-webhook" className="text-blue-700 underline decoration-1">
             Learn more

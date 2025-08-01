@@ -66,10 +66,10 @@ const CustomLlmModal: FC<Props> = ({
       onClose={onClose}
       onOK={() => handleSave(customLlmUrl)}
     >
-      <div className="text-gray-400">
+      <div className="text-gray-600 dark:text-gray-400">
         Integrate your Custom LLM with Millis AI Voice Agent by providing a Websocket URL to your LLM Chatbot.
       </div>
-      <hr className="my-5 text-gray-800" />
+      <hr className="my-5 text-gray-200 dark:text-gray-800" />
       <InputBox
         onChange={(e) => setCustomLlmUrl(e)}
         value={customLlmUrl}

@@ -128,7 +128,7 @@ const EditAgentModal: FC<Props> = ({
       {selectedModel ? (
         <div>
           {!!speechModels.find((model) => model.value === selectedModel) && (
-            <div className="my-3 px-4 py-3 rounded-lg flex gap-3 border border-white">
+            <div className="my-3 px-4 py-3 rounded-lg flex gap-3 border border-gray-500 dark:border-white">
               <FaInfoCircle className="text-sky-600 text-2xl" />
               <div>
                 Experimental. Only use it for testing purposes.<br />
@@ -148,13 +148,13 @@ const EditAgentModal: FC<Props> = ({
               onChange={(e) => setTemperaature(Number(e.target.value))}
             />
           </div>
-          <div className="mt-5 mb-1 rounded border border-white">
+          <div className="mt-5 mb-1 rounded border border-gray-500 dark:border-white">
             <div
               className="flex items-center gap-2 justify-between py-4 px-6 cursor-pointer"
               onClick={() => setShowAdvancedConfig(!showAdvancedConfig)}
             >
               <div className="font-semibold">Chat Settings</div>
-              <div className="px-2 text-gray-400">
+              <div className="px-2 text-gray-600 dark:text-gray-400">
                 <FaChevronDown
                   className={clsx(
                     'transition-all duration-300',
@@ -176,7 +176,7 @@ const EditAgentModal: FC<Props> = ({
                 <div className="py-2 px-4">
                   <input
                     type="number"
-                    className="w-32 rounded border border-gray-700 p-3 outline-0 focus:border-sky-500 transition-all duration-300"
+                    className="w-32 rounded border border-gray-400 dark:border-gray-700 p-3 outline-0 focus:border-sky-500 transition-all duration-300"
                     value={historyMessageLimit}
                     onChange={(e) => setHistoryMessageLimit(Number(e.target.value))}
                   />
@@ -190,7 +190,7 @@ const EditAgentModal: FC<Props> = ({
                 <div className="py-2 px-4">
                   <input
                     type="number"
-                    className="w-32 rounded border border-gray-700 p-3 outline-0 focus:border-sky-500 transition-all duration-300"
+                    className="w-32 rounded border border-gray-400 dark:border-gray-700 p-3 outline-0 focus:border-sky-500 transition-all duration-300"
                     value={historyToolResultLimit}
                     onChange={(e) => setHistoryToolResultLimit(Number(e.target.value))}
                   />
@@ -200,7 +200,7 @@ const EditAgentModal: FC<Props> = ({
           </div>
         </div>
       ) : (
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-600 dark:text-gray-400">
           Millis selects the optimal LLM model with the lowest latency based on your config and functions.
         </p>
       )}

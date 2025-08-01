@@ -230,7 +230,7 @@ export default function CampaignScheduling() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-400 bg-clip-text text-transparent">
             Campaign Scheduling
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Automate your call campaigns with intelligent scheduling
           </p>
         </div>
@@ -241,20 +241,20 @@ export default function CampaignScheduling() {
       </div>
 
       {/* Quick Schedule Form */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader>
-          <CardTitle className="text-cyan-400 flex items-center gap-2">
+          <CardTitle className="text-cyan-500 dark:text-cyan-400 flex items-center gap-2">
             <Calendar className="w-5 h-5" />
             Quick Schedule
           </CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardDescription className="text-slate-600 dark:text-slate-400">
             Set up a new scheduled campaign in minutes
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3 mb-3">
             <div>
-              <Label className="text-slate-300 font-medium">
+              <Label className="text-slate-700 dark:text-slate-300 font-medium">
                 Schedule By Existing Campaign
               </Label>
             </div>
@@ -262,14 +262,14 @@ export default function CampaignScheduling() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div className="space-y-2">
-              <Label htmlFor="campaign-name" className="text-slate-300">
+              <Label htmlFor="campaign-name" className="text-slate-700 dark:text-slate-300">
                 Campaign Name
               </Label>
               {!createNew ? (
                 <Input
                   id="campaign-name"
                   placeholder="Enter campaign name"
-                  className="bg-slate-800 border-slate-700 text-white"
+                  className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white"
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
                   disabled={isLoading}
@@ -280,10 +280,10 @@ export default function CampaignScheduling() {
                   onValueChange={setSelectedCampaign}
                   disabled={isLoading}
                 >
-                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                  <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white">
                     <SelectValue placeholder="Select campaign" />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-600">
+                  <SelectContent className="bg-white dark:bg-slate-800 border-slate-400 dark:border-slate-600">
                     {campaigns.map((campaign) => (
                       <SelectItem key={campaign.id} value={campaign.id}>
                         {campaign.name}
@@ -295,21 +295,21 @@ export default function CampaignScheduling() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Select Caller</Label>
+              <Label className="text-slate-700 dark:text-slate-300">Select Caller</Label>
               <Select
                 value={selectedPhone}
                 onValueChange={setSelectedPhone}
                 disabled={isLoading}
               >
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white">
                   <SelectValue
                     className="bg-red-500"
                     placeholder="Choose caller"
                   />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
+                <SelectContent className="bg-white dark:bg-slate-800 border-slate-400 dark:border-slate-600">
                   {!phoneNumbers.length && (
-                    <div className="text-gray-400 px-3 py-1">
+                    <div className="text-gray-600 dark:text-gray-400 px-3 py-1">
                       Not found phone numbers.
                     </div>
                   )}
@@ -320,7 +320,7 @@ export default function CampaignScheduling() {
                     return (
                       <SelectItem value={phone.id} key={index}>
                         <div className="flex items-center text-nowrap gap-2">
-                          <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+                          <div className="flex items-center p-1 gap-2 rounded bg-gray-300 dark:bg-gray-700">
                             <div>
                               <FaPhoneAlt />
                             </div>
@@ -331,7 +331,7 @@ export default function CampaignScheduling() {
                               <div className="w-5">
                                 <MdInsertLink />
                               </div>
-                              <div className="flex items-center p-1 gap-2 rounded bg-gray-700">
+                              <div className="flex items-center p-1 gap-2 rounded bg-gray-300 dark:bg-gray-700">
                                 <div>
                                   <FaUser />
                                 </div>
@@ -348,7 +348,7 @@ export default function CampaignScheduling() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-300">Frequency</Label>
+              <Label className="text-slate-700 dark:text-slate-300">Frequency</Label>
               <Select
                 value={frequency}
                 onValueChange={(e) =>
@@ -356,10 +356,10 @@ export default function CampaignScheduling() {
                 }
                 disabled={isLoading}
               >
-                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white">
                   <SelectValue placeholder="Select frequency" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-600">
+                <SelectContent className="bg-white dark:bg-slate-800 border-slate-400 dark:border-slate-600">
                   <SelectItem value="daily">Daily</SelectItem>
                   <SelectItem value="weekdays">Weekdays Only</SelectItem>
                   <SelectItem value="weekends">Weekends Only</SelectItem>
@@ -374,7 +374,7 @@ export default function CampaignScheduling() {
               (isLoading ? (
                 <button
                   type="button"
-                  className="cursor-pointer flex flex-wrap gap-x-2 rounded-md border border-input px-3 py-2 text-base ring-offset-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-800 border-slate-700 text-white"
+                  className="cursor-pointer flex flex-wrap gap-x-2 rounded-md border border-input px-3 py-2 text-base ring-offset-gray-50 dark:ring-offset-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white"
                   disabled
                 >
                   <div>{formatDateTime(selectedRange.start.getTime())}</div>
@@ -383,7 +383,7 @@ export default function CampaignScheduling() {
                 </button>
               ) : (
                 <div className="space-y-2 col-span-2">
-                  <Label htmlFor="start-date" className="text-slate-300">
+                  <Label htmlFor="start-date" className="text-slate-700 dark:text-slate-300">
                     Time Range
                   </Label>
                   <DateTimePicker
@@ -404,7 +404,7 @@ export default function CampaignScheduling() {
                   >
                     <button
                       type="button"
-                      className="cursor-pointer flex flex-wrap gap-x-2 rounded-md border border-input px-3 py-2 text-base ring-offset-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-slate-800 border-slate-700 text-white"
+                      className="cursor-pointer flex flex-wrap gap-x-2 rounded-md border border-input px-3 py-2 text-base ring-offset-gray-50 dark:ring-offset-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white"
                     >
                       <div>{formatDateTime(selectedRange.start.getTime())}</div>
                       <div>~</div>
@@ -428,7 +428,7 @@ export default function CampaignScheduling() {
       </Card>
 
       {/* Scheduled Campaigns Table */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
         <CardHeader>
           <CardTitle className="text-cyan-400 flex items-center gap-2">
             <Clock className="w-5 h-5" />
@@ -439,23 +439,23 @@ export default function CampaignScheduling() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border border-slate-800 overflow-hidden">
+          <div className="rounded-md border border-slate-200 dark:border-slate-800 overflow-hidden">
             <Table>
-              <TableHeader className="bg-slate-800">
-                <TableRow className="border-slate-700 hover:bg-transparent">
-                  <TableHead className="text-slate-300">
+              <TableHeader className="bg-white dark:bg-slate-800">
+                <TableRow className="border-slate-300 dark:border-slate-700 hover:bg-transparent">
+                  <TableHead className="text-slate-700 dark:text-slate-300">
                     Campaign Name
                   </TableHead>
-                  <TableHead className="text-slate-300">Caller</TableHead>
-                  <TableHead className="text-slate-300">Frequency</TableHead>
-                  <TableHead className="text-slate-300">Status</TableHead>
-                  <TableHead className="text-slate-300">Next Run</TableHead>
+                  <TableHead className="text-slate-700 dark:text-slate-300">Caller</TableHead>
+                  <TableHead className="text-slate-700 dark:text-slate-300">Frequency</TableHead>
+                  <TableHead className="text-slate-700 dark:text-slate-300">Status</TableHead>
+                  <TableHead className="text-slate-700 dark:text-slate-300">Next Run</TableHead>
                   <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {!scheduledCampaigns.length && (
-                  <TableRow className="border-slate-800 hover:bg-slate-800/50">
+                  <TableRow className="border-white dark:border-slate-800 hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
                     <TableCell
                       className="text-slate-400 text-center"
                       colSpan={6}
@@ -467,7 +467,7 @@ export default function CampaignScheduling() {
                 {scheduledCampaigns.map((campaign) => (
                   <TableRow
                     key={campaign.id}
-                    className="border-slate-800 hover:bg-slate-800/50"
+                    className="border-white dark:border-slate-800 hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
                   >
                     <TableCell className="font-medium text-white">
                       {campaign.campaign_name}
@@ -481,7 +481,7 @@ export default function CampaignScheduling() {
                         className={
                           campaign.frequency === "custom"
                             ? "border-purple-500/50 text-purple-400"
-                            : "border-slate-600 text-slate-400"
+                            : "border-slate-400 dark:border-slate-600 text-slate-600 dark:text-slate-400"
                         }
                       >
                         {campaign.frequency}
@@ -505,10 +505,10 @@ export default function CampaignScheduling() {
                           }
                           className={
                             campaign.status === "active"
-                              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/50"
+                              ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/50"
                               : campaign.status === "scheduled"
-                              ? "bg-cyan-500/20 text-cyan-400 border-cyan-500/50"
-                              : "bg-yellow-500/20 text-yellow-400 border-yellow-500/50"
+                              ? "bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border-cyan-500/50"
+                              : "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/50"
                           }
                         >
                           {campaign.status}
@@ -516,7 +516,7 @@ export default function CampaignScheduling() {
                       </div>
                       {!!campaign.error && <div>{campaign.error}</div>}
                     </TableCell>
-                    <TableCell className="text-slate-400">
+                    <TableCell className="text-slate-600 dark:text-slate-400">
                       {formatNextRunCampaign(
                         campaign.status,
                         campaign.frequency
@@ -528,7 +528,7 @@ export default function CampaignScheduling() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="text-slate-400 hover:text-white"
+                            className="text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
                             disabled={isLoading}
                             onClick={() =>
                               handleStopCampaignSchedule(campaign.id)
@@ -541,7 +541,7 @@ export default function CampaignScheduling() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="text-slate-400 hover:text-white"
+                            className="text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
                             disabled={isLoading}
                             onClick={() =>
                               handleResumeCampaignSchedule(campaign.id)
@@ -555,7 +555,7 @@ export default function CampaignScheduling() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="text-slate-400 hover:text-white"
+                            className="text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
                             disabled={isLoading}
                             onClick={() =>
                               handleStopCampaignSchedule(
@@ -570,7 +570,7 @@ export default function CampaignScheduling() {
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="text-slate-400 hover:text-white"
+                            className="text-slate-600 dark:text-slate-400 hover:text-black dark:hover:text-white"
                             disabled={isLoading}
                             onClick={() =>
                               handleDeleteCampaignSchedule(campaign.id)
@@ -608,7 +608,7 @@ export default function CampaignScheduling() {
                   Default Timezone
                 </Label>
                 <Select defaultValue="est">
-                  <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                  <SelectTrigger className="bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-800 border-slate-600">
@@ -642,13 +642,13 @@ export default function CampaignScheduling() {
                   <Input
                     type="time"
                     defaultValue="09:00"
-                    className="bg-slate-800 border-slate-700 text-white"
+                    className="bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white"
                   />
                   <span className="text-slate-400 self-center">to</span>
                   <Input
                     type="time"
                     defaultValue="17:00"
-                    className="bg-slate-800 border-slate-700 text-white"
+                    className="bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-black dark:text-white"
                   />
                 </div>
               </div>

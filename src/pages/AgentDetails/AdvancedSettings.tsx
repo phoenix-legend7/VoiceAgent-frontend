@@ -66,7 +66,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
           <div className="font-semibold">Agent Timezone</div>
           <div>
             <select
-              className="rounded-md text-gray-400 bg-neutral-800/50 border border-gray-700 w-full py-2 px-3 focus:border-sky-600 focus:outline-none transition-all duration-300"
+              className="rounded-md text-gray-600 dark:text-gray-400 bg-neutral-200/50 dark:bg-neutral-800/50 border border-gray-400 dark:border-gray-700 w-full py-2 px-3 focus:border-sky-600 focus:outline-none transition-all duration-300"
               value={editData.config.timezone || ''}
               onChange={(e) => {
                 setEditData({
@@ -75,12 +75,12 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
                 })
               }}
             >
-              <option className="bg-neutral-800"></option>
-              <option className="bg-neutral-800" value="America/New_York">America/New_York</option>
-              <option className="bg-neutral-800" value="America/Los_Angeles">America/Los_Angeles</option>
-              <option className="bg-neutral-800" value="America/Chicago">America/Chicago</option>
-              <option className="bg-neutral-800" value="America/Denver">America/Denver</option>
-              <option className="bg-neutral-800" value="America/Phoenix">America/Phoenix</option>
+              <option className="dark:bg-neutral-800 bg-neutral-200"></option>
+              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/New_York">America/New_York</option>
+              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Los_Angeles">America/Los_Angeles</option>
+              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Chicago">America/Chicago</option>
+              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Denver">America/Denver</option>
+              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Phoenix">America/Phoenix</option>
             </select>
           </div>
         </div>
@@ -90,7 +90,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
               <div className="font-semibold">
                 Voice Detection Confidence Threshold
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Set the confidence level for detecting voice. 1 is the highest confidence, meaning the agent is less likely to detect voice and pause.
               </p>
             </div>
@@ -124,13 +124,13 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
             />
           </div>
         </div>
-        <div className="px-6 py-4 border-t border-b border-gray-700">
+        <div className="px-6 py-4 border-t border-b border-gray-300 dark:border-gray-700">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="font-semibold">
                 Call Recording
               </div>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Enable or disable recording of calls. Recording is disabled by default.
               </p>
             </div>
@@ -153,7 +153,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
         </div>
         <div className="p-6">
           <div className="font-semibold">Session Timeout</div>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             Set the session to automatically end after a fixed duration or following a period of no voice activity.
           </p>
           <div className="pt-6">
@@ -181,7 +181,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
                     />
                   </td>
                 </tr>
-                <tr className="border-t border-b border-gray-700">
+                <tr className="border-t border-b border-gray-300 dark:border-gray-700">
                   <td className="p-4">No Voice Activity: End session after [X] seconds of inactivity</td>
                   <td className="p-4">
                     <InputBoxWithUnit

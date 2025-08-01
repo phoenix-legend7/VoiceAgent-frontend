@@ -26,7 +26,7 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBl
             {
               'text-red-500': !!invalidText,
               'text-sky-600': !invalidText && isFocused,
-              'text-gray-400': disabled,
+              'text-gray-600 dark:text-gray-400': disabled,
             }
           )}
         >
@@ -38,8 +38,8 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBl
         className={clsx(
           inputClassName,
           'rounded-md border w-full py-2 px-3 focus:outline-none transition-all duration-300',
-          !invalidText ? 'border-gray-700 focus:border-sky-600' : 'border-red-500',
-          { 'text-gray-400': disabled }
+          !invalidText ? 'border-gray-400 dark:border-gray-700 focus:border-sky-600' : 'border-red-500',
+          { 'text-gray-600 dark:text-gray-400': disabled }
         )}
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -73,16 +73,16 @@ export const InputBoxWithUnit: React.FC<InputBoxWithUnitProps> = ({ unit, value,
   const [isFocused, setIsFocused] = useState(false);
   return (
     <div className={clsx(
-      className, 'flex items-center justify-center rounded border border-gray-700 transition-all duration-300',
-      isFocused ? 'border-sky-600' : 'hover:border-white',
+      className, 'flex items-center justify-center rounded border border-gray-400 dark:border-gray-700 transition-all duration-300',
+      isFocused ? 'border-sky-400 dark:border-sky-600' : 'hover:border-black dark:hover:border-white',
       showRightUnit ? 'pr-3.5' : 'pl-3.5'
     )}>
-      {!showRightUnit && <span className="text-gray-400">{unit}</span>}
+      {!showRightUnit && <span className="text-gray-600 dark:text-gray-400">{unit}</span>}
       <input
         type="number"
         className={clsx(
           'rounded-md w-full py-2 px-3 focus:outline-none',
-          { 'text-gray-400': disabled }
+          { 'text-gray-600 dark:text-gray-400': disabled }
         )}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
@@ -90,7 +90,7 @@ export const InputBoxWithUnit: React.FC<InputBoxWithUnitProps> = ({ unit, value,
         placeholder={placeholder}
         onChange={(e) => onChange(Number(e.target.value))}
       />
-      {showRightUnit && <span className="text-gray-400">{unit}</span>}
+      {showRightUnit && <span className="text-gray-600 dark:text-gray-400">{unit}</span>}
     </div>
   )
 }
@@ -113,7 +113,7 @@ export const SwtichWithLabel: React.FC<SwitchWithLabelProps> = ({ label, value, 
         <label
           className={clsx(
             'leading-[1.6] transition-colors duration-300',
-            { 'text-sky-600': isFocused, 'text-gray-400': disabled }
+            { 'text-sky-600': isFocused, 'text-gray-600 dark:text-gray-400': disabled }
           )}
         >
           {label}
@@ -125,7 +125,7 @@ export const SwtichWithLabel: React.FC<SwitchWithLabelProps> = ({ label, value, 
         aria-checked={value}
         className={clsx(
           'relative cursor-pointer inline-flex h-6 min-w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-1 focus:ring-sky-600 focus:ring-offset-2 disabled:opacity-20',
-          value ? 'bg-sky-600 disabled:bg-sky-600/20' : 'bg-gray-700',
+          value ? 'bg-sky-600 disabled:bg-sky-600/20' : 'bg-gray-400 dark:bg-gray-700',
         )}
         onClick={() => onChange(!value)}
         onFocus={() => setIsFocused(true)}
@@ -253,12 +253,12 @@ export const Slider: React.FC<SliderProps> = ({
           ref={tooltipRef}
           style={{ top: 'calc(-100% - 5px)' }}
         >
-          <div className='px-3 py-1 rounded-xs bg-neutral-500 text-sm'>{value}</div>
+          <div className='px-3 py-1 rounded-xs bg-neutral-300 dark:bg-neutral-500 text-sm'>{value}</div>
         </div>
         {defaultValue && (
           <>
             <div className="absolute top-full mt-1" style={{ left: `calc(${defaultValueProgress}% - 25px)` }}>
-              <div className={value >= defaultValue ? 'text-white' : 'text-gray-400'}>
+              <div className={value >= defaultValue ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-400'}>
                 Default
               </div>
             </div>
@@ -270,8 +270,8 @@ export const Slider: React.FC<SliderProps> = ({
         )}
       </div>
       <div className="flex items-center justify-between mt-1">
-        <div className="text-white">{min}</div>
-        <div className={value === max ? 'text-white' : 'text-gray-400'}>
+        <div className="text-black dark:text-white">{min}</div>
+        <div className={value === max ? 'text-black dark:text-white' : 'text-gray-600 dark:text-gray-400'}>
           {max}
         </div>
       </div>

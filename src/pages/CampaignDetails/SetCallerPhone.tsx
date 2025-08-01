@@ -63,7 +63,7 @@ const SetCallerPhone: FC<Props> = ({
       okBtnLabel="Select"
     >
       <div>
-        <div className="text-gray-400">
+        <div className="text-gray-600 dark:text-gray-400">
           Please select the phone from the list.
         </div>
         <Select

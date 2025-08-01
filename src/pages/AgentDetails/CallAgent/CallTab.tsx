@@ -51,14 +51,15 @@ const CallTab: FC<CallTabProps> = ({ agent }) => {
     <div className="p-2 relative">
       <div className="h-[50vh] text-center">
         <select
-          className="opacity-0 px-3 py-2 cursor-pointer rounded-md bg-gray-900 border border-gray-700 focus:border-sky-600 focus:outline-none transition-all duration-300"
+          className="w-full max-w-md px-3 py-2 cursor-pointer rounded-md bg-white dark:bg-gray-900 border border-gray-400 dark:border-gray-700 focus:border-sky-600 focus:outline-none transition-all duration-300"
           onChange={(e) => setRegion(e.target.value)}
+          id="region-select"
         >
           {regions.map((region, index) => (
             <option
               key={index}
               value={region.value}
-              className="bg-gray-900"
+              className="bg-white dark:bg-gray-900"
             >
               {region.label}
             </option>

@@ -14,7 +14,7 @@ export const TabButton: FC<TabButtonProps> = ({ label, onClick, isActive }) => {
         "cursor-pointer w-full border-b-2 transition-all duration-300 px-2 py-1 md:px-4 md:py-2",
         isActive
           ? "border-sky-600 text-sky-600"
-          : "text-gray-400 border-transparent"
+          : "text-gray-600 dark:text-gray-400 border-transparent"
       )}
       onClick={onClick}
     >
