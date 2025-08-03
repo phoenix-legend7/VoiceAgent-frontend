@@ -339,7 +339,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 p-6">
             {/* Google Sign In */}
             <Button
               onClick={handleGoogleLogin}
