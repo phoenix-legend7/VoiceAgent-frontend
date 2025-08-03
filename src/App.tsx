@@ -1,7 +1,9 @@
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom'
+import { useAuth } from './core/authProvider'
 import MasterLayout from './Layout/MasterLayout'
 // import Home from './pages/Home'
-// import NotFound from './pages/error/404'
+import NotFound from './pages/error/404'
 import Agents from './pages/Agents'
 import AgentDetails from './pages/AgentDetails'
 import PhoneNumbers from './pages/PhoneNumbers'
@@ -14,6 +16,44 @@ import Billing from './pages/Settings/Billing'
 import Transactions from './pages/Settings/Transactions'
 import Dashboard from './pages/Dashboard'
 import CampaignScheduling from './pages/CampaignSchedule'
+import LoginScreen from './pages/Login'
+import Wizard from './pages/Wizard'
+import BuildingAnimation from './pages/AgentBuilding'
+
+const WizardRoute = () => {
+  const [agentData, setAgentData] = useState<any>();
+
+  const navigate = useNavigate();
+
+  const handleWizardComplete = useCallback((data: any) => {
+    console.log('Wizard complete:', data);
+    setAgentData(data);
+  }, [navigate]);
+  const handleBuildingComplete = useCallback(() => {
+    console.log('Building animation complete');
+    navigate('/');
+  }, [navigate]);
+
+  return agentData ? (
+    <BuildingAnimation
+      agentData={agentData}
+      onComplete={handleBuildingComplete} />
+  ) : (
+    <Wizard onComplete={handleWizardComplete} />
+  );
+};
+
+const LoginRoute = () => {
+  const { setCurrentUser } = useAuth();
+  const navigate = useNavigate();
+  const handleLogin = useCallback((data: any) => {
+    console.log('Login success:', data);
+    setCurrentUser(data);
+    navigate('/wizard');
+  }, [navigate]);
+
+  return <LoginScreen onLogin={handleLogin} />;
+};
 
 const Settings = () => {
   return (
@@ -28,23 +68,38 @@ const Settings = () => {
 }
 
 function App() {
+  const { currentUser } = useAuth();
+  useEffect(() => {
+    console.log(currentUser);
+  }, [currentUser])
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path="/" element={<Home />} /> */}
-        <Route element={<MasterLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/agents" element={<Agents />} />
-          <Route path="/agents/:id" element={<AgentDetails />} />
-          <Route path="/phones" element={<PhoneNumbers />} />
-          <Route path="/campaigns" element={<Campaigns />} />
-          <Route path="/campaign-schedule" element={<CampaignScheduling />} />
-          <Route path="/campaigns/:id" element={<CampaignDetails />} />
-          <Route path="/knowledge" element={<AgentKnowledge />} />
-          <Route path="/histories" element={<CallLogs />} />
-          <Route path="/settings/*" element={<Settings />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/agents" />} />
+        {currentUser ? (
+          <>
+            <Route path='/wizard' element={<WizardRoute />} />
+            <Route element={<MasterLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/agents" element={<Agents />} />
+              <Route path="/agents/:id" element={<AgentDetails />} />
+              <Route path="/phones" element={<PhoneNumbers />} />
+              <Route path="/campaigns" element={<Campaigns />} />
+              <Route path="/campaign-schedule" element={<CampaignScheduling />} />
+              <Route path="/campaigns/:id" element={<CampaignDetails />} />
+              <Route path="/knowledge" element={<AgentKnowledge />} />
+              <Route path="/histories" element={<CallLogs />} />
+              <Route path="/settings/*" element={<Settings />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </>
+        ) : (
+          <>
+            {/* <Route path="/" element={<Home />} /> */}
+            <Route path='/login' element={<LoginRoute />} />
+            <Route path="*" element={<Navigate to="/login" />} />
+          </>
+        )}
       </Routes>
     </BrowserRouter>
   )

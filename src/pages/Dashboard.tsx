@@ -137,7 +137,7 @@ export default function Dashboard() {
             Analytics Filters
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm text-slate-700 dark:text-slate-300">Filter by Agent</label>
@@ -213,7 +213,7 @@ export default function Dashboard() {
             Call Dispositions
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center p-4 rounded-lg bg-slate-100/50 dark:bg-slate-800/50 border border-cyan-500/80 dark:border-cyan-500/20">
               <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400 mb-1">
@@ -295,7 +295,7 @@ export default function Dashboard() {
               Agent Performance
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-6">
             {!dashboardData?.performances.length ? (
               <div className="text-center mt-5">There is no performances.</div>
             ) : (
@@ -342,7 +342,7 @@ export default function Dashboard() {
               Quick Actions
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 p-6">
             <Button
               className="w-full bg-gradient-to-r from-cyan-600 via-cyan-600 to-emerald-500 hover:from-cyan-700 hover:via-cyan-700 hover:to-emerald-600 text-white"
               onClick={() => navigate("/agents")}
@@ -384,7 +384,7 @@ export default function Dashboard() {
             Cost Breakdown by Agent
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {!dashboardData?.performances.length ? (
               <div className="text-center md:col-span-3">
@@ -435,7 +435,7 @@ function StatCard({
           <Icon className="w-4 h-4 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         <div className="text-3xl font-bold text-slate-900 dark:text-white">
           {value}
         </div>

@@ -251,7 +251,7 @@ export default function CampaignScheduling() {
             Set up a new scheduled campaign in minutes
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="flex items-center gap-3 mb-3">
             <div>
               <Label className="text-slate-700 dark:text-slate-300 font-medium">
@@ -438,7 +438,7 @@ export default function CampaignScheduling() {
             Manage your automated campaign schedules
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="rounded-md border border-slate-200 dark:border-slate-800 overflow-hidden">
             <Table>
               <TableHeader className="bg-white dark:bg-slate-800">
