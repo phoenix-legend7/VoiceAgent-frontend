@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
@@ -40,47 +40,53 @@ interface WizardProps {
 
 const voices = [
   {
-    id: "luna",
-    name: "Luna",
-    description: "Warm and professional female voice",
+    id: "21m00Tcm4TlvDq8ikWAM",
+    name: "Rachel",
+    description: "A calm, young female voice with an American accent, suitable for soothing narration",
     accent: "American",
-    personality: "Friendly & Approachable",
+    personality: "Warm & Professional",
+    preview_url: "https://storage.googleapis.com/eleven-public-prod/premade/voices/21m00Tcm4TlvDq8ikWAM/b4928a68-c03b-411f-8533-3d5c299fd451.mp3",
   },
   {
-    id: "phoenix",
-    name: "Phoenix",
-    description: "Confident and charismatic male voice",
+    id: "AZnzlk1XvdvUeBnXmlld",
+    name: "Domi",
+    description: "A strong, young female voice with an American accent, great for impactful narration",
+    accent: "American",
+    personality: "Confident & Persuasive",
+    preview_url: "https://storage.googleapis.com/eleven-public-prod/premade/voices/AZnzlk1XvdvUeBnXmlld/b3c36b01-f80d-4b16-a698-f83682dee84c.mp3",
+  },
+  {
+    id: "ThT5KcBeYPX3keUQqHPh",
+    name: "Dorothy",
+    description: "A pleasant, young female voice with a British accent, ideal for storytelling",
     accent: "British",
-    personality: "Bold & Persuasive",
+    personality: "Friendly & Approachable",
+    preview_url: "https://storage.googleapis.com/eleven-public-prod/premade/voices/ThT5KcBeYPX3keUQqHPh/981f0855-6598-48d2-9f8f-b6d92fbbe3fc.mp3",
   },
   {
-    id: "nova",
-    name: "Nova",
-    description: "Energetic and bright female voice",
-    accent: "Australian",
-    personality: "Energetic & Fun",
-  },
-  {
-    id: "atlas",
-    name: "Atlas",
-    description: "Deep and authoritative male voice",
-    accent: "Canadian",
+    id: "onwK4e9ZLuTAKqWW03F9",
+    name: "Daniel",
+    description: "A deep, middle‑aged male voice with a British accent, excellent for news presenter roles",
+    accent: "British",
     personality: "Professional & Trustworthy",
+    preview_url: "https://storage.googleapis.com/eleven-public-prod/premade/voices/onwK4e9ZLuTAKqWW03F9/7eee0236-1a72-4b86-b303-5dcadc007ba9.mp3",
   },
   {
-    id: "sage",
-    name: "Sage",
-    description: "Clear and articulate female voice",
+    id: "D38z5RcWu1voky8WS1ja",
+    name: "Fin",
+    description: "An older male voice with an Irish accent, characterized as a sailor, brings warmth and wisdom",
     accent: "Irish",
     personality: "Wise & Calming",
+    preview_url: "https://storage.googleapis.com/eleven-public-prod/premade/voices/D38z5RcWu1voky8WS1ja/a470ba64-1e72-46d9-ba9d-030c4155e2d2.mp3",
   },
   {
-    id: "river",
-    name: "River",
-    description: "Smooth and calming male voice",
-    accent: "American",
-    personality: "Smooth & Relaxed",
-  },
+    id: "IKne3meq5aSn9XLyUdCD",
+    name: "Charlie",
+    description: "Casual, middle‑aged male voice with an Australian accent, ideal for conversational content",
+    accent: "Australian",
+    personality: "Energetic & Fun",
+    preview_url: "https://storage.googleapis.com/eleven-public-prod/premade/voices/IKne3meq5aSn9XLyUdCD/102de6f2-22ed-43e0-a1f1-111fa75c5481.mp3",
+  }
 ]
 
 const industries = [
@@ -305,6 +311,7 @@ export default function Wizard({ onComplete }: WizardProps) {
   })
 
   const totalSteps = 10
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const navigate = useNavigate()
 
   // Get screen dimensions
@@ -359,12 +366,25 @@ export default function Wizard({ onComplete }: WizardProps) {
     return () => clearInterval(interval)
   }, [dimensions])
 
-  const playVoiceSample = (voiceId: string) => {
-    if (isPlaying === voiceId) {
-      setIsPlaying(null)
+  const playVoiceSample = (voice: any) => {
+    if (isPlaying === voice.id) {
+      audioRef.current?.pause();
+      audioRef.current = null;
+      setIsPlaying(null);
     } else {
-      setIsPlaying(voiceId)
-      setTimeout(() => setIsPlaying(null), 3000)
+      if (audioRef.current) {
+        audioRef.current.pause(); // stop any previous audio
+        audioRef.current.src = voice.preview_url;
+        audioRef.current.play();
+        audioRef.current.onended = () => {
+          setIsPlaying(null);
+        };
+        audioRef.current.onerror = (e: any) => {
+          console.error("Error playing audio:", e);
+          setIsPlaying(null);
+        }
+      }
+      setIsPlaying(voice.id);
     }
   }
 
@@ -558,11 +578,10 @@ export default function Wizard({ onComplete }: WizardProps) {
               {industries.map((industry) => (
                 <Card
                   key={industry.id}
-                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                    formData.industry === industry.id
+                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${formData.industry === industry.id
                       ? "bg-green-500/20 border-green-400"
                       : "bg-black/50 border-gray-600 hover:border-green-400"
-                  }`}
+                    }`}
                   style={{
                     boxShadow: formData.industry === industry.id ? "0 0 30px #00FF00" : "0 0 10px rgba(0, 255, 0, 0.3)",
                   }}
@@ -642,11 +661,10 @@ export default function Wizard({ onComplete }: WizardProps) {
               {voices.map((voice) => (
                 <Card
                   key={voice.id}
-                  className={`cursor-pointer transition-all duration-300 hover:scale-102 ${
-                    formData.voice === voice.id
+                  className={`cursor-pointer transition-all duration-300 hover:scale-102 ${formData.voice === voice.id
                       ? "bg-yellow-500/20 border-yellow-400"
                       : "bg-black/50 border-gray-600 hover:border-yellow-400"
-                  }`}
+                    }`}
                   style={{
                     boxShadow: formData.voice === voice.id ? "0 0 30px #FFFF00" : "0 0 10px rgba(255, 255, 0, 0.3)",
                   }}
@@ -671,35 +689,42 @@ export default function Wizard({ onComplete }: WizardProps) {
                           </div>
                         </div>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          playVoiceSample(voice.id)
-                        }}
-                        className="ml-4 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                        style={{
-                          boxShadow: "0 0 15px #FFFF00",
-                        }}
-                      >
-                        {isPlaying === voice.id ? (
-                          <>
-                            <Pause className="w-5 h-5 mr-2" />
-                            Playing...
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-5 h-5 mr-2" />
-                            Preview
-                          </>
-                        )}
-                      </Button>
+                      {!!voice.preview_url && (
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            playVoiceSample(voice)
+                          }}
+                          className="ml-4 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                          style={{
+                            boxShadow: "0 0 15px #FFFF00",
+                          }}
+                        >
+                          {isPlaying === voice.id ? (
+                            <>
+                              <Pause className="w-5 h-5 mr-2" />
+                              Playing...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-5 h-5 mr-2" />
+                              Preview
+                            </>
+                          )}
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
+            <audio
+              ref={audioRef}
+              onEnded={() => setIsPlaying(null)}
+              className="hidden"
+            />
           </div>
         )
 
@@ -763,11 +788,10 @@ export default function Wizard({ onComplete }: WizardProps) {
                     return (
                       <Card
                         key={tool.id}
-                        className={`cursor-pointer transition-all duration-500 hover:scale-105 group relative overflow-hidden ${
-                          isSelected
+                        className={`cursor-pointer transition-all duration-500 hover:scale-105 group relative overflow-hidden ${isSelected
                             ? "bg-gradient-to-br from-cyan-500/20 via-blue-500/20 to-purple-500/20 border-cyan-400 shadow-2xl"
                             : "bg-gradient-to-br from-gray-900/50 to-black/50 border-gray-600 hover:border-cyan-400 hover:shadow-xl"
-                        }`}
+                          }`}
                         style={{
                           boxShadow: isSelected
                             ? "0 0 40px rgba(0, 255, 255, 0.4), 0 0 80px rgba(0, 255, 255, 0.2)"
@@ -790,11 +814,10 @@ export default function Wizard({ onComplete }: WizardProps) {
                           <div className="flex items-start gap-6">
                             {/* Icon with glow effect */}
                             <div
-                              className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${
-                                isSelected
+                              className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${isSelected
                                   ? "bg-gradient-to-r from-cyan-500 to-blue-500 shadow-lg"
                                   : "bg-gradient-to-r from-gray-700 to-gray-600 group-hover:from-cyan-500/50 group-hover:to-blue-500/50"
-                              }`}
+                                }`}
                               style={{
                                 boxShadow: isSelected ? "0 0 20px rgba(0, 255, 255, 0.5)" : "none",
                               }}
@@ -807,28 +830,25 @@ export default function Wizard({ onComplete }: WizardProps) {
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-3">
                                 <h3
-                                  className={`font-bold text-xl transition-colors duration-300 ${
-                                    isSelected ? "text-white" : "text-gray-200 group-hover:text-white"
-                                  }}`}
+                                  className={`font-bold text-xl transition-colors duration-300 ${isSelected ? "text-white" : "text-gray-200 group-hover:text-white"
+                                    }}`}
                                 >
                                   {tool.name}
                                 </h3>
                                 <Badge
                                   variant="outline"
-                                  className={`text-xs transition-all duration-300 ${
-                                    isSelected
+                                  className={`text-xs transition-all duration-300 ${isSelected
                                       ? "border-cyan-400 text-cyan-300 bg-cyan-500/10"
                                       : "border-gray-500 text-gray-400 group-hover:border-cyan-400 group-hover:text-cyan-300"
-                                  }`}
+                                    }`}
                                 >
                                   {tool.category}
                                 </Badge>
                               </div>
 
                               <p
-                                className={`text-sm leading-relaxed mb-4 transition-colors duration-300 ${
-                                  isSelected ? "text-gray-200" : "text-gray-400 group-hover:text-gray-200"
-                                }`}
+                                className={`text-sm leading-relaxed mb-4 transition-colors duration-300 ${isSelected ? "text-gray-200" : "text-gray-400 group-hover:text-gray-200"
+                                  }`}
                               >
                                 {tool.description}
                               </p>
@@ -903,11 +923,10 @@ export default function Wizard({ onComplete }: WizardProps) {
                           <div className="mt-6 flex justify-end">
                             <Button
                               size="sm"
-                              className={`transition-all duration-300 ${
-                                isSelected
+                              className={`transition-all duration-300 ${isSelected
                                   ? "bg-gradient-to-r from-green-500 to-cyan-500 text-white border-0 shadow-lg"
                                   : "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-300 border border-cyan-500/30 hover:from-cyan-500 hover:to-blue-500 hover:text-white"
-                              }`}
+                                }`}
                               style={{
                                 boxShadow: isSelected ? "0 0 15px rgba(0, 255, 255, 0.5)" : "none",
                               }}
@@ -962,11 +981,10 @@ export default function Wizard({ onComplete }: WizardProps) {
                     return (
                       <Card
                         key={tool.id}
-                        className={`cursor-pointer transition-all duration-300 hover:scale-105 group ${
-                          isSelected
+                        className={`cursor-pointer transition-all duration-300 hover:scale-105 group ${isSelected
                             ? "bg-gradient-to-br from-cyan-500/15 to-purple-500/15 border-cyan-400"
                             : "bg-gradient-to-br from-gray-900/30 to-black/30 border-gray-600 hover:border-cyan-400"
-                        }`}
+                          }`}
                         style={{
                           boxShadow: isSelected ? "0 0 25px rgba(0, 255, 255, 0.3)" : "0 0 10px rgba(0, 255, 255, 0.1)",
                         }}
@@ -981,11 +999,10 @@ export default function Wizard({ onComplete }: WizardProps) {
 
                           <div className="flex items-start gap-4">
                             <div
-                              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                                isSelected
+                              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isSelected
                                   ? "bg-gradient-to-r from-cyan-500 to-blue-500"
                                   : "bg-gradient-to-r from-gray-700 to-gray-600 group-hover:from-cyan-500/50 group-hover:to-blue-500/50"
-                              }`}
+                                }`}
                             >
                               <tool.icon
                                 className={`w-6 h-6 ${isSelected ? "text-white" : "text-gray-300 group-hover:text-white"} transition-colors duration-300`}
@@ -994,16 +1011,14 @@ export default function Wizard({ onComplete }: WizardProps) {
 
                             <div className="flex-1 min-w-0">
                               <h3
-                                className={`font-bold text-base mb-1 transition-colors duration-300 ${
-                                  isSelected ? "text-white" : "text-gray-200 group-hover:text-white"
-                                }`}
+                                className={`font-bold text-base mb-1 transition-colors duration-300 ${isSelected ? "text-white" : "text-gray-200 group-hover:text-white"
+                                  }`}
                               >
                                 {tool.name}
                               </h3>
                               <p
-                                className={`text-sm leading-relaxed transition-colors duration-300 ${
-                                  isSelected ? "text-gray-200" : "text-gray-400 group-hover:text-gray-200"
-                                }`}
+                                className={`text-sm leading-relaxed transition-colors duration-300 ${isSelected ? "text-gray-200" : "text-gray-400 group-hover:text-gray-200"
+                                  }`}
                               >
                                 {tool.description}
                               </p>
@@ -1013,11 +1028,10 @@ export default function Wizard({ onComplete }: WizardProps) {
                           <div className="mt-4 flex items-center justify-between">
                             <Badge
                               variant="outline"
-                              className={`text-xs transition-all duration-300 ${
-                                isSelected
+                              className={`text-xs transition-all duration-300 ${isSelected
                                   ? "border-cyan-400 text-cyan-300 bg-cyan-500/10"
                                   : "border-gray-500 text-gray-400 group-hover:border-cyan-400 group-hover:text-cyan-300"
-                              }`}
+                                }`}
                             >
                               {tool.category}
                             </Badge>
@@ -1025,9 +1039,8 @@ export default function Wizard({ onComplete }: WizardProps) {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className={`h-8 px-3 text-xs transition-all duration-300 ${
-                                isSelected ? "text-green-400 hover:text-green-300" : "text-cyan-400 hover:text-cyan-300"
-                              }`}
+                              className={`h-8 px-3 text-xs transition-all duration-300 ${isSelected ? "text-green-400 hover:text-green-300" : "text-cyan-400 hover:text-cyan-300"
+                                }`}
                             >
                               {isSelected ? "Added" : "Add"}
                             </Button>
@@ -1080,11 +1093,10 @@ export default function Wizard({ onComplete }: WizardProps) {
                 <label className="block text-green-300 text-lg mb-4 font-medium">Choose your setup:</label>
                 <div className="space-y-4">
                   <div
-                    className={`p-6 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                      formData.phoneSetup.option === "purchase"
+                    className={`p-6 border-2 rounded-lg cursor-pointer transition-all duration-300 ${formData.phoneSetup.option === "purchase"
                         ? "border-green-400 bg-green-500/10"
                         : "border-gray-600 hover:border-green-400"
-                    }`}
+                      }`}
                     style={{
                       boxShadow: formData.phoneSetup.option === "purchase" ? "0 0 20px rgba(0, 255, 0, 0.3)" : "none",
                     }}
@@ -1094,11 +1106,10 @@ export default function Wizard({ onComplete }: WizardProps) {
                     <p className="text-gray-300">Get a new number instantly via Twilio integration (~$1/month)</p>
                   </div>
                   <div
-                    className={`p-6 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
-                      formData.phoneSetup.option === "twilio"
+                    className={`p-6 border-2 rounded-lg cursor-pointer transition-all duration-300 ${formData.phoneSetup.option === "twilio"
                         ? "border-green-400 bg-green-500/10"
                         : "border-gray-600 hover:border-green-400"
-                    }`}
+                      }`}
                     style={{
                       boxShadow: formData.phoneSetup.option === "twilio" ? "0 0 20px rgba(0, 255, 0, 0.3)" : "none",
                     }}
