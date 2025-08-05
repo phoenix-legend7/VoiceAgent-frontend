@@ -44,11 +44,11 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (!!savedTheme && savedTheme === "dark") {
-      setIsDarkMode(true);
+      setIsDarkMode(true)
     } else {
-      setIsDarkMode(false);
+      setIsDarkMode(false)
     }
-  }, []);
+  }, [])
 
   // Generate matrix characters
   const generateMatrixChar = () => {
@@ -214,7 +214,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
   // Theme-specific colors and styles
   const theme = {
-    background: isDarkMode ? "bg-black" : "bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50",
+    background: isDarkMode ? "bg-black" : "bg-gradient-to-br from-cyan-50 via-blue-50 to-cyan-50",
     arcColor: isDarkMode ? "#00FFFF" : "#7dd7ff",
     matrixColor: isDarkMode ? "#00FF00" : "#7dd7ff",
     gridColor: isDarkMode ? "rgba(0,255,255,0.3)" : "rgba(14,165,233,0.3)",
@@ -230,13 +230,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       : "0 0 30px rgba(14,165,233,0.4), 0 0 60px rgba(2,132,199,0.3), inset 0 0 20px rgba(255, 255, 255, 0.3)",
     titleColor: isDarkMode ? "text-white" : "text-gray-800",
     titleShadow: isDarkMode ? "0 0 10px #00FFFF, 0 0 20px #00FFFF, 0 0 30px #00FFFF" : "0 0 10px rgba(14,165,233,0.3)",
-    descColor: isDarkMode ? "text-cyan-300" : "text-sky-600",
+    descColor: isDarkMode ? "text-cyan-300" : "text-cyan-600",
     descShadow: isDarkMode ? "0 0 5px #00FFFF" : "0 0 5px rgba(14,165,233,0.2)",
-    labelColor: isDarkMode ? "text-white" : "text-sky-700",
+    labelColor: isDarkMode ? "text-white" : "text-cyan-700",
     labelShadow: isDarkMode ? "0 0 5px #00FFFF" : "none",
     inputBg: isDarkMode ? "bg-black/50" : "bg-white/70",
     inputText: isDarkMode ? "text-white" : "text-gray-800",
-    inputPlaceholder: isDarkMode ? "placeholder:text-gray-400" : "placeholder:text-sky-500",
+    inputPlaceholder: isDarkMode ? "placeholder:text-gray-400" : "placeholder:text-gray-600",
     inputBorder: isDarkMode ? "#00FFFF" : "#7dd7ff",
     inputShadow: isDarkMode
       ? "0 0 10px #00FFFF, inset 0 0 10px rgba(0, 255, 255, 0.1)"
@@ -245,7 +245,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     buttonShadow: isDarkMode
       ? "0 0 20px #FF00FF, 0 0 40px #00FFFF, inset 0 0 20px rgba(255, 255, 255, 0.1)"
       : "0 0 20px rgba(14,165,233,0.3), 0 0 40px rgba(2,132,199,0.2), inset 0 0 20px rgba(255, 255, 255, 0.2)",
-    textColor: isDarkMode ? "text-cyan-300" : "text-sky-600",
+    textColor: isDarkMode ? "text-cyan-300" : "text-cyan-600",
     textShadow: isDarkMode ? "0 0 5px #00FFFF" : "none",
   }
 
