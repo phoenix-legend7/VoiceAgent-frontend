@@ -334,10 +334,10 @@ export default function Wizard({ onComplete }: WizardProps) {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
-    if (!!savedTheme && savedTheme === "dark") {
-      setIsDarkMode(true)
-    } else {
+    if (!!savedTheme && savedTheme === "light") {
       setIsDarkMode(false)
+    } else {
+      setIsDarkMode(!window.matchMedia('(prefers-color-scheme: dark)').matches)
     }
   }, [])
 
