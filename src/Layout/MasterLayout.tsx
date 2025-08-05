@@ -10,7 +10,7 @@ type ThemeType = "light" | "dark" | "system"
 
 const ThemeModeSwitch = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [theme, setTheme] = useState<ThemeType>("light")
+  const [theme, setTheme] = useState<ThemeType>(localStorage.getItem("theme") as ThemeType || "system");
 
   const handleThemeChange = (currentTheme: ThemeType) => {
     setTheme(currentTheme || "system");
@@ -40,13 +40,14 @@ const ThemeModeSwitch = () => {
   useEffect(() => {
     if (theme === "light") {
       document.body.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     } else if (theme === "dark") {
       document.body.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     } else {
       const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
       document.body.classList.toggle("dark", isDarkMode);
     }
-    localStorage.setItem("theme", theme);
   }, [theme]);
   useEffect(() => {
     const closeDropdown = (event: MouseEvent) => {

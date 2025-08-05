@@ -41,6 +41,15 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     return () => window.removeEventListener("resize", updateDimensions)
   }, [])
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (!!savedTheme && savedTheme === "dark") {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(false);
+    }
+  }, []);
+
   // Generate matrix characters
   const generateMatrixChar = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?"
@@ -195,6 +204,11 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   }
 
   const toggleTheme = () => {
+    if (isDarkMode) {
+      localStorage.setItem("theme", "light")
+    } else {
+      localStorage.setItem("theme", "dark")
+    }
     setIsDarkMode(!isDarkMode)
   }
 
