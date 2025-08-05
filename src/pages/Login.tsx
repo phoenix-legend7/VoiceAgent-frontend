@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Separator } from "../components/ui/separator"
-import { Zap, Mail, Lock, Sparkles } from "lucide-react"
+import { Zap, Mail, Lock, Sparkles, Sun, Moon } from "lucide-react"
 
 interface LoginScreenProps {
   onLogin: (userData: any) => void
@@ -15,6 +15,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(true)
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
   const [electricArcs, setElectricArcs] = useState<
     Array<{ id: number; x1: number; y1: number; x2: number; y2: number; intensity: number }>
@@ -80,7 +81,10 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
     // Generate spark particles (reduced to 30)
     const generateSparks = () => {
-      const colors = ["#00FFFF", "#FF00FF", "#FFFF00", "#00FF00", "#FF0080", "#8000FF"]
+      const darkColors = ["#00FFFF", "#FF00FF", "#FFFF00", "#00FF00", "#FF0080", "#8000FF"]
+      const lightColors = ["#87CEEB", "#4FC3F7", "#29B6F6", "#03A9F4", "#0288D1", "#0277BD"]
+      const colors = isDarkMode ? darkColors : lightColors
+
       const newSparks = Array.from({ length: 30 }, (_, i) => ({
         id: i,
         x: Math.random() * dimensions.width,
@@ -161,7 +165,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       clearInterval(animationInterval)
       clearInterval(effectsInterval)
     }
-  }, [dimensions])
+  }, [dimensions, isDarkMode])
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)
@@ -190,8 +194,61 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     }, 1500)
   }
 
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode)
+  }
+
+  // Theme-specific colors and styles
+  const theme = {
+    background: isDarkMode ? "bg-black" : "bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50",
+    arcColor: isDarkMode ? "#00FFFF" : "#7dd7ff",
+    matrixColor: isDarkMode ? "#00FF00" : "#7dd7ff",
+    gridColor: isDarkMode ? "rgba(0,255,255,0.3)" : "rgba(14,165,233,0.3)",
+    scanColor: isDarkMode ? "#00FFFF" : "#7dd7ff",
+    cardBg: isDarkMode ? "rgba(0, 0, 0, 0.8)" : "rgba(255, 255, 255, 0.9)",
+    cardBorder: isDarkMode ? "#00FFFF" : "#7dd7ff",
+    cardShadow: isDarkMode
+      ? "0 0 20px #00FFFF, 0 0 40px #00FFFF, 0 0 60px #00FFFF, inset 0 0 20px rgba(0, 255, 255, 0.1)"
+      : "0 0 20px rgba(14,165,233,0.3), 0 0 40px rgba(14,165,233,0.2), 0 0 60px rgba(14,165,233,0.1), inset 0 0 20px rgba(14,165,233,0.05)",
+    iconBg: isDarkMode ? "linear-gradient(45deg, #FF00FF, #00FFFF)" : "linear-gradient(45deg, #7dd7ff, #0284c7)",
+    iconShadow: isDarkMode
+      ? "0 0 30px #FF00FF, 0 0 60px #00FFFF, inset 0 0 20px rgba(255, 255, 255, 0.2)"
+      : "0 0 30px rgba(14,165,233,0.4), 0 0 60px rgba(2,132,199,0.3), inset 0 0 20px rgba(255, 255, 255, 0.3)",
+    titleColor: isDarkMode ? "text-white" : "text-gray-800",
+    titleShadow: isDarkMode ? "0 0 10px #00FFFF, 0 0 20px #00FFFF, 0 0 30px #00FFFF" : "0 0 10px rgba(14,165,233,0.3)",
+    descColor: isDarkMode ? "text-cyan-300" : "text-sky-600",
+    descShadow: isDarkMode ? "0 0 5px #00FFFF" : "0 0 5px rgba(14,165,233,0.2)",
+    labelColor: isDarkMode ? "text-white" : "text-sky-700",
+    labelShadow: isDarkMode ? "0 0 5px #00FFFF" : "none",
+    inputBg: isDarkMode ? "bg-black/50" : "bg-white/70",
+    inputText: isDarkMode ? "text-white" : "text-gray-800",
+    inputPlaceholder: isDarkMode ? "placeholder:text-gray-400" : "placeholder:text-sky-500",
+    inputBorder: isDarkMode ? "#00FFFF" : "#7dd7ff",
+    inputShadow: isDarkMode
+      ? "0 0 10px #00FFFF, inset 0 0 10px rgba(0, 255, 255, 0.1)"
+      : "0 0 10px rgba(14,165,233,0.2), inset 0 0 10px rgba(14,165,233,0.05)",
+    buttonGradient: isDarkMode ? "linear-gradient(45deg, #FF00FF, #00FFFF)" : "linear-gradient(45deg, #7dd7ff, #0284c7)",
+    buttonShadow: isDarkMode
+      ? "0 0 20px #FF00FF, 0 0 40px #00FFFF, inset 0 0 20px rgba(255, 255, 255, 0.1)"
+      : "0 0 20px rgba(14,165,233,0.3), 0 0 40px rgba(2,132,199,0.2), inset 0 0 20px rgba(255, 255, 255, 0.2)",
+    textColor: isDarkMode ? "text-cyan-300" : "text-sky-600",
+    textShadow: isDarkMode ? "0 0 5px #00FFFF" : "none",
+  }
+
   return (
-    <div className="min-h-screen relative overflow-hidden bg-black">
+    <div className={`min-h-screen relative overflow-hidden ${theme.background}`}>
+      {/* Theme Toggle Button */}
+      <Button
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 z-50 w-12 h-12 rounded-full border-0 transition-all duration-300"
+        style={{
+          background: theme.iconBg,
+          boxShadow: theme.iconShadow,
+        }}
+      >
+        {!isDarkMode ? <Sun className="w-5 h-5 text-white" /> : <Moon className="w-5 h-5 text-white" />}
+      </Button>
+
       {/* Electric Arcs */}
       <svg className="absolute inset-0 pointer-events-none z-10" width="100%" height="100%">
         {electricArcs.map((arc) => (
@@ -199,15 +256,15 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             <polyline
               points={generateElectricArc(arc.x1, arc.y1, arc.x2, arc.y2)}
               fill="none"
-              stroke="#00FFFF"
+              stroke={theme.arcColor}
               strokeWidth="3"
-              opacity={arc.intensity}
+              opacity={arc.intensity * (isDarkMode ? 1 : 0.6)}
               className="animate-pulse"
               style={{
                 filter: `
-                  drop-shadow(0 0 5px #00FFFF) 
-                  drop-shadow(0 0 10px #00FFFF) 
-                  drop-shadow(0 0 20px #00FFFF)
+                  drop-shadow(0 0 5px ${theme.arcColor}) 
+                  drop-shadow(0 0 10px ${theme.arcColor}) 
+                  drop-shadow(0 0 20px ${theme.arcColor})
                 `,
                 animation: `electric-crackle ${1 + Math.random()}s infinite`,
               }}
@@ -217,7 +274,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               fill="none"
               stroke="#FFFFFF"
               strokeWidth="1"
-              opacity={arc.intensity * 0.8}
+              opacity={arc.intensity * 0.8 * (isDarkMode ? 1 : 0.4)}
               className="animate-pulse"
             />
           </g>
@@ -234,6 +291,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             r={spark.size}
             fill={spark.color}
             className="animate-pulse"
+            opacity={isDarkMode ? 1 : 0.7}
             style={{
               filter: `
                 drop-shadow(0 0 5px ${spark.color}) 
@@ -251,12 +309,12 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             key={drop.id}
             x={drop.x}
             y={drop.y}
-            fill="#00FF00"
+            fill={theme.matrixColor}
             fontSize="14"
             fontFamily="monospace"
-            opacity={drop.opacity}
+            opacity={drop.opacity * (isDarkMode ? 1 : 0.4)}
             style={{
-              filter: "drop-shadow(0 0 3px #00FF00)",
+              filter: `drop-shadow(0 0 3px ${theme.matrixColor})`,
             }}
           >
             {drop.char}
@@ -270,8 +328,8 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           className="w-full h-full"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(0,255,255,0.3) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,255,255,0.3) 1px, transparent 1px)
+              linear-gradient(${theme.gridColor} 1px, transparent 1px),
+              linear-gradient(90deg, ${theme.gridColor} 1px, transparent 1px)
             `,
             backgroundSize: "50px 50px",
             animation: "grid-pulse 4s ease-in-out infinite",
@@ -282,10 +340,11 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       {/* Scanning Line */}
       <div className="absolute inset-0 pointer-events-none z-25">
         <div
-          className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-60"
+          className={`absolute w-full h-0.5 bg-gradient-to-r from-transparent to-transparent opacity-60`}
           style={{
+            backgroundImage: `linear-gradient(to right, transparent, ${theme.scanColor}, transparent)`,
             animation: "scan-vertical 4s ease-in-out infinite",
-            filter: "drop-shadow(0 0 5px #00FFFF) blur(0.5px)",
+            filter: `drop-shadow(0 0 5px ${theme.scanColor}) blur(0.5px)`,
           }}
         />
       </div>
@@ -295,26 +354,17 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         <Card
           className="w-full max-w-md border-0 backdrop-blur-xl"
           style={{
-            background: "rgba(0, 0, 0, 0.8)",
-            border: "2px solid #00FFFF",
-            boxShadow: `
-              0 0 20px #00FFFF,
-              0 0 40px #00FFFF,
-              0 0 60px #00FFFF,
-              inset 0 0 20px rgba(0, 255, 255, 0.1)
-            `,
+            background: theme.cardBg,
+            border: `2px solid ${theme.cardBorder}`,
+            boxShadow: theme.cardShadow,
           }}
         >
           <CardHeader className="text-center space-y-4">
             <div
               className="mx-auto w-16 h-16 rounded-full flex items-center justify-center"
               style={{
-                background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
-                boxShadow: `
-                  0 0 30px #FF00FF,
-                  0 0 60px #00FFFF,
-                  inset 0 0 20px rgba(255, 255, 255, 0.2)
-                `,
+                background: theme.iconBg,
+                boxShadow: theme.iconShadow,
                 animation: "neon-pulse 2s ease-in-out infinite",
               }}
             >
@@ -322,17 +372,17 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             </div>
             <div>
               <CardTitle
-                className="text-2xl font-bold text-white"
+                className={`text-2xl font-bold ${theme.titleColor}`}
                 style={{
-                  textShadow: "0 0 10px #00FFFF, 0 0 20px #00FFFF, 0 0 30px #00FFFF",
+                  textShadow: theme.titleShadow,
                 }}
               >
                 Welcome to Spark
               </CardTitle>
               <CardDescription
-                className="text-cyan-300"
+                className={theme.descColor}
                 style={{
-                  textShadow: "0 0 5px #00FFFF",
+                  textShadow: theme.descShadow,
                 }}
               >
                 Create powerful AI voice agents in minutes
@@ -346,7 +396,9 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               disabled={isLoading}
               className="w-full h-12 bg-white hover:bg-gray-50 text-gray-900 border-0 transition-all duration-200"
               style={{
-                boxShadow: "0 0 20px rgba(255, 255, 255, 0.5)",
+                boxShadow: isDarkMode
+                  ? "0 0 20px rgba(255, 255, 255, 0.5)"
+                  : "0 0 20px rgba(0, 0, 0, 0.1), 0 4px 20px rgba(0, 0, 0, 0.1)",
               }}
             >
               {isLoading ? (
@@ -384,17 +436,17 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                 <Separator
                   className="w-full"
                   style={{
-                    background: "linear-gradient(90deg, transparent, #00FFFF, transparent)",
+                    background: `linear-gradient(90deg, transparent, ${theme.cardBorder}, transparent)`,
                     height: "2px",
-                    boxShadow: "0 0 10px #00FFFF",
+                    boxShadow: `0 0 10px ${theme.cardBorder}`,
                   }}
                 />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span
-                  className="bg-black px-2 text-cyan-300"
+                  className={`${isDarkMode ? 'bg-black' : 'bg-white'} px-2 ${theme.descColor}`}
                   style={{
-                    textShadow: "0 0 5px #00FFFF",
+                    textShadow: theme.descShadow,
                   }}
                 >
                   Or continue with email
@@ -403,29 +455,30 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             </div>
 
             {/* Email Form */}
-            <form onSubmit={handleEmailLogin} className="space-y-4">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <Label
                   htmlFor="email"
-                  className="text-white"
+                  className={theme.labelColor}
                   style={{
-                    textShadow: "0 0 5px #00FFFF",
+                    textShadow: theme.labelShadow,
                   }}
                 >
                   Email
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-cyan-400" />
+                  <Mail className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4`}
+                    style={{ color: theme.cardBorder }} />
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-black/50 text-white placeholder:text-gray-400"
+                    className={`pl-10 ${theme.inputBg} ${theme.inputText} ${theme.inputPlaceholder}`}
                     style={{
-                      border: "2px solid #00FFFF",
-                      boxShadow: "0 0 10px #00FFFF, inset 0 0 10px rgba(0, 255, 255, 0.1)",
+                      border: `2px solid ${theme.inputBorder}`,
+                      boxShadow: theme.inputShadow,
                     }}
                     required
                   />
@@ -434,41 +487,41 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               <div className="space-y-2">
                 <Label
                   htmlFor="password"
-                  className="text-white"
+                  className={theme.labelColor}
                   style={{
-                    textShadow: "0 0 5px #00FFFF",
+                    textShadow: theme.labelShadow,
                   }}
                 >
                   Password
                 </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-cyan-400" />
+                  <Lock className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4`}
+                    style={{ color: theme.cardBorder }} />
                   <Input
                     id="password"
                     type="password"
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-black/50 text-white placeholder:text-gray-400"
+                    className={`pl-10 ${theme.inputBg} ${theme.inputText} ${theme.inputPlaceholder}`}
                     style={{
-                      border: "2px solid #00FFFF",
-                      boxShadow: "0 0 10px #00FFFF, inset 0 0 10px rgba(0, 255, 255, 0.1)",
+                      border: `2px solid ${theme.inputBorder}`,
+                      boxShadow: theme.inputShadow,
                     }}
                     required
                   />
                 </div>
               </div>
               <Button
-                type="submit"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleEmailLogin(e)
+                }}
                 disabled={isLoading || !email || !password}
                 className="w-full h-12 text-white border-0 transition-all duration-200 disabled:opacity-50"
                 style={{
-                  background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
-                  boxShadow: `
-                    0 0 20px #FF00FF,
-                    0 0 40px #00FFFF,
-                    inset 0 0 20px rgba(255, 255, 255, 0.1)
-                  `,
+                  background: theme.buttonGradient,
+                  boxShadow: theme.buttonShadow,
                   animation: "neon-pulse 2s ease-in-out infinite",
                 }}
               >
@@ -484,12 +537,12 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   </div>
                 )}
               </Button>
-            </form>
+            </div>
 
             <p
-              className="text-center text-sm text-cyan-300"
+              className={`text-center text-sm ${theme.textColor}`}
               style={{
-                textShadow: "0 0 5px #00FFFF",
+                textShadow: theme.textShadow,
               }}
             >
               Don't have an account? Sign up with Google above
@@ -506,17 +559,16 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         
         @keyframes neon-pulse {
           0%, 100% { 
-            box-shadow: 
-              0 0 20px #FF00FF,
-              0 0 40px #00FFFF,
-              inset 0 0 20px rgba(255, 255, 255, 0.1);
+            box-shadow: ${isDarkMode
+          ? `0 0 20px #FF00FF, 0 0 40px #00FFFF, inset 0 0 20px rgba(255, 255, 255, 0.1)`
+          : `0 0 20px rgba(14,165,233,0.3), 0 0 40px rgba(2,132,199,0.2), inset 0 0 20px rgba(255, 255, 255, 0.2)`
+        };
           }
           50% { 
-            box-shadow: 
-              0 0 30px #FF00FF,
-              0 0 60px #00FFFF,
-              0 0 80px #FFFF00,
-              inset 0 0 30px rgba(255, 255, 255, 0.2);
+            box-shadow: ${isDarkMode
+          ? `0 0 30px #FF00FF, 0 0 60px #00FFFF, 0 0 80px #FFFF00, inset 0 0 30px rgba(255, 255, 255, 0.2)`
+          : `0 0 30px rgba(14,165,233,0.4), 0 0 60px rgba(2,132,199,0.3), 0 0 80px rgba(56,189,248,0.2), inset 0 0 30px rgba(255, 255, 255, 0.3)`
+        };
           }
         }
         

@@ -1348,7 +1348,7 @@ export default function Wizard({ onComplete }: WizardProps) {
                       key={day}
                       className="flex items-center space-x-4 p-4 bg-orange-500/10 rounded-lg border border-orange-400/30"
                     >
-                      <div className="w-20">
+                      <div className="w-32">
                         <label className="flex items-center space-x-2">
                           <input
                             type="checkbox"
