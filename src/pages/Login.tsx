@@ -1,17 +1,14 @@
-import type React from "react"
 import { useState, useEffect } from "react"
+import { toast, ToastContainer } from "react-toastify"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Separator } from "../components/ui/separator"
 import { Zap, Mail, Lock, Sparkles, Sun, Moon } from "lucide-react"
+import axiosInstance from "../core/axiosInstance"
 
-interface LoginScreenProps {
-  onLogin: (userData: any) => void
-}
-
-export default function LoginScreen({ onLogin }: LoginScreenProps) {
+export default function LoginScreen() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -177,30 +174,35 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   }, [dimensions, isDarkMode])
 
   const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    setTimeout(() => {
-      onLogin({
-        name: "John Doe",
-        email: "john@example.com",
-        avatar: "/placeholder.svg?height=40&width=40",
-        provider: "google",
-      })
-      setIsLoading(false)
-    }, 2000)
+    try {
+      setIsLoading(true)
+      const response = await axiosInstance.get("/auth/google/authorize")
+      const data = response.data
+      const url = data.authorization_url
+      if (!url) {
+        toast.error("Failed to get authentication url");
+        return;
+      }
+      window.location.assign(url);
+    } catch (e) {
+      toast.error("Failed to get authentication url");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setTimeout(() => {
-      onLogin({
-        name: email.split("@")[0],
-        email: email,
-        avatar: "/placeholder.svg?height=40&width=40",
-        provider: "email",
-      })
-      setIsLoading(false)
-    }, 1500)
+    // setTimeout(() => {
+    //   onLogin({
+    //     name: email.split("@")[0],
+    //     email: email,
+    //     avatar: "/placeholder.svg?height=40&width=40",
+    //     provider: "email",
+    //   })
+    //   setIsLoading(false)
+    // }, 1500)
   }
 
   const toggleTheme = () => {
@@ -564,6 +566,8 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           </CardContent>
         </Card>
       </div>
+
+      <ToastContainer />
 
       <style>{`
         @keyframes electric-crackle {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from './core/authProvider'
 import MasterLayout from './Layout/MasterLayout'
@@ -19,6 +19,7 @@ import CampaignScheduling from './pages/CampaignSchedule'
 import LoginScreen from './pages/Login'
 import Wizard from './pages/Wizard'
 import BuildingAnimation from './pages/AgentBuilding'
+import OAuthCallback from './pages/OAuthCallback'
 
 const WizardRoute = () => {
   const [agentData, setAgentData] = useState<any>();
@@ -43,18 +44,6 @@ const WizardRoute = () => {
   );
 };
 
-const LoginRoute = () => {
-  const { setCurrentUser } = useAuth();
-  const navigate = useNavigate();
-  const handleLogin = useCallback((data: any) => {
-    console.log('Login success:', data);
-    setCurrentUser(data);
-    navigate('/wizard');
-  }, [navigate]);
-
-  return <LoginScreen onLogin={handleLogin} />;
-};
-
 const Settings = () => {
   return (
     <Routes>
@@ -69,9 +58,6 @@ const Settings = () => {
 
 function App() {
   const { currentUser } = useAuth();
-  useEffect(() => {
-    console.log(currentUser);
-  }, [currentUser])
 
   return (
     <BrowserRouter>
@@ -96,10 +82,11 @@ function App() {
         ) : (
           <>
             {/* <Route path="/" element={<Home />} /> */}
-            <Route path='/login' element={<LoginRoute />} />
+            <Route path='/login' element={<LoginScreen />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </>
         )}
+        <Route path='/oauth-callback' element={<OAuthCallback />} />
       </Routes>
     </BrowserRouter>
   )

@@ -2,6 +2,7 @@
 import {FC, useState, useEffect, createContext, useContext, Dispatch, SetStateAction} from 'react'
 import * as authHelper from "./authHelper";
 import { AuthModel, UserModel } from './_model'
+import axiosInstance from './axiosInstance';
 
 type AuthContextProps = {
   auth: AuthModel | undefined
@@ -15,11 +16,13 @@ interface WithChildren {
   children?: React.ReactNode;
 }
 
-const getUserByToken = async (token: string) => {
-  console.log(token);
-  return {
-    data: undefined,
+export const getUserByToken = async (token: string) => {
+  if (token) {
+    axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers['Authorization'];
   }
+  return axiosInstance.get<UserModel>("/auth/users/me");
 }
 
 const initAuthContextPropsState = {
