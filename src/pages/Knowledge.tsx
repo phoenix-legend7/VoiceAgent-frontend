@@ -276,7 +276,7 @@ const KnowledgeAction: FC<KnowledgeActionProps> = ({
         <FaEllipsisV />
       </button>
       {isOpen && (
-        <div className="absolute right-full top-1/2 -translate-y-[66%] bg-white dark:bg-gray-950 rounded-md shadow-md py-2 z-50">
+        <div className="absolute right-full top-1/2 -translate-y-[66%] bg-gray-100 dark:bg-gray-950 rounded-md shadow-md py-2 z-50">
           <div className="flex flex-col">
             <button
               className="px-4 py-1.5 cursor-pointer text-left text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800"
@@ -347,7 +347,7 @@ const AgentKnowledge = () => {
             {knowledges.map((file) => (
               <div
                 key={file.id}
-                className="rounded-lg bg-white dark:bg-gray-950/80 border dark:border-0 border-gray-300 px-6 py-4 flex flex-col gap-2"
+                className="rounded-lg bg-white dark:bg-gray-800/60 border dark:border-0 border-gray-300 px-6 py-4 flex flex-col gap-2"
               >
                 <div className="gap-3 flex justify-between">
                   <div className="flex flex-col gap-1">
