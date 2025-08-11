@@ -3,6 +3,7 @@ import {FC, useState, useEffect, createContext, useContext, Dispatch, SetStateAc
 import * as authHelper from "./authHelper";
 import { AuthModel, UserModel } from './_model'
 import axiosInstance from './axiosInstance';
+import { Loading } from '../Layout/Loading';
 
 type AuthContextProps = {
   auth: AuthModel | undefined
@@ -95,11 +96,8 @@ const AuthInit: FC<WithChildren> = ({children}) => {
     }
     // eslint-disable-next-line
   }, [])
-  useEffect(() => {
-    console.log(showSplashScreen);
-  }, [showSplashScreen])
 
-  return <>{children}</>
+  return showSplashScreen ? <Loading /> : <>{children}</>
 }
 
 export {AuthProvider, AuthInit, useAuth}
