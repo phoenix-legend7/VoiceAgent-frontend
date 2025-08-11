@@ -66,6 +66,7 @@ function App() {
           <>
             <Route path='/wizard' element={<WizardRoute />} />
             <Route element={<MasterLayout />}>
+              <Route path='/login' element={<Navigate to="/" />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/agents" element={<Agents />} />
               <Route path="/agents/:id" element={<AgentDetails />} />

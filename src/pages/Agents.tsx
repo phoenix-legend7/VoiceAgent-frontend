@@ -65,7 +65,7 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
   return (
     <div className="ml-auto mr-0 relative w-fit">
       <button
-        className="cursor-pointer hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
+        className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
         onClick={() => setIsOpen(true)}
       >
         <FaEllipsisV />
