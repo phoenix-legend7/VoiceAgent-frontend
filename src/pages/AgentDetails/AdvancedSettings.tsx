@@ -38,12 +38,10 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
   const handleSave = async () => {
     try {
       const data = {
-        config: {
-          timezone: editData.config.timezone,
-          vad_threshold: editData.config.vad_threshold,
-          call_settings: editData.config.call_settings,
-          session_timeout: editData.config.session_timeout
-        }
+        timezone: editData.config.timezone,
+        vad_threshold: editData.config.vad_threshold,
+        call_settings: editData.config.call_settings,
+        session_timeout: editData.config.session_timeout
       }
       setIsOverlayShow(true)
       await axiosInstance.put(
@@ -51,7 +49,7 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
         { config: data, name: agent.name }
       )
       toast.success('Prompt updated successfully')
-      setAgent({ ...agent, config: { ...agent.config, ...data.config } })
+      setAgent({ ...agent, config: { ...agent.config, ...data } })
     } catch (error) {
       handleAxiosError('Failed to update prompt', error)
     } finally {
