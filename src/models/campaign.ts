@@ -17,15 +17,8 @@ export interface CampaignTypeRead extends CampaignTypeBase {
   status: "idle" | "started" | "paused" | "finished" | "failed";
   records: Array<CampaignRecordTypeRead>;
   created_at: number;
-}
-
-export interface CampaignInfoType {
-  id: string;
-  name: string;
-  status: "idle" | "started" | "paused" | "finished" | "failed";
-  created_at: number;
   include_metadata_in_prompt: boolean;
-  caller?: string;
+  caller: string | null;
 }
 
 export default CampaignTypeBase;

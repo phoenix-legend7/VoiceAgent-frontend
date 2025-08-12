@@ -132,7 +132,7 @@ const Campaigns = () => {
             <thead>
               <tr className="border-b border-gray-300 dark:border-gray-700">
                 <TableCell>Campaign Name</TableCell>
-                {/* <TableCell>Caller</TableCell> */}
+                <TableCell>Caller</TableCell>
                 <TableCell>Num of Records</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Created At</TableCell>
@@ -156,7 +156,7 @@ const Campaigns = () => {
                         </div>
                       </Link>
                     </TableCell>
-                    {/* <TableCell>{campaign}</TableCell> */}
+                    <TableCell>{campaign.caller || "(Not set)"}</TableCell>
                     <TableCell>{campaign.records.length}</TableCell>
                     <TableCell>
                       <CampaignStatusBadge status={campaign.status} />

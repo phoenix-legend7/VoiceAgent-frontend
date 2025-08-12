@@ -22,7 +22,7 @@ import Content from "../../Layout/Content";
 import Table, { TableCell, TableRow } from "../../library/Table";
 import { SwtichWithLabel } from "../../library/FormField";
 import { AgentTypeRead } from "../../models/agent";
-import { CampaignInfoType, CampaignTypeRead } from "../../models/campaign";
+import { CampaignTypeRead } from "../../models/campaign";
 import { PhoneTypeRead } from "../../models/phone";
 import NotFound from "../error/404";
 import ImportRecordModal from "./ImportRecordsModal";
@@ -33,7 +33,6 @@ import SetCallerPhone from "./SetCallerPhone";
 const CampaignDetails = () => {
   const { id } = useParams();
   const [campaign, setCampaign] = useState<CampaignTypeRead | null>(null);
-  const [campaignInfo, setCampaignInfo] = useState<CampaignInfoType>();
   const [phones, setPhones] = useState<PhoneTypeRead[]>([]);
   const [agents, setAgents] = useState<AgentTypeRead[]>([]);
   const [isChanged, setIsChanged] = useState(false);
@@ -81,17 +80,7 @@ const CampaignDetails = () => {
         setIsOverlayShow(false);
       }
     };
-    const fetchCampaignInfo = async () => {
-      try {
-        const response = await axiosInstance.get(`/campaigns/${id}/info`);
-        const data = response.data;
-        setCampaignInfo(data);
-      } catch (error) {
-        handleAxiosError('Failed to get campaign info', error);
-      }
-    };
     fetchCampaign();
-    fetchCampaignInfo();
   }, [id, isChanged]);
 
   const phoneOptions = useMemo(
@@ -127,11 +116,11 @@ const CampaignDetails = () => {
   );
 
   const handleIncludeMetaData = async () => {
-    if (!campaignInfo) return;
+    if (!campaign) return;
     try {
       const payload = {
-        name: campaignInfo.name,
-        include_metadata_in_prompt: !campaignInfo.include_metadata_in_prompt,
+        name: campaign.name,
+        include_metadata_in_prompt: !campaign.include_metadata_in_prompt,
       };
       setIsOverlayShow(true);
       const response = await axiosInstance.put(
@@ -139,7 +128,12 @@ const CampaignDetails = () => {
         payload
       );
       const data = response.data;
-      setCampaignInfo(data);
+      if (campaign) {
+        setCampaign({
+          ...campaign,
+          ...data,
+        });
+      }
     } catch (error) {
       handleAxiosError('Failed to include metadata', error);
     } finally {
@@ -256,11 +250,11 @@ const CampaignDetails = () => {
                   <div className="font-bold text-gray-600 dark:text-gray-400 uppercase mb-2">
                     Caller
                   </div>
-                  {campaignInfo?.caller ? (
+                  {campaign?.caller ? (
                     <div className="flex flex-wrap items-center gap-2">
                       {
                         phoneOptions.find(
-                          (p) => p.value === campaignInfo.caller
+                          (p) => p.value === campaign.caller
                         )?.label
                       }
                       <div>
@@ -292,7 +286,8 @@ const CampaignDetails = () => {
             <div className="mt-8 flex flex-wrap gap-2">
               <SwtichWithLabel
                 onChange={handleIncludeMetaData}
-                value={!!campaignInfo?.include_metadata_in_prompt}
+                value={!!campaign?.include_metadata_in_prompt}
+                disabled={!!campaign}
               />
               <div>Include extra metadata in agent prompt</div>
             </div>
@@ -391,7 +386,6 @@ const CampaignDetails = () => {
           />
           <SetCallerPhone
             campaign={campaign}
-            campaignInfo={campaignInfo}
             isOpen={isSetCallerPhoneModalOpen}
             isOverlayShow={isOverlayShow}
             phoneOptions={phoneOptions}

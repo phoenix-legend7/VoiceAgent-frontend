@@ -2,12 +2,11 @@ import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
 import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Modal from "../../library/ModalProvider";
 import Select from "../../library/Select";
-import { CampaignInfoType, CampaignTypeRead } from "../../models/campaign";
+import { CampaignTypeRead } from "../../models/campaign";
 import { SelectOptionType } from "../../models/common";
 
 interface Props {
   campaign: CampaignTypeRead;
-  campaignInfo: CampaignInfoType | undefined;
   isOpen: boolean;
   isOverlayShow: boolean;
   phoneOptions: SelectOptionType[];
@@ -18,7 +17,6 @@ interface Props {
 
 const SetCallerPhone: FC<Props> = ({
   campaign,
-  campaignInfo,
   isOpen,
   isOverlayShow,
   phoneOptions,
@@ -29,10 +27,10 @@ const SetCallerPhone: FC<Props> = ({
   const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
 
   useEffect(() => {
-    if (campaignInfo?.caller) {
-      setSelectedPhone(campaignInfo.caller);
+    if (campaign?.caller) {
+      setSelectedPhone(campaign.caller);
     }
-  }, [campaignInfo, isOpen]);
+  }, [campaign, isOpen]);
 
   const onClose = () => {
     setIsOpen(false);
