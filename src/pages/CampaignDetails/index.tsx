@@ -287,7 +287,7 @@ const CampaignDetails = () => {
               <SwtichWithLabel
                 onChange={handleIncludeMetaData}
                 value={!!campaign?.include_metadata_in_prompt}
-                disabled={!!campaign}
+                disabled={!campaign}
               />
               <div>Include extra metadata in agent prompt</div>
             </div>
