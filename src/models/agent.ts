@@ -141,6 +141,7 @@ interface AgentTypeBase {
 export interface AgentTypeRead extends AgentTypeBase {
   id: string
   created_at: number
+  sip: { [key: string]: number }
 }
 
 export default AgentTypeBase

@@ -13,18 +13,11 @@ const regionOptions = [
   { label: 'eu-west', value: 'eu-west' },
 ]
 
-interface SIPEndpoint {
-  endpoint: string
-  created_at: number
-  call_id: string
-}
-
-const mockSipEndpoints: SIPEndpoint[] = []
-
 interface Props {
   agent: AgentTypeRead
   isModalOpen: boolean
   isOverlayShow: boolean
+  setAgent: Dispatch<SetStateAction<AgentTypeRead | null>>
   setIsModalOpen: Dispatch<SetStateAction<boolean>>
   setIsOverlayShow: Dispatch<SetStateAction<boolean>>
 }
@@ -33,6 +26,7 @@ const ManageSipEndpointModal: FC<Props> = ({
   agent,
   isModalOpen,
   isOverlayShow,
+  setAgent,
   setIsModalOpen,
   setIsOverlayShow,
 }) => {
@@ -44,13 +38,21 @@ const ManageSipEndpointModal: FC<Props> = ({
   const handleGenerate = async () => {
     setIsOverlayShow(true)
     try {
-      await axiosInstance.post(
+      const response = await axiosInstance.post(
         `/sip`,
         {
           agent,
           region: selectedRegion,
         }
       )
+      const data = response.data
+      setAgent({
+        ...agent,
+        sip: {
+          ...(agent.sip || {}),
+          [data.sip]: new Date().getTime()
+        }
+      })
       toast.success('New SIP Endpoint generated successfully.')
     } catch (error) {
       toast.error('Failed to generate new SIP endpoint.')
@@ -58,10 +60,14 @@ const ManageSipEndpointModal: FC<Props> = ({
       setIsOverlayShow(false)
     }
   }
-  const handleDeleteSip = async (call_id: string) => {
+  const handleDeleteSip = async (sip: string) => {
+    const callId = sip.split(":")[1].split("@")[0]
     setIsOverlayShow(true)
     try {
-      await axiosInstance.delete(`/sip/${call_id}`)
+      await axiosInstance.delete(`/sip/${callId}`)
+      const dbSip = structuredClone(agent.sip || {})
+      delete dbSip[sip]
+      setAgent({ ...agent, sip: dbSip })
     } catch (error) {
       toast.error('Failed to delete SIP endpoint.')
     } finally {
@@ -86,22 +92,24 @@ const ManageSipEndpointModal: FC<Props> = ({
         Manage SIP endpoints for your agent.
       </div>
       <div className="mt-4 py-2">
-        {mockSipEndpoints.map((sip, index) => (
+        {Object.keys(agent.sip).map((sip, index) => (
           <div className="flex items-center gap-3 px-4 py-2" key={index}>
             <div className="w-[calc(100%-64px)]">
-              <div className="w-full text-nowrap truncate">{sip.endpoint}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">{formatDateTime(sip.created_at)}</div>
+              <div className="w-full text-nowrap truncate">{sip}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">{formatDateTime(agent.sip[sip])}</div>
             </div>
             <div className="flex items-center">
               <button
                 className="cursor-pointer p-2 rounded-md text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-700/10 transition-all duration-300"
-                onClick={() => handleCopySip(sip.endpoint)}
+                onClick={() => handleCopySip(sip)}
+                disabled={isOverlayShow}
               >
                 <FaCopy />
               </button>
               <button
                 className="cursor-pointer p-2 rounded-md text-red-400 dark:text-red-600 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-700/10 transition-all duration-300"
-                onClick={() => handleDeleteSip(sip.call_id)}
+                onClick={() => handleDeleteSip(sip)}
+                disabled={isOverlayShow}
               >
                 <FaTrashAlt />
               </button>
@@ -122,6 +130,7 @@ const ManageSipEndpointModal: FC<Props> = ({
           <button
             className="cursor-pointer px-3 py-2 rounded-md border border-sky-600 hover:border-sky-400 text-sky-400 transition-all duration-300"
             onClick={handleGenerate}
+            disabled={isOverlayShow}
           >
             Generate New SIP Endpoint
           </button>
