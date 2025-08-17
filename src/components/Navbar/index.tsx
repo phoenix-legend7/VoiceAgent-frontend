@@ -1,6 +1,5 @@
 import clsx from "clsx";
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   FaAngleLeft,
   FaAngleRight,
@@ -17,7 +16,6 @@ import {
 // import { PiSparkle } from "react-icons/pi"
 import NavLink from "./NavLink";
 // import settingsItems from "../../consts/settings";
-import axiosInstance from "../../core/axiosInstance";
 
 // const SettingsButtonGroup = () => {
 //   const [isOpen, setIsOpen] = useState(false);
@@ -91,28 +89,6 @@ import axiosInstance from "../../core/axiosInstance";
 //   )
 // }
 
-type UserDataType = {
-  user_id: string;
-  credit: number;
-  used_credit: number;
-  auto_refill: {
-    enabled: boolean;
-    threshold?: number;
-    refill_amount?: number;
-  };
-};
-
-const initialUserData: UserDataType = {
-  user_id: "<string>",
-  credit: 5,
-  used_credit: 0,
-  auto_refill: {
-    enabled: true,
-    threshold: 0,
-    refill_amount: 0,
-  },
-};
-
 interface Props {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -120,7 +96,6 @@ interface Props {
 
 const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [userData, setUserData] = useState<UserDataType>(initialUserData);
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -134,27 +109,6 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
     window.addEventListener("resize", checkIsMobile);
     return () => {
       window.removeEventListener("resize", checkIsMobile);
-    };
-  }, []);
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axiosInstance.get("/user/info");
-        const data = response.data;
-        setUserData(data);
-      } catch (error) {
-        console.error(error);
-        // toast.error(`Failed to fetch user data: ${error}`);
-      }
-    };
-    fetchUserData();
-    const timerId = setInterval(() => {
-      fetchUserData();
-    }, 10000);
-    return () => {
-      if (timerId !== undefined) {
-        clearInterval(timerId);
-      }
     };
   }, []);
   useEffect(() => {
@@ -241,13 +195,13 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
         {/* <NewsGroup /> */}
       </div>
       <div className="w-full">
-        <div className="rounded bg-gray-200 dark:bg-gray-800/40 py-5 px-6 credit-usage">
+        {/* <div className="rounded bg-gray-200 dark:bg-gray-800/40 py-5 px-6 credit-usage">
           <div className="text-gray-500 text-sm font-semibold">
             Credit Usage
           </div>
           <div className="text-black dark:text-white font-semibold">
-            ${(userData.used_credit / 100).toFixed(4)} / $
-            {(userData.credit / 100).toFixed(4)}
+            ${((currentUser?.used_credit || 0) / 100).toFixed(4)} / $
+            {((currentUser?.total_credit || 0) / 100).toFixed(4)}
           </div>
           <hr className="text-gray-600 dark:text-gray-400 mb-1.5" />
           <Link
@@ -256,7 +210,7 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
           >
             Purchase Credits
           </Link>
-        </div>
+        </div> */}
         <hr className="w-full h-px text-gray-800" />
         <div className="pt-2">
           <button

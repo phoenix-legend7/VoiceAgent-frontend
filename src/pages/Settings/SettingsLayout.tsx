@@ -28,7 +28,7 @@ const SettingsLayout = ({ children, isOverlayShown }: SettingsLayoutProps) => {
       <div className="flex flex-col h-full">
         <div className="text-2xl font-bold">Settings</div>
         <div className="flex gap-4 mt-4 border-b border-gray-300 dark:border-gray-700">
-          <TabLink to="/settings/credentials">Credentials</TabLink>
+          <TabLink to="/settings/account">Account</TabLink>
           <TabLink to="/settings/billing">Billing</TabLink>
           <TabLink to="/settings/transactions">Transactions</TabLink>
         </div>

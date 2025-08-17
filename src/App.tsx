@@ -11,7 +11,7 @@ import Campaigns from './pages/Campaigns'
 import CampaignDetails from './pages/CampaignDetails'
 import AgentKnowledge from './pages/Knowledge'
 import CallLogs from './pages/CallLogs'
-import Credentials from './pages/Settings/Credentials'
+import AccountInfo from './pages/Settings/AccountInfo'
 import Billing from './pages/Settings/Billing'
 import Transactions from './pages/Settings/Transactions'
 import Dashboard from './pages/Dashboard'
@@ -47,11 +47,11 @@ const WizardRoute = () => {
 const Settings = () => {
   return (
     <Routes>
-      <Route index element={<Navigate to="/settings/credentials" />} />
-      <Route path="credentials" element={<Credentials />} />
+      <Route index element={<Navigate to="/settings/account" />} />
+      <Route path="account" element={<AccountInfo />} />
       <Route path="billing" element={<Billing />} />
       <Route path="transactions" element={<Transactions />} />
-      <Route path="*" element={<Navigate to="/settings/credentials" />} />
+      <Route path="*" element={<Navigate to="/settings/account" />} />
     </Routes>
   )
 }

@@ -1,10 +1,11 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { FaBars } from "react-icons/fa"
-import { Link, Outlet } from "react-router-dom"
+import { Link, Outlet, useNavigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
-import { Laptop, MoonStar, Sun, Zap } from "lucide-react"
+import { CreditCard, Laptop, LogOut, MoonStar, Sun, User, Zap } from "lucide-react"
 import Navbar from "../components/Navbar"
+import { useAuth } from "../core/authProvider"
 
 type ThemeType = "light" | "dark" | "system"
 
@@ -106,8 +107,94 @@ const ThemeModeSwitch = () => {
   )
 }
 
+const UserMenu = () => {
+  const [isOpen, setIsOpen] = useState(false)
+  const { currentUser, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleChangeLocation = (location: string) => {
+    setIsOpen(false)
+    navigate(location)
+  }
+  useEffect(() => {
+    const closeDropdown = (event: MouseEvent) => {
+      if (!(event.target as HTMLElement).closest("#user-menu")) {
+        setIsOpen(false)
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("click", closeDropdown);
+    }
+    return () => {
+      document.removeEventListener("click", closeDropdown);
+    }
+  }, [isOpen]);
+
+  return (
+    <div className="relative" id="user-menu">
+      <button
+        className="rounded cursor-pointer px-2 py-1.5 hover:bg-sky-600/10 transition-all duration-300"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {currentUser?.avatar ? (
+          <img
+            src={currentUser.avatar}
+            width={32}
+            height={32}
+            className="rounded-full"
+          />
+        ) : (
+          <div className="rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white size-8 flex items-center justify-center font-bold">
+            {currentUser?.first_name?.charAt(0) || "U"}
+          </div>
+        )}
+      </button>
+      {/* Show menu when clicked with animation */}
+      <div className={clsx(
+        "absolute top-full right-0 w-40 rounded-md overflow-hidden transition-all duration-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 z-50",
+        isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+      )}>
+        <div className="flex flex-col p-1.5">
+          <div>
+            <div className="px-4 py-2 font-bold">
+              {currentUser?.first_name} {currentUser?.last_name}
+            </div>
+            <hr className="w-full my-1 text-gray-200" />
+            <button
+              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-all duration-300"
+              onClick={() => handleChangeLocation("/settings/account")}
+            >
+              <User size={20} className="inline-block mr-2" />
+              Account
+            </button>
+            <button
+              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-all duration-300"
+              onClick={() => handleChangeLocation("/settings/billing")}
+            >
+              <CreditCard size={20} className="inline-block mr-2" />
+              Billing
+            </button>
+            <hr className="w-full my-1 text-gray-200" />
+            <button
+              className="cursor-pointer w-full text-left px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-all duration-300"
+              onClick={() => {
+                setIsOpen(false);
+                logout();
+              }}
+            >
+              <LogOut size={20} className="inline-block mr-2" />
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const MasterLayout = () => {
   const [isOpen, setIsOpen] = useState(true)
+  const { currentUser } = useAuth()
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -131,6 +218,9 @@ const MasterLayout = () => {
         </div>
         <div className="flex items-center gap-4">
           <ThemeModeSwitch />
+          {!!currentUser && (
+            <UserMenu />
+          )}
         </div>
       </div>
       <div className="flex h-full">

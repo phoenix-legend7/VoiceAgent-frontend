@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { FaCreditCard, FaRegCopyright } from "react-icons/fa";
-import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import Card from "../../library/Card";
 import { InputBoxWithUnit } from "../../library/FormField";
 import SettingsLayout from "./SettingsLayout";
 import clsx from "clsx";
 import StatusBadge from "../../components/StatusBadge";
+import { useAuth } from "../../core/authProvider";
 
 const CardAction = () => {
   return (
@@ -17,51 +17,19 @@ const CardAction = () => {
   );
 };
 
-type UserDataType = {
-  user_id: string;
-  credit: number;
-  used_credit: number;
-  auto_refill: {
-    enabled: boolean;
-    threshold?: number;
-    refill_amount?: number;
-  };
-};
-
-const initialUserData: UserDataType = {
-  user_id: "<string>",
-  credit: 5,
-  used_credit: 0,
-  auto_refill: {
-    enabled: true,
-    threshold: 0,
-    refill_amount: 0,
-  },
-};
-
 const Billing = () => {
-  const [userData, setUserData] = useState<UserDataType>(initialUserData);
+  const { currentUser } = useAuth();
   const [threshold, setThreshold] = useState<number>(0);
   const [refillAmount, setRefillAmount] = useState<number>(5000);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axiosInstance.get("/user/info");
-        const data = response.data;
-        setUserData(data);
-        setThreshold(data.auto_refill.threshold || 0);
-        setRefillAmount(data.auto_refill.refill_amount || 5000);
-      } catch (error) {
-        handleAxiosError('Failed to fetch user data', error);
-      }
-    };
-    fetchUserData();
-  }, []);
+    setThreshold(currentUser?.auto_threshold || 0);
+    setRefillAmount(currentUser?.auto_refill_amount || 5000);
+  }, [currentUser]);
 
   return (
     <SettingsLayout isOverlayShown={false}>
-      <div className="w-full grid grid-cols-1 lg:grid-cols-2 items-start justify-center gap-6">
+      <div className="w-full grid grid-cols-1 xl:grid-cols-2 items-start justify-center gap-6">
         <div className="bg-white dark:bg-gray-900 rounded-md px-8 py-4">
           <div className="mb-4">
             <FaRegCopyright size={32} />
@@ -72,14 +40,14 @@ const Billing = () => {
           </p>
           <div className="flex items-center gap-3">
             <div className="text-nowrap">
-              ${(userData.used_credit / 100).toFixed(4)} / $
-              {(userData.credit / 100).toFixed(4)}
+              ${((currentUser?.used_credit || 0) / 100).toFixed(4)} / $
+              {((currentUser?.total_credit || 0) / 100).toFixed(4)}
             </div>
             <div className="bg-sky-600/30 w-full h-2 rounded overflow-hidden">
               <div
                 className="bg-sky-500 h-full"
                 style={{
-                  width: `${(userData.used_credit / userData.credit) * 100}%`,
+                  width: `${((currentUser?.used_credit || 0) / (currentUser?.total_credit || 1)) * 100}%`,
                 }}
               />
             </div>
@@ -103,13 +71,13 @@ const Billing = () => {
           </div>
           <div className="my-3 flex gap-3 w-full items-center">
             <div className="w-1/2">Refill Amount</div>
-            <div className="w-1/2 flex items-center rounded overflow-hidden border border-gray-700 select-none">
+            <div className="w-1/2 flex items-center rounded overflow-hidden border border-gray-200 dark:border-gray-700 select-none">
               <div
                 className={clsx(
-                  "p-3 cursor-pointer transition-all duration-300 text-center flex-1 border-r",
+                  "p-3 cursor-pointer transition-all duration-300 text-center flex-1 border-r border-gray-200 dark:border-gray-700",
                   refillAmount === 500
-                    ? "bg-sky-600/20 text-sky-600 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-300/80 dark:hover:bg-sky-700/50 border-sky-900"
-                    : "bg-gray-600/20 border-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700"
+                    ? "bg-sky-600/20 text-sky-600 dark:text-sky-400 hover:bg-sky-300/40 dark:hover:bg-sky-700/50"
+                    : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                 )}
                 onClick={() => setRefillAmount(500)}
               >
@@ -117,10 +85,10 @@ const Billing = () => {
               </div>
               <div
                 className={clsx(
-                  "p-3 cursor-pointer transition-all duration-300 text-center flex-1 border-r",
+                  "p-3 cursor-pointer transition-all duration-300 text-center flex-1 border-r border-gray-200 dark:border-gray-700",
                   refillAmount === 1000
-                    ? "bg-sky-600/20 text-sky-600 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-300/80 dark:hover:bg-sky-700/50 border-sky-900"
-                    : "bg-gray-600/20 border-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700"
+                    ? "bg-sky-600/20 text-sky-600 dark:text-sky-400 hover:bg-sky-300/40 dark:hover:bg-sky-700/50"
+                    : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                 )}
                 onClick={() => setRefillAmount(1000)}
               >
@@ -128,10 +96,10 @@ const Billing = () => {
               </div>
               <div
                 className={clsx(
-                  "p-3 cursor-pointer transition-all duration-300 text-center flex-1 border-r",
+                  "p-3 cursor-pointer transition-all duration-300 text-center flex-1 border-r border-gray-200 dark:border-gray-700",
                   refillAmount === 5000
-                    ? "bg-sky-600/20 text-sky-600 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-300/80 dark:hover:bg-sky-700/50 border-sky-900"
-                    : "bg-gray-600/20 border-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700"
+                    ? "bg-sky-600/20 text-sky-600 dark:text-sky-400 hover:bg-sky-300/40 dark:hover:bg-sky-700/50"
+                    : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                 )}
                 onClick={() => setRefillAmount(5000)}
               >
@@ -141,8 +109,8 @@ const Billing = () => {
                 className={clsx(
                   "p-3 cursor-pointer transition-all duration-300 text-center flex-1",
                   refillAmount === 10000
-                    ? "bg-sky-600/20 text-sky-600 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-sky-300/80 dark:hover:bg-sky-700/50"
-                    : "bg-gray-600/20 text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700"
+                    ? "bg-sky-600/20 text-sky-600 dark:text-sky-400 hover:bg-sky-300/40 dark:hover:bg-sky-700/50"
+                    : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-300"
                 )}
                 onClick={() => setRefillAmount(10000)}
               >
@@ -153,7 +121,7 @@ const Billing = () => {
           <div className="my-3 flex gap-3 w-full items-center">
             <div className="w-1/2">Status</div>
             <div>
-              {userData.auto_refill.enabled ? (
+              {currentUser?.auto_refill ? (
                 <StatusBadge
                   colors="border-emerald-500 bg-emerald-200/20 text-emerald-500"
                   status="Active"
@@ -171,7 +139,7 @@ const Billing = () => {
               <button className="bg-sky-600 px-4 py-2 rounded-md cursor-pointer text-white hover:bg-sky-600/80 transition-all duration-300">
                 Activate Auto Refill
               </button>
-              {userData.auto_refill.enabled && (
+              {currentUser?.auto_refill && (
                 <button className="bg-red-800 px-4 py-2 rounded-md cursor-pointer text-white hover:bg-red-600/80 transition-all duration-300">
                   Remove
                 </button>
