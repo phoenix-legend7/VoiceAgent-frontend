@@ -1,30 +1,102 @@
-import React from "react"
+import React, { useState, useEffect, useMemo } from "react"
+import axios from "axios"
 import clsx from "clsx"
 
-import { useState, useEffect } from "react"
+import { toast, ToastContainer } from "react-toastify"
 import { Progress } from "../components/ui/progress"
 import { Card, CardContent } from "../components/ui/card"
-import { Zap, Brain, Cpu, Network, Database, Phone, MessageSquare, Settings, CheckCircle, Sparkles } from "lucide-react"
+import { Zap, Brain, Cpu, Database, Phone, MessageSquare, Settings, CheckCircle, Sparkles, Megaphone, Bot, Upload } from "lucide-react"
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
+import AgentTypeBase, { AgentTypeRead } from "../models/agent"
+import LanguageType from "../models/language"
+import { CampaignTypeRead } from "../models/campaign"
+
+const generatePresignedUrl = async (filename: string) => {
+  const payload = { filename };
+  const response = await axiosInstance.post(
+    "knowledge/generate_presigned_url",
+    payload
+  );
+  const data = response.data;
+  if (!data.url) {
+    throw new Error(data);
+  }
+  return data;
+};
+const uploadFileToAWS = async (
+  key: string,
+  awsAccessKeyId: string,
+  awsSecurityToken: string,
+  policy: string,
+  signature: string,
+  file: File
+) => {
+  const form = new FormData();
+  form.append("key", key);
+  form.append("AWSAccessKeyId", awsAccessKeyId);
+  form.append("x-amz-security-token", awsSecurityToken);
+  form.append("policy", policy);
+  form.append("signature", signature);
+  form.append("file", file);
+  return axios.post(
+    "https://millis-ai-agent-knowledge.s3.amazonaws.com/",
+    form,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  );
+};
+const createKnowledge = async (file: File) => {
+  try {
+    const presignedUrl = await generatePresignedUrl(file.name);
+    await uploadFileToAWS(
+      presignedUrl.fields["key"],
+      presignedUrl.fields["AWSAccessKeyId"],
+      presignedUrl.fields["x-amz-security-token"],
+      presignedUrl.fields["policy"],
+      presignedUrl.fields["signature"],
+      file
+    );
+    const data = {
+      object_key: presignedUrl.fields.key,
+      description: file.name,
+      name: file.name,
+      file_type: file.type,
+      size: file.size,
+    };
+    const response = await axiosInstance.post(
+      "/knowledge/create_file",
+      data,
+      { headers: { 'Content-Type': 'application/text' } }
+    );
+    return response.data as string
+  } catch (error) {
+    console.error('Failed to create file', error)
+    toast.error("Failed to create file")
+  }
+};
 
 interface BuildingAnimationProps {
   agentData: any
+  setAgentData: React.Dispatch<any>
   onComplete: () => void
 }
 
-export default function BuildingAnimation({ agentData, onComplete }: BuildingAnimationProps) {
-  const [progress, setProgress] = useState(0)
+export default function BuildingAnimation({ agentData, setAgentData, onComplete }: BuildingAnimationProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [matrixChars, setMatrixChars] = useState<string[]>([])
   const [isDark, setIsDark] = useState(true)
 
   const buildingSteps = [
-    { id: 1, title: "Initializing AI Core", icon: Brain, duration: 2000 },
-    { id: 2, title: "Training Neural Networks", icon: Network, duration: 2500 },
-    { id: 3, title: "Configuring Voice Engine", icon: MessageSquare, duration: 2000 },
-    { id: 4, title: "Setting Up Phone Integration", icon: Phone, duration: 1500 },
-    { id: 5, title: "Loading Knowledge Base", icon: Database, duration: 2000 },
-    { id: 6, title: "Finalizing Agent Configuration", icon: Settings, duration: 2000 },
+    { id: 1, title: "Uploading files", icon: Upload },
+    { id: 2, title: "Creating agent", icon: Bot },
+    { id: 3, title: "Setting Up Phone Integration", icon: Phone },
+    { id: 4, title: "Configuring Voice Engine", icon: MessageSquare },
+    { id: 5, title: "Creating campaign", icon: Megaphone },
+    { id: 6, title: "Configuring campaign", icon: Settings },
   ]
+
+  const numberSteps = useMemo(() => agentData.phoneSetup.option === "twilio" ? 6 : 2, [agentData.phoneSetup.option])
 
   // Check theme from localStorage
   useEffect(() => {
@@ -39,33 +111,93 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
   }, [])
 
   useEffect(() => {
-    const totalDuration = buildingSteps.reduce((sum, step) => sum + step.duration, 0)
-    let elapsed = 0
-
-    const interval = setInterval(() => {
-      elapsed += 100
-      const newProgress = Math.min((elapsed / totalDuration) * 100, 100)
-      setProgress(newProgress)
-
-      // Update current step
-      let stepElapsed = 0
-      for (let i = 0; i < buildingSteps.length; i++) {
-        stepElapsed += buildingSteps[i].duration
-        if (elapsed <= stepElapsed) {
-          setCurrentStep(i)
-          break
+    const createKnowledges = async () => {
+      const files = (agentData.knowledgeBase.files || []) as File[]
+      const ids = await Promise.all(files.map((file) => createKnowledge(file)))
+      setCurrentStep(1)
+      return ids.filter(id => id !== undefined)
+    }
+    const createAgent = async (files: string[]) => {
+      const payload: AgentTypeBase = {
+        name: agentData.agentName,
+        config: {
+          prompt: `You are ${agentData.agentName}, an AI assistant for the ${agentData.industry} industry.\nYour primary purpose is:\n"""\n${agentData.purpose}\n""".\n\n${agentData.personality ? `Your personality is: ${agentData.personality}.` : ''}`,
+          voice: {
+            provider: 'elevenlabs',
+            voice_id: agentData.voice,
+          },
+          flow: {},
+          first_message: agentData.greeting || `Hello! I'm ${agentData.agentName}. How can I help you today?`,
+          language: "en-US" as LanguageType,
+          ...(files.length > 0 ? {
+            knowledge_base: { files }
+          } : {})
         }
       }
-
-      if (elapsed >= totalDuration) {
-        clearInterval(interval)
+      const response = await axiosInstance.post("/agents", payload)
+      setCurrentStep(2)
+      return response.data
+    }
+    const importPhone = async () => {
+      const payload: { [key: string]: string } = {
+        provider: "twilio",
+        region: agentData.phoneSetup.twilioRegion,
+        country: agentData.phoneSetup.twilioCountry,
+        phone: agentData.phoneSetup.twilioPhoneNumber,
+        account_sid: agentData.phoneSetup.twilioSid,
+        api_key: agentData.phoneSetup.twilioApiKey,
+        api_secret: agentData.phoneSetup.twilioSecret,
+      }
+      await axiosInstance.post("/phones/import", payload)
+      setCurrentStep(3)
+      return agentData.phoneSetup.twilioPhoneNumber
+    }
+    const configuringVoice = async (agent: AgentTypeRead, phone: string) => {
+      const response = await axiosInstance.post("/set_phone_agent", {
+        phone: phone,
+        agent_id: agent?.id,
+      });
+      const data = response.data;
+      if (data !== "ok") {
+        throw new Error(data.details);
+      }
+      setCurrentStep(4)
+    }
+    const createCampaign = async (phone: string) => {
+      const response = await axiosInstance.post(
+        `/campaigns`,
+        { name: `Campaign for ${phone}` }
+      )
+      setCurrentStep(5)
+      return response.data
+    }
+    const configureCampaign = async (campaign: CampaignTypeRead, phone: string) => {
+      await axiosInstance.post(`/campaigns/${campaign.id}/set_caller`, {
+        caller: phone,
+      })
+      setCurrentStep(6)
+    }
+    const startProgress = async () => {
+      try {
+        const files = await createKnowledges()
+        const agent = await createAgent(files)
+        if (agentData.phoneSetup.option === "twilio") {
+          const phone = await importPhone()
+          await configuringVoice(agent, phone)
+          const campaign = await createCampaign(phone)
+          await configureCampaign(campaign, phone)
+        }
         setTimeout(() => {
           onComplete()
         }, 1000)
+      } catch (e) {
+        handleAxiosError("Failed to build agent", e)
+        setTimeout(() => {
+          setAgentData(undefined)
+        }, 5000)
       }
-    }, 100)
-
-    return () => clearInterval(interval)
+    }
+    startProgress()
   }, [onComplete])
 
   return (
@@ -214,9 +346,9 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
                 )}>
                   Overall Progress
                 </span>
-                <span className="text-[#F26AE1] font-bold">{Math.round(progress)}%</span>
+                <span className="text-[#F26AE1] font-bold">{Math.round(currentStep / numberSteps)}%</span>
               </div>
-              <Progress value={progress} className={clsx(
+              <Progress value={currentStep / numberSteps} className={clsx(
                 "h-3",
                 isDark ? 'bg-gray-700' : 'bg-gray-200'
               )} />
@@ -406,10 +538,6 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
                   <span className={clsx(isDark ? 'text-gray-400' : 'text-gray-600')}>Goal:</span>
                   <span className={clsx(isDark ? 'text-white' : 'text-gray-900')}>{agentData.primaryGoal}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className={clsx(isDark ? 'text-gray-400' : 'text-gray-600')}>Tools:</span>
-                  <span className={clsx(isDark ? 'text-white' : 'text-gray-900')}>{agentData.tools.length}</span>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -476,6 +604,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
           </div>
         </div>
       </div>
+
+      <ToastContainer />
     </div>
   )
 }

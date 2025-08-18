@@ -27,17 +27,16 @@ const WizardRoute = () => {
   const navigate = useNavigate();
 
   const handleWizardComplete = useCallback((data: any) => {
-    console.log('Wizard complete:', data);
     setAgentData(data);
-  }, [navigate]);
+  }, []);
   const handleBuildingComplete = useCallback(() => {
-    console.log('Building animation complete');
     navigate('/');
   }, [navigate]);
 
   return agentData ? (
     <BuildingAnimation
       agentData={agentData}
+      setAgentData={setAgentData}
       onComplete={handleBuildingComplete} />
   ) : (
     <Wizard onComplete={handleWizardComplete} />
