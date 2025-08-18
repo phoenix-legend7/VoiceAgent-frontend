@@ -79,7 +79,7 @@ const Campaigns = () => {
       setIsOverlayShow(true)
       try {
         const response = await axiosInstance.get(`/campaigns`)
-        if (!response.data.length) {
+        if (response.data.detail) {
           throw new Error(response.data.detail)
         }
         setCampaigns(response.data)
