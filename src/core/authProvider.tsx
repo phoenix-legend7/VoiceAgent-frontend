@@ -53,6 +53,7 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
   }
 
   const logout = () => {
+    axiosInstance.post("/auth/jwt/logout")
     saveAuth(undefined)
     setCurrentUser(undefined)
   }
