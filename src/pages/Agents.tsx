@@ -254,6 +254,11 @@ const Agents = () => {
               })}
             </tbody>
           </Table>
+          {agents.length === 0 && (
+            <div className="text-center m-4 p-6">
+              <div className="text-gray-400">Resources are not available</div>
+            </div>
+          )}
         </div>
       </div>
       <CreateAgentModal
