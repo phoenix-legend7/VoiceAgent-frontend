@@ -23,6 +23,7 @@ import {
   Database,
   Sun,
   Moon,
+  AlarmClock,
 } from "lucide-react"
 import clsx from "clsx"
 import { countryPhoneOptions } from "../consts/countryPhones"
@@ -1478,8 +1479,17 @@ export default function Wizard({ onComplete }: WizardProps) {
               boxShadow: "0 0 15px rgba(0, 255, 255, 0.3)",
             }}
           >
-            <ArrowLeft className="w-5 h-5" />
-            Back
+            {currentStep === 1 ? (
+              <>
+                <AlarmClock className="w-5 h-5" />
+                Not now
+              </>
+            ): (
+              <>
+                <ArrowLeft className="w-5 h-5" />
+                Back
+              </>
+            )}
           </Button>
           <Button
             onClick={handleNext}

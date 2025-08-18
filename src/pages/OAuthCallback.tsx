@@ -20,7 +20,13 @@ const OAuthCallback = () => {
         saveAuth({ access_token: data.access_token });
         const { data: user } = await getUserByToken(data.access_token);
         setCurrentUser(user);
-        navigate("/wizard");
+        const agentResponse = await axiosInstance.get("/agent");
+        const agents = agentResponse.data || [];
+        if (!agents.length) {
+          navigate("/wizard");
+        } else {
+          navigate("/");
+        }
       } catch (error) {
         console.error("Error handling OAuth success:", error);
       }

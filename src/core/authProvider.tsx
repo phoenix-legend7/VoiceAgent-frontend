@@ -20,10 +20,11 @@ interface WithChildren {
 export const getUserByToken = async (token: string) => {
   if (token) {
     axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
+    return axiosInstance.get<UserModel>("/auth/users/me");
   } else {
     delete axiosInstance.defaults.headers['Authorization'];
+    return { data: undefined }
   }
-  return axiosInstance.get<UserModel>("/auth/users/me");
 }
 
 const initAuthContextPropsState = {
@@ -53,7 +54,9 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
   }
 
   const logout = () => {
-    axiosInstance.post("/auth/jwt/logout")
+    if (auth && auth.access_token) {
+      axiosInstance.post("/auth/jwt/logout")
+    }
     saveAuth(undefined)
     setCurrentUser(undefined)
   }
