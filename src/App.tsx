@@ -36,7 +36,6 @@ const WizardRoute = () => {
   return agentData ? (
     <BuildingAnimation
       agentData={agentData}
-      setAgentData={setAgentData}
       onComplete={handleBuildingComplete} />
   ) : (
     <Wizard onComplete={handleWizardComplete} />

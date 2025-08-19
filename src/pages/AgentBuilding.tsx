@@ -74,11 +74,10 @@ const createKnowledge = async (file: File) => {
 
 interface BuildingAnimationProps {
   agentData: any
-  setAgentData: React.Dispatch<any>
   onComplete: () => void
 }
 
-export default function BuildingAnimation({ agentData, setAgentData, onComplete }: BuildingAnimationProps) {
+export default function BuildingAnimation({ agentData, onComplete }: BuildingAnimationProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [matrixChars, setMatrixChars] = useState<string[]>([])
   const [isDark, setIsDark] = useState(true)
@@ -189,7 +188,7 @@ export default function BuildingAnimation({ agentData, setAgentData, onComplete 
       } catch (e) {
         handleAxiosError("Failed to build agent", e)
         setTimeout(() => {
-          setAgentData(undefined)
+          onComplete()
         }, 5000)
       }
     }
