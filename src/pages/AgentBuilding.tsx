@@ -64,11 +64,7 @@ const createKnowledge = async (file: File) => {
       file_type: file.type,
       size: file.size,
     };
-    const response = await axiosInstance.post(
-      "/knowledge/create_file",
-      data,
-      { headers: { 'Content-Type': 'application/text' } }
-    );
+    const response = await axiosInstance.post("/knowledge/create_file", data);
     return response.data as string
   } catch (error) {
     console.error('Failed to create file', error)
@@ -134,7 +130,7 @@ export default function BuildingAnimation({ agentData, setAgentData, onComplete 
           } : {})
         }
       }
-      const response = await axiosInstance.post("/agents", payload)
+      const response = await axiosInstance.post("/agent", payload)
       setCurrentStep(2)
       return response.data
     }
