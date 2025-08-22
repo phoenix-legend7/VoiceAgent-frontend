@@ -43,7 +43,7 @@ export const TransparentButton: React.FC<ButtonProps> = ({ children, className, 
   return (
     <button
       className={clsx(
-        'cursor-pointer gap-x-2 bg-transparent border-0 rounded-full py-2 px-6 min-w-[48px] min-h-[48px] font-normal leading-none no-underline transition-all duration-300 flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10',
+        'cursor-pointer gap-x-2 bg-transparent border border-gray-300 dark:border-gray-700 rounded-full py-2 px-6 min-w-[48px] min-h-[48px] font-normal leading-none no-underline transition-all duration-300 flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10',
         className
       )}
       onClick={onClick}
