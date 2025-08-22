@@ -13,7 +13,7 @@ import SettingsLayout from "./SettingsLayout";
 import clsx from "clsx";
 import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../core/authProvider";
-import axiosInstance from "../../core/axiosInstance";
+import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import { toast } from "react-toastify";
 
 // Initialize Stripe
@@ -113,6 +113,7 @@ const CardSetupForm = ({ onSuccess, onCancel }: { onSuccess: () => void; onCance
       await axiosInstance.post("/billing/setup-payment-method", payload);
       onSuccess();
     } catch (err) {
+      handleAxiosError("Request failed", err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -165,7 +166,7 @@ const PaymentMethodCard = ({
       onRemove(paymentMethod.id);
     } catch (error) {
       console.error('Failed to remove payment method:', error);
-      toast.error("Failed to remove payment method");
+      toast.error(`Failed to remove payment method: ${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -233,7 +234,7 @@ const Billing = () => {
       setPaymentMethods(response.data.payment_methods || []);
     } catch (error) {
       console.error('Failed to fetch payment methods:', error);
-      toast.error("Failed to fetch payment methods");
+      toast.error(`Failed to fetch payment methods: ${(error as Error).message}`);
     }
   };
 
@@ -262,7 +263,7 @@ const Billing = () => {
       await axiosInstance.post('/billing/auto-refill/configure', payload);
     } catch (error) {
       console.error('Failed to configure auto-refill:', error);
-      toast.error("Failed to configure auto-refill");
+      toast.error(`Failed to configure auto-refill: ${(error as Error).message}`);
     } finally {
       setAutoRefillLoading(false);
     }
@@ -277,7 +278,10 @@ const Billing = () => {
     setLoading(true);
     try {
       const response = await axiosInstance.post('/billing/manual-topup', { amount: (amount / 100) });
-      toast.success(`Successfully added $${response.data.amount_added} to your account`);
+      if (!response.data.success) {
+        throw new Error(response.data.status);
+      }
+      toast.success(`Successfully added ${response.data.amount_added} to your account`);
       if (currentUser) {
         setCurrentUser({
           ...currentUser,
@@ -286,7 +290,7 @@ const Billing = () => {
       }
     } catch (error) {
       console.error('Failed to process payment:', error);
-      toast.error('Failed to process payment');
+      toast.error(`Failed to process payment: ${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
