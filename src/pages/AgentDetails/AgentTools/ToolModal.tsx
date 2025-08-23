@@ -383,7 +383,7 @@ const ToolModal: FC<ToolModalProps> = ({
                 <div key={`hook-${index}`} className="flex flex-col my-2">
                   <div className="flex items-center justify-between gap-3 my-2">
                     <InputBox
-                      onChange={(e) => setWebhookHeaders(webhookHeaders.map((hook, i) => i === index ? { ...hook, key: e } : hook))}
+                      onChange={(e) => setWebhookParams(webhookParams.map((param, i) => i === index ? { ...param, name: e } : param))}
                       value={param.name}
                       className="w-full"
                       label="Name"
