@@ -13,6 +13,7 @@ import AgentKnowledge from './pages/Knowledge'
 import CallLogs from './pages/CallLogs'
 import AccountInfo from './pages/Settings/AccountInfo'
 import Billing from './pages/Settings/Billing'
+import Tools from './pages/Settings/Tools'
 import Transactions from './pages/Settings/Transactions'
 import Dashboard from './pages/Dashboard'
 import CampaignScheduling from './pages/CampaignSchedule'
@@ -48,6 +49,7 @@ const Settings = () => {
       <Route index element={<Navigate to="/settings/account" />} />
       <Route path="account" element={<AccountInfo />} />
       <Route path="billing" element={<Billing />} />
+      <Route path="tools" element={<Tools />} />
       <Route path="transactions" element={<Transactions />} />
       <Route path="*" element={<Navigate to="/settings/account" />} />
     </Routes>

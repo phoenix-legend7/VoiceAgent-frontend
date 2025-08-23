@@ -30,7 +30,12 @@ export const handleAxiosError = (msg: string, e: unknown) => {
     
     // Check if data has a detail property (common API error format)
     if (typeof data === 'object' && data !== null && 'detail' in data) {
-      errorMessage = (data as { detail: string }).detail;
+      const error = (data as { detail: string | Array<any> }).detail;
+      if (typeof error === 'object') {
+        errorMessage = JSON.stringify(error);
+      } else {
+        errorMessage = error;
+      }
     } 
     // Check if data is a string
     else if (typeof data === 'string') {
