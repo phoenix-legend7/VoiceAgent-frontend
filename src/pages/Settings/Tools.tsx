@@ -263,7 +263,7 @@ const Tools = () => {
   const disconnectTool = async (id: string) => {
     try {
       await axiosInstance.delete(`/tools/${id}`);
-      setConnectedTools(connectedTools.filter((tool) => tool.tool_id !== id));
+      setConnectedTools(connectedTools.filter((tool) => tool.id !== id));
     } catch (error) {
       console.error('Failed to fetch tools:', error);
       toast.error(`Failed to fetch tools: ${(error as Error).message}`);
