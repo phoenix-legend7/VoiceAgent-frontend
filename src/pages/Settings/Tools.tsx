@@ -256,9 +256,18 @@ const Tools = () => {
         toast.error(`Failed to fetch tools: ${(error as Error).message}`);
       }
     };
+    const fetchCustomTools = async () => {
+      try {
+        const response = await axiosInstance.get("/tools/custom");
+        setCustomTools(response.data || []);
+      } catch (error) {
+        console.error('Failed to fetch custom tools:', error);
+        toast.error(`Failed to fetch custom tools: ${(error as Error).message}`);
+      }
+    };
     fetchConnectedTools();
+    fetchCustomTools();
   }, []);
-
 
   const disconnectTool = async (id: string) => {
     try {
