@@ -1,10 +1,11 @@
-import { Dispatch, FC, SetStateAction, useState } from "react"
+import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { AiOutlineProduct } from "react-icons/ai"
 import { FaEdit, FaPlus, FaRegCalendarPlus, FaRegTrashAlt } from "react-icons/fa"
 import { toast } from "react-toastify"
 import axiosInstance, { handleAxiosError } from "../../../core/axiosInstance"
 import Card from "../../../library/Card"
-import { AgentTypeRead } from "../../../models/agent"
+import { AgentTypeRead, ToolType } from "../../../models/agent"
+import { ConnectedTool } from "../../Settings/Tools"
 import AppToolModal from "./AppToolModal"
 import AppToolConfigModal from "./AppToolConfigModal"
 import ToolModal from "./ToolModal"
@@ -19,55 +20,83 @@ interface Props {
 const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow }) => {
   const [showToolModal, setShowToolModal] = useState(false)
   const [showAppToolModal, setShowAppToolModal] = useState(false)
-  const [selectedTool, setSelectedTool] = useState<{ name: string, type: string } | null>(null)
+  // const [selectedTool, setSelectedTool] = useState<{ name: string, type: string } | null>(null)
+  const [selectedTool, setSelectedTool] = useState<ToolType | null>(null)
   const [selectedAppTool, setSelectedAppTool] = useState<string | null>(null)
+  const [connectedTools, setConnectedTools] = useState<ConnectedTool[]>([])
 
-  const handleDeleteTool = async (name: string) => {
-    const tools = agent.config.tools?.filter((tool) => tool.name !== name)
-    const editData = {
-      name: agent.name,
-      config: { tools }
-    }
+  useEffect(() => {
+    const fetchConnectedTools = async () => {
+      try {
+        const response = await axiosInstance.get("/tools");
+        setConnectedTools(response.data || []);
+      } catch (error) {
+        console.error('Failed to fetch tools:', error);
+        toast.error(`Failed to fetch tools: ${(error as Error).message}`);
+      }
+    };
+    fetchConnectedTools();
+  }, []);
+
+  const handleDeleteTool = async (id: string) => {
+    const tools = agent.tools?.filter((tool) => tool.id !== id)
     setIsOverlayShow(true)
     try {
-      await axiosInstance.put(`/agent/${agent.id}`, editData)
+      await axiosInstance.put(`/agent/${agent.id}/tools`, tools)
       toast.success('Function deleted')
-      setAgent({
-        ...agent,
-        config: {
-          ...agent.config,
-          tools
-        }
-      })
+      setAgent({ ...agent, tools })
     } catch (error) {
       handleAxiosError('Failed to delte function', error)
     } finally {
       setIsOverlayShow(false)
     }
   }
-  const handleDeleteMillisFunc = async (name: string) => {
-    const millisFunctions = agent.config.millis_functions?.filter((tool) => tool.name !== name)
-    const editData = {
-      name: agent.name,
-      config: { millis_functions: millisFunctions }
-    }
-    setIsOverlayShow(true)
-    try {
-      await axiosInstance.put(`/agent/${agent.id}`, editData)
-      toast.success('Function deleted')
-      setAgent({
-        ...agent,
-        config: {
-          ...agent.config,
-          millis_functions: millisFunctions,
-        }
-      })
-    } catch (error) {
-      handleAxiosError('Failed to delete function', error)
-    } finally {
-      setIsOverlayShow(false)
-    }
-  }
+  // const handleDeleteTool = async (name: string) => {
+  //   const tools = agent.config.tools?.filter((tool) => tool.name !== name)
+  //   const editData = {
+  //     name: agent.name,
+  //     config: { tools }
+  //   }
+  //   setIsOverlayShow(true)
+  //   try {
+  //     await axiosInstance.put(`/agent/${agent.id}`, editData)
+  //     toast.success('Function deleted')
+  //     setAgent({
+  //       ...agent,
+  //       config: {
+  //         ...agent.config,
+  //         tools
+  //       }
+  //     })
+  //   } catch (error) {
+  //     handleAxiosError('Failed to delte function', error)
+  //   } finally {
+  //     setIsOverlayShow(false)
+  //   }
+  // }
+  // const handleDeleteMillisFunc = async (name: string) => {
+  //   const millisFunctions = agent.config.millis_functions?.filter((tool) => tool.name !== name)
+  //   const editData = {
+  //     name: agent.name,
+  //     config: { millis_functions: millisFunctions }
+  //   }
+  //   setIsOverlayShow(true)
+  //   try {
+  //     await axiosInstance.put(`/agent/${agent.id}`, editData)
+  //     toast.success('Function deleted')
+  //     setAgent({
+  //       ...agent,
+  //       config: {
+  //         ...agent.config,
+  //         millis_functions: millisFunctions,
+  //       }
+  //     })
+  //   } catch (error) {
+  //     handleAxiosError('Failed to delete function', error)
+  //   } finally {
+  //     setIsOverlayShow(false)
+  //   }
+  // }
   const handleDeleteAppFunc = async (name: string) => {
     const appFunctions = agent.config.app_functions?.filter((tool) => tool.name !== name)
     const editData = {
@@ -111,7 +140,34 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
         )}
         {(!!agent.config.millis_functions?.length || !!agent.config.tools?.length || !!agent.config.app_functions?.length) && (
           <div className="py-2">
-            {agent.config.tools?.map((tool, index) => (
+            {agent.tools?.map((tool, index) => (
+              <div
+                key={`tool-${index}`}
+                className="flex items-center justify-between gap-2 px-4 py-1"
+              >
+                <div className="truncate text-nowrap" style={{ width: 'calc(100% - 64px)' }}>
+                  {tool.id}
+                </div>
+                <div className="flex items-center">
+                  <button
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    onClick={() => {
+                      setSelectedTool(tool)
+                      setShowToolModal(true)
+                    }}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                    onClick={() => handleDeleteTool(tool.id)}
+                  >
+                    <FaRegTrashAlt />
+                  </button>
+                </div>
+              </div>
+            ))}
+            {/* {agent.config.tools?.map((tool, index) => (
               <div
                 key={`tool-${index}`}
                 className="flex items-center justify-between gap-2 px-4 py-1"
@@ -167,7 +223,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                   </button>
                 </div>
               </div>
-            ))}
+            ))} */}
             {agent.config.app_functions?.map((func, index) => (
               <div
                 key={`func-${index}`}
@@ -226,6 +282,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
       <ToolModal
         agent={agent}
         isOverlayShow={isOverlayShow}
+        connectedTools={connectedTools}
         selectedTool={selectedTool}
         showModal={showToolModal}
         setAgent={setAgent}

@@ -4,13 +4,13 @@ import { ConfigToolModal } from "./ConfigToolModal";
 import { ConfigCustomToolModal } from "./ConfigCustomToolModal";
 import {
   Calendar,
+  Cog,
   Database,
   LucideProps,
   Mail,
   MessageSquare,
   ShoppingCart,
   Target,
-  WheatIcon,
   Workflow,
   X,
 } from "lucide-react";
@@ -58,7 +58,7 @@ export interface ToolType {
   popular?: boolean;
 }
 
-const tools: ToolType[] = [
+export const tools: ToolType[] = [
   // Communication
   {
     id: "whatsapp-business",
@@ -507,10 +507,10 @@ const Tools = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {customTools.map((tool) => {
+              {customTools.map((tool, index) => {
                 return (
                   <Card
-                    key={tool.id}
+                    key={index}
                     className={clsx(
                       "relative select-none",
                       isDarkMode
@@ -560,7 +560,7 @@ const Tools = () => {
                               : "bg-gradient-to-r from-cyan-500 to-blue-500"
                           )}
                         >
-                          <WheatIcon className="w-6 h-6 transition-colors text-white duration-300" />
+                          <Cog className="w-6 h-6 transition-colors text-white duration-300" />
                         </div>
 
                         <div className="flex-1 min-w-0">

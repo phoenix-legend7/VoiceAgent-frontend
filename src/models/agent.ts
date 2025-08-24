@@ -133,9 +133,20 @@ export interface AgentConfigType {
   timezone?: string
 }
 
+export interface ToolType {
+  id: string;
+  timeout?: number;
+  run_after_call?: boolean;
+  messages?: string[];
+  response_mode?: "strict" | "flexible";
+  execute_after_message?: boolean;
+  exclude_session_id?: boolean;
+}
+
 interface AgentTypeBase {
   name: string
   config: AgentConfigType
+  tools: ToolType[]
 }
 
 export interface AgentTypeRead extends AgentTypeBase {
