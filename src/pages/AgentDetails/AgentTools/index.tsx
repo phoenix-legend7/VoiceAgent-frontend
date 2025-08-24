@@ -2,10 +2,11 @@ import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { AiOutlineProduct } from "react-icons/ai"
 import { FaEdit, FaPlus, FaRegCalendarPlus, FaRegTrashAlt } from "react-icons/fa"
 import { toast } from "react-toastify"
+import { Cog } from "lucide-react"
 import axiosInstance, { handleAxiosError } from "../../../core/axiosInstance"
 import Card from "../../../library/Card"
 import { AgentTypeRead, ToolType } from "../../../models/agent"
-import { ConnectedTool } from "../../Settings/Tools"
+import { ConnectedTool, tools as totalTools } from "../../Settings/Tools"
 import AppToolModal from "./AppToolModal"
 import AppToolConfigModal from "./AppToolConfigModal"
 import ToolModal from "./ToolModal"
@@ -124,7 +125,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
   return (
     <>
       <Card title="Tools" className="mt-6" icon={<AiOutlineProduct />}>
-        {(!agent.config.tools?.length && !agent.config.millis_functions?.length && !agent.config.app_functions?.length) && (
+        {(!agent.tools?.length && !agent.config.millis_functions?.length && !agent.config.app_functions?.length) && (
           <div className="p-6 m-4 mt-8">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               Connect tools to let agent take action with external systems.
@@ -138,35 +139,43 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
             </button>
           </div>
         )}
-        {(!!agent.config.millis_functions?.length || !!agent.config.tools?.length || !!agent.config.app_functions?.length) && (
+        {(!!agent.tools?.length || !!agent.config.app_functions?.length) && (
           <div className="py-2">
-            {agent.tools?.map((tool, index) => (
-              <div
-                key={`tool-${index}`}
-                className="flex items-center justify-between gap-2 px-4 py-1"
-              >
-                <div className="truncate text-nowrap" style={{ width: 'calc(100% - 64px)' }}>
-                  {tool.id}
+            {agent.tools?.map((tool, index) => {
+              const connectedTool = connectedTools.find(ct => ct.id === tool.id);
+              if (!connectedTool) return;
+              const Icon = totalTools.find(t => t.id === connectedTool.tool_id)?.icon ?? Cog
+              return (
+                <div
+                  key={`tool-${index}`}
+                  className="flex items-center gap-2 px-4 py-1"
+                >
+                  <div className="size-8 p-1.5 text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-md">
+                    <Icon className="size-5" />
+                  </div>
+                  <div className="font-semibold truncate text-nowrap" style={{ width: 'calc(100% - 96px)' }}>
+                    {connectedTool.name}
+                  </div>
+                  <div className="flex items-center ml-auto mr-0">
+                    <button
+                      className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                      onClick={() => {
+                        setSelectedTool(tool)
+                        setShowToolModal(true)
+                      }}
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                      onClick={() => handleDeleteTool(tool.id)}
+                    >
+                      <FaRegTrashAlt />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <button
-                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
-                    onClick={() => {
-                      setSelectedTool(tool)
-                      setShowToolModal(true)
-                    }}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
-                    onClick={() => handleDeleteTool(tool.id)}
-                  >
-                    <FaRegTrashAlt />
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
             {/* {agent.config.tools?.map((tool, index) => (
               <div
                 key={`tool-${index}`}
