@@ -131,12 +131,26 @@ const ToolModal: FC<ToolModalProps> = ({
     >
       <div>
         <div className="p-4 border border-gray-300 dark:border-gray-700 rounded-lg mt-4">
-          <Select
-            isSearchable
-            options={connectedToolOptions}
-            value={connectedToolOptions.find(ct => ct.value === toolId)}
-            onChange={(e) => setToolId((e as SelectOptionType).value as string)}
-          />
+          {connectedToolOptions.length > 0 ? (
+            <div>
+              <div className="font-semibold text-lg mb-2">
+                Select a tool to connect with your agent:
+              </div>
+              <div>
+                <Select
+                  isSearchable
+                  placeholder="Select a tool"
+                  options={connectedToolOptions}
+                  value={connectedToolOptions.find(ct => ct.value === toolId)}
+                  onChange={(e) => setToolId((e as SelectOptionType).value as string)}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="text-red-600">
+              All tools are connected or no tools available. Please add more tools in the settings.
+            </div>
+          )}
           <div className="border border-gray-800 dark:border-white px-5 py-2 flex justify-between items-center rounded-xl mt-4">
             <div>
               <div className="text-semibold">
