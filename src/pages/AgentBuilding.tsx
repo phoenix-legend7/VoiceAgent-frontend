@@ -127,7 +127,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
           ...(files.length > 0 ? {
             knowledge_base: { files }
           } : {})
-        }
+        },
+        tools: [],
       }
       const response = await axiosInstance.post("/agent", payload)
       setCurrentStep(2)
