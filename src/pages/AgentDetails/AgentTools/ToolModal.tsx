@@ -53,25 +53,27 @@ const ToolModal: FC<ToolModalProps> = ({
   }, [selectedTool])
   useEffect(() => {
     if (showModal && !selectedTool) {
-      const unConnectedTools = connectedTools.filter(ct => !!agent.tools.find(t => t.id === ct.id))
+      const unConnectedTools = connectedTools.filter(ct => !agent.tools.find(t => t.id === ct.id))
       setToolId(unConnectedTools.length > 0 ? unConnectedTools[0].id : "whatsapp-business")
     }
   }, [showModal, selectedTool, connectedTools, agent.tools])
 
   const connectedToolOptions = useMemo(() =>
-    connectedTools.map((ct) => {
-      const Icon = totalTools.find(t => t.id === ct.tool_id)?.icon ?? Cog
-      return {
-        label: ct.name,
-        value: ct.id,
-        icon: (
-          <div className="size-8 p-1.5 text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-md">
-            <Icon className="size-5" />
-          </div>
-        ),
-      }
-    }),
-    [connectedTools]
+    connectedTools
+      .filter(ct => !agent.tools.find(t => t.id === ct.id))
+      .map((ct) => {
+        const Icon = totalTools.find(t => t.id === ct.tool_id)?.icon ?? Cog
+        return {
+          label: ct.name,
+          value: ct.id,
+          icon: (
+            <div className="size-8 p-1.5 text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-md">
+              <Icon className="size-5" />
+            </div>
+          ),
+        }
+      }),
+    [connectedTools, agent.tools]
   )
 
   const onClose = () => {
@@ -86,7 +88,7 @@ const ToolModal: FC<ToolModalProps> = ({
   }
   const handleCreate = async () => {
     if (!toolId) return;
-    const tools: ToolType[] = [];
+    const tools = agent.tools;
     if (selectedTool) {
       const tool = tools.find((tool) => tool.id === selectedTool.id)
       if (tool) {
