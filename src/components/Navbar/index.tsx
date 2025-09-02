@@ -148,38 +148,45 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
       id="navbar"
     >
       <div className="w-full">
-        <NavLink href="/" icon={<FaChartBar size={20} />} label="Dashboard" />
+        <NavLink id="tour-dashboard" href="/" icon={<FaChartBar size={20} />} label="Dashboard" />
         <NavLink
+          id="tour-agents"
           href="/agents"
           icon={<FaUsers size={20} />}
           label="Voice Agents"
         />
         <NavLink
+          id="tour-phones"
           href="/phones"
           icon={<FaPhoneAlt size={20} />}
           label="Phone Number"
         />
         <NavLink
+          id="tour-campaigns"
           href="/campaigns"
           icon={<FaBullhorn size={20} />}
           label="Campaigns"
         />
         <NavLink
+          id="tour-schedule"
           href="/campaign-schedule"
           icon={<FaCalendarAlt size={20} />}
           label="Campaign Scheduling"
         />
         <NavLink
+          id="tour-knowledge"
           href="/knowledge"
           icon={<FaBook size={20} />}
           label="Agent Knowledge"
         />
         <NavLink
+          id="tour-logs"
           href="/histories"
           icon={<FaHistory size={20} />}
           label="Call Logs"
         />
         <NavLink
+          id="tour-settings"
           href="/settings"
           icon={<FaCog size={20} />}
           label="Settings"

@@ -7,9 +7,10 @@ interface Props {
   label: string
   rightIcon?: React.ReactNode
   isExternal?: boolean
+  id?: string
 }
 
-const NavLink = ({ href, icon, label, rightIcon, isExternal }: Props) => {
+const NavLink = ({ href, icon, label, rightIcon, isExternal, id }: Props) => {
   const location = useLocation()
 
   const normalize = (path: string) => path.replace(/\/+$/, "")
@@ -20,7 +21,7 @@ const NavLink = ({ href, icon, label, rightIcon, isExternal }: Props) => {
     current === base || (!!base && current.startsWith(base + "/"))
 
   return (
-    <div className="relative">
+    <div className="relative" id={id}>
       <Link
         to={href}
         target={isExternal ? "_blank" : undefined}

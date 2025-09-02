@@ -5,6 +5,7 @@ import { Link, Outlet, useNavigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
 import { CreditCard, Laptop, LogOut, MoonStar, Sun, User, Zap } from "lucide-react"
 import Navbar from "../components/Navbar"
+import OnboardingTour from "../components/OnboardingTour"
 import { useAuth } from "../core/authProvider"
 
 type ThemeType = "light" | "dark" | "system"
@@ -229,6 +230,8 @@ const MasterLayout = () => {
         <div className="w-full mx-auto overflow-y-auto relative h-[calc(100vh-4rem)]">
           <Outlet />
         </div>
+        {/* Onboarding tour runs after first login */}
+        <OnboardingTour userId={currentUser?.email} />
       </div>
     </div>
   )
