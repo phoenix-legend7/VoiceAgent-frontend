@@ -129,7 +129,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       const payload: AgentTypeBase = {
         name: agentData.agentName,
         config: {
-          prompt: `You are ${agentData.agentName}\n\n${industryPrompts[agentData.industry]}\n\nYour primary purpose is:\n"""\n${agentData.purpose}\n""".\n\n${agentData.personality ? `Your personality is: ${agentData.personality}.` : ''}`,
+          prompt: `You are ${agentData.agentName}.\n\n${industryPrompts[agentData.industry]}\n\nYour primary purpose is:\n"""\n${agentData.purpose}\n""".\n\n${agentData.personality ? `Your personality is: ${agentData.personality}.` : ''}`,
           voice: {
             provider: 'elevenlabs',
             voice_id: agentData.voice,

@@ -19,17 +19,17 @@ import { SelectOptionType } from "../../models/common";
 import { SpeechToTextProvider } from "../../models/provider";
 import VoiceType from "../../models/voice";
 
-const sttProviderOptions = [
-  { label: "Millis - Auto Select Best Option", value: "" },
-  { label: "Deepgram", value: "deepgram" },
-  { label: "Gladia", value: "gladia" },
-];
-const deepgramModelOptions = [
-  "nova-3",
-  "nova-2",
-  "nova-2-phonecall",
-  "nova-2-conversationalai",
-].map((op) => ({ label: op, value: op }));
+// const sttProviderOptions = [
+//   { label: "Millis - Auto Select Best Option", value: "" },
+//   { label: "Deepgram", value: "deepgram" },
+//   { label: "Gladia", value: "gladia" },
+// ];
+// const deepgramModelOptions = [
+//   "nova-3",
+//   "nova-2",
+//   "nova-2-phonecall",
+//   "nova-2-conversationalai",
+// ].map((op) => ({ label: op, value: op }));
 const multiLangOptionList = [
   {
     value: "en-sp",
@@ -350,7 +350,7 @@ const AgentLanguageModal: FC<Props> = ({
           </div>
         </div>
       </div>
-      <div className="my-4 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-400 dark:after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-400 dark:before:border-gray-700 before:translate-y-1/2">
+      {/* <div className="my-4 flex shrink-0 after:w-100 after:top-1/2 after:border-t after:border-gray-400 dark:after:border-gray-700 after:translate-y-1/2 before:w-100 before:top-1/2 before:border-t before:border-gray-400 dark:before:border-gray-700 before:translate-y-1/2">
         <div className="px-2.5 text-center text-nowrap text-lg">
           Advanced Settings
         </div>
@@ -391,7 +391,7 @@ const AgentLanguageModal: FC<Props> = ({
             </a>
           </div>
         </>
-      )}
+      )} */}
     </Modal>
   );
 };
