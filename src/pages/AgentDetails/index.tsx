@@ -4,7 +4,6 @@ import { Link, useParams } from "react-router-dom"
 import { BiWorld } from "react-icons/bi"
 import { BsSoundwave } from "react-icons/bs"
 import { FaPencil } from "react-icons/fa6"
-import { PiOpenAiLogo } from "react-icons/pi"
 import { toast } from "react-toastify"
 
 import StatusBadge from "../../components/StatusBadge"
@@ -25,7 +24,6 @@ import KnowledgeCard from "./Knowledge"
 import ToolCard from "./AgentTools"
 import AgentLanguageModal from "./AgentLanguageModal"
 import AgentVoiceModal from "./AgentVoiceModal"
-import EditAgentModal from "./EditAgentModal"
 
 const AgentDetails = () => {
   const { id } = useParams()
@@ -36,7 +34,7 @@ const AgentDetails = () => {
   const [isEditAgentName, setIsEditAgentName] = useState(false)
   const [isKnowledgeChanged, setIsKnowledgeChanged] = useState(false)
   const [editAgentName, setEditAgentName] = useState('')
-  const [showEditAgentModal, setShowEditAgentModal] = useState(false)
+  // const [showEditAgentModal, setShowEditAgentModal] = useState(false)
   const [showAgentVoiceModal, setShowAgentVoiceModal] = useState(false)
   const [showAgentLangModal, setShowAgentLangModal] = useState(false)
 
@@ -168,7 +166,7 @@ const AgentDetails = () => {
           <div className="flex flex-wrap mt-8">
             <div className="p-3 w-full xl:w-2/3">
               <div className="flex flex-wrap items-center justify-between">
-                <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
+                {/* <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
                   <div
                     className="flex items-center justify-between cursor-pointer rounded-md bg-white dark:bg-gray-900 border dark:border-0 border-gray-300 px-2 py-1"
                     onClick={() => setShowEditAgentModal(true)}
@@ -182,7 +180,7 @@ const AgentDetails = () => {
                     </div>
                     <FaSlidersH className="my-4 mx-2 text-gray-600 dark:text-gray-400 min-w-5 min-h-5" />
                   </div>
-                </div>
+                </div> */}
                 <div className="w-full md:w-1/2 xl:w-1/3 p-1.5">
                   <div
                     className="flex items-center justify-between cursor-pointer rounded-md bg-white dark:bg-gray-900 border dark:border-0 border-gray-300 px-2 py-1"
@@ -254,14 +252,14 @@ const AgentDetails = () => {
               />
             </div>
           </div>
-          <EditAgentModal
+          {/* <EditAgentModal
             agent={agent}
             isOverlayShow={isOverlayShow}
             showEditAgentModal={showEditAgentModal}
             setAgent={setAgent}
             setIsOverlayShow={setIsOverlayShow}
             setShowEditAgentModal={setShowEditAgentModal}
-          />
+          /> */}
           <AgentVoiceModal
             agent={agent}
             isOverlayShow={isOverlayShow}
