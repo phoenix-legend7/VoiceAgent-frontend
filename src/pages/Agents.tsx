@@ -1,6 +1,7 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react"
 import { FaEllipsisV, FaPlus, FaUserAlt } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
+import { createPortal } from "react-dom"
 
 import StatusBadge from "../components/StatusBadge"
 import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
@@ -19,6 +20,8 @@ interface EditAgentActionProps {
 
 const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, setIsOverlayShow }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -65,13 +68,23 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
   return (
     <div className="ml-auto mr-0 relative w-fit">
       <button
+        ref={buttonRef}
         className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          if (buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect()
+            setMenuPosition({ top: rect.bottom + 8 + window.scrollY, left: rect.right + window.scrollX })
+          }
+          setIsOpen(true)
+        }}
       >
         <FaEllipsisV />
       </button>
-      {isOpen && (
-        <div className="absolute right-full top-1/2 -translate-y-[66%] bg-gray-50 dark:bg-gray-950 rounded-md shadow-md py-2 z-50">
+      {isOpen && createPortal(
+        <div
+          className="fixed z-50 bg-gray-50 dark:bg-gray-950 rounded-md shadow-md py-2"
+          style={{ top: menuPosition.top, left: menuPosition.left, transform: 'translateX(-100%)' }}
+        >
           <div className="flex flex-col">
             <button
               className="px-4 py-1.5 cursor-pointer text-left text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800"
@@ -92,7 +105,8 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
               Delete
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
