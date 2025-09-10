@@ -96,9 +96,15 @@ export const ConfigToolModal: FC<Props> = ({
         <div className="space-y-6">
           {/* Header */}
           <div className="flex items-center gap-3">
-            <div className="size-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg p-3">
-              <selectedTool.icon className="size-6 text-white" />
-            </div>
+            <img
+              src={selectedTool.icon}
+              alt={selectedTool.name}
+              className="w-12 h-12 transition-opacity duration-300"
+              onError={(e) => {
+                // Fallback to a default icon if image fails to load
+                e.currentTarget.style.display = 'none';
+              }}
+            />
             <div>
               <h2 className="text-lg font-semibold">{selectedTool.name}</h2>
               <p className="text-sm text-muted-foreground">
