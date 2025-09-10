@@ -4,7 +4,6 @@ import {
   FaEdit,
   FaEllipsisV,
   FaPhoneAlt,
-  FaPlus,
   FaUserAlt,
 } from "react-icons/fa";
 
@@ -171,13 +170,13 @@ const PhoneNumbers = () => {
               <FaDownload />
               Import Number
             </button>
-            <button
+            {/* <button
               className="flex gap-2 items-center cursor-pointer bg-sky-600 text-white px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-700"
               onClick={() => setPurchaseModalOpen(true)}
             >
               <FaPlus />
               Buy Number
-            </button>
+            </button> */}
           </div>
         </div>
         <div className="flex flex-col justify-between h-full gap-4 rounded-lg bg-white dark:bg-gray-900/80 border dark:border-0 border-gray-300 overflow-x-auto">
@@ -269,10 +268,10 @@ const PhoneNumbers = () => {
               <div className="my-3">
                 <button
                   className="flex gap-2 items-center cursor-pointer bg-transparent text-sky-600 border border-sky-600 px-4 py-2 mx-auto rounded-md transition-all duration-300 hover:bg-sky-600 hover:text-white"
-                  onClick={() => setPurchaseModalOpen(true)}
+                  onClick={() => setIsImportModalOpen(true)}
                 >
-                  <FaPlus />
-                  Buy Number
+                  <FaDownload />
+                  Import Number
                 </button>
               </div>
             </div>

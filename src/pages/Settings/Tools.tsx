@@ -3,15 +3,7 @@ import SettingsLayout from "./SettingsLayout";
 import { ConfigToolModal } from "./ConfigToolModal";
 import { ConfigCustomToolModal } from "./ConfigCustomToolModal";
 import {
-  Calendar,
   Cog,
-  Database,
-  LucideProps,
-  Mail,
-  MessageSquare,
-  ShoppingCart,
-  Target,
-  Workflow,
   X,
 } from "lucide-react";
 import clsx from "clsx";
@@ -48,7 +40,7 @@ export interface ToolType {
   id: string;
   name: string;
   description: string;
-  icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
+  icon: string;
   category: string;
   params: Array<{
     label: string;
@@ -64,7 +56,7 @@ export const tools: ToolType[] = [
     id: "whatsapp-business",
     name: "WhatsApp Business",
     description: "Send messages via WhatsApp Business API",
-    icon: MessageSquare,
+    icon: "/tool-logo/whatsapp.svg",
     category: "SMS",
     params: [
       { label: "Phone Number ID", id: "phone_number_id" },
@@ -77,7 +69,7 @@ export const tools: ToolType[] = [
     id: "pipedrive",
     name: "Pipedrive",
     description: "Sync leads and deals with your sales pipeline",
-    icon: Target,
+    icon: "/tool-logo/pipedrive.svg",
     category: "CRM & Sales",
     popular: true,
     params: [
@@ -89,7 +81,7 @@ export const tools: ToolType[] = [
     id: "hubspot",
     name: "HubSpot CRM",
     description: "Connect with your HubSpot contacts and deals",
-    icon: Database,
+    icon: "/tool-logo/hubspot.svg",
     category: "CRM & Sales",
     popular: true,
     params: [
@@ -100,7 +92,7 @@ export const tools: ToolType[] = [
     id: "salesforce",
     name: "Salesforce",
     description: "Integrate with Salesforce CRM data",
-    icon: Database,
+    icon: "/tool-logo/salesforce.svg",
     category: "CRM & Sales",
     params: [
       { label: "Instance URL", id: "instance_url" },
@@ -113,7 +105,7 @@ export const tools: ToolType[] = [
     id: "email",
     name: "Email Integration",
     description: "Send follow-up emails automatically",
-    icon: Mail,
+    icon: "/tool-logo/email.svg",
     category: "Email & Communication",
     popular: true,
     params: [
@@ -129,7 +121,7 @@ export const tools: ToolType[] = [
     id: "google-calendar",
     name: "Google Calendar",
     description: "Schedule appointments automatically",
-    icon: Calendar,
+    icon: "/tool-logo/google-calendar.svg",
     category: "Scheduling",
     popular: true,
     params: [
@@ -141,7 +133,7 @@ export const tools: ToolType[] = [
     id: "calendly",
     name: "Calendly",
     description: "Book meetings through Calendly integration",
-    icon: Calendar,
+    icon: "/tool-logo/calendly.svg",
     category: "Scheduling",
     popular: true,
     params: [
@@ -152,7 +144,7 @@ export const tools: ToolType[] = [
     id: "acuity-scheduling",
     name: "Acuity Scheduling",
     description: "Schedule appointments with Acuity",
-    icon: Calendar,
+    icon: "/tool-logo/acuity.svg",
     category: "Scheduling",
     params: [
       { label: "User ID", id: "user_id" },
@@ -165,7 +157,7 @@ export const tools: ToolType[] = [
     id: "make",
     name: "Make.com",
     description: "Create powerful automation workflows",
-    icon: Workflow,
+    icon: "/tool-logo/make.com.svg",
     category: "Automation",
     popular: true,
     params: [
@@ -176,7 +168,7 @@ export const tools: ToolType[] = [
     id: "zapier",
     name: "Zapier",
     description: "Connect 6000+ apps with automation",
-    icon: Workflow,
+    icon: "/tool-logo/zapier.svg",
     category: "Automation",
     popular: true,
     params: [
@@ -189,7 +181,7 @@ export const tools: ToolType[] = [
     id: "shopify",
     name: "Shopify",
     description: "Access your Shopify store data",
-    icon: ShoppingCart,
+    icon: "/tool-logo/shopify.svg",
     category: "E-commerce",
     popular: true,
     params: [
@@ -201,7 +193,7 @@ export const tools: ToolType[] = [
     id: "woocommerce",
     name: "WooCommerce",
     description: "Connect with your WooCommerce store",
-    icon: ShoppingCart,
+    icon: "/tool-logo/woocommerce.svg",
     category: "E-commerce",
     params: [
       { label: "Store URL", id: "store_url" },
@@ -215,7 +207,7 @@ export const tools: ToolType[] = [
   //   id: "google-analytics",
   //   name: "Google Analytics",
   //   description: "Track website visitor data",
-  //   icon: BarChart3,
+  //   icon: "/tool-logo/google-analytics.svg",
   //   category: "Analytics",
   //   params: [
   //     { label: "Access Token", id: "access_token", isSecret: true },
@@ -273,6 +265,7 @@ const Tools = () => {
     try {
       await axiosInstance.delete(`/tools/${id}`);
       setConnectedTools(connectedTools.filter((tool) => tool.id !== id));
+      setCustomTools(customTools.filter((tool) => tool.id !== id));
     } catch (error) {
       console.error('Failed to fetch tools:', error);
       toast.error(`Failed to fetch tools: ${(error as Error).message}`);
@@ -391,29 +384,15 @@ const Tools = () => {
                         )}
 
                         <div className="flex items-start gap-4">
-                          <div
-                            className={clsx(
-                              "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300",
-                              isSelected
-                                ? isDarkMode
-                                  ? "bg-gradient-to-r from-cyan-500 to-blue-500"
-                                  : "bg-gradient-to-r from-cyan-500 to-blue-500"
-                                : isDarkMode
-                                  ? "bg-gradient-to-r from-gray-700 to-gray-600 group-hover:from-cyan-500/50 group-hover:to-blue-500/50"
-                                  : "bg-gradient-to-r from-gray-300 to-gray-400 group-hover:from-cyan-500/50 group-hover:to-blue-500/50"
-                            )}
-                          >
-                            <tool.icon
-                              className={clsx(
-                                "w-6 h-6 transition-colors duration-300",
-                                isSelected
-                                  ? "text-white"
-                                  : isDarkMode
-                                    ? "text-gray-300 group-hover:text-white"
-                                    : "text-gray-600 group-hover:text-white"
-                              )}
-                            />
-                          </div>
+                          <img
+                            src={tool.icon}
+                            alt={tool.name}
+                            className="w-12 h-12 transition-opacity duration-300"
+                            onError={(e) => {
+                              // Fallback to a default icon if image fails to load
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
 
                           <div className="flex-1 min-w-0">
                             <h3
