@@ -120,7 +120,7 @@ export default function Wizard({ onComplete }: WizardProps) {
     greeting: "",
     // New fields
     phoneSetup: {
-      option: "", // "purchase" or "twilio"
+      option: "twilio", // "purchase" or "twilio"
       twilioSid: "",
       twilioSecret: "",
       twilioPhoneNumber: "",
@@ -287,9 +287,9 @@ export default function Wizard({ onComplete }: WizardProps) {
       // NEW STEPS
       {
         icon: Phone,
-        title: "Set up your phone number",
-        subtitle: "Configure calling capabilities",
-        description: "Choose how your agent will make and receive calls.",
+        title: "Connect your Twilio account",
+        subtitle: "Configure calling capabilities with Twilio",
+        description: "Enter your Twilio credentials to enable calling and SMS for your agent.",
         gradient: "from-green-500 to-cyan-600",
         color: "#00FF00",
       },
@@ -745,7 +745,7 @@ export default function Wizard({ onComplete }: WizardProps) {
             </div>
 
             <div className="space-y-6">
-              <div>
+              {/* <div>
                 <label
                   className={clsx(
                     "block text-lg mb-4 font-medium",
@@ -794,7 +794,7 @@ export default function Wizard({ onComplete }: WizardProps) {
                     </p>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {formData.phoneSetup.option === "twilio" && (
                 <div className="space-y-4">
