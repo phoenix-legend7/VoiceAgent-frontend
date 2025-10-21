@@ -5,6 +5,10 @@ import { ConfigCustomToolModal } from "./ConfigCustomToolModal";
 import {
   Cog,
   X,
+  HelpCircle,
+  ExternalLink,
+  Copy,
+  Check,
 } from "lucide-react";
 import clsx from "clsx";
 import { toast } from "react-toastify";
@@ -12,6 +16,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import axiosInstance from "../../core/axiosInstance";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 
 export interface ConnectedTool {
   id: string;
@@ -48,7 +53,182 @@ export interface ToolType {
     isSecret?: boolean;
   }>;
   popular?: boolean;
+  helpInfo?: {
+    title: string;
+    description: string;
+    steps: Array<{
+      title: string;
+      description: string;
+      link?: string;
+      code?: string;
+    }>;
+    documentation?: string;
+    supportEmail?: string;
+  };
 }
+
+interface HelpModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  tool: ToolType | null;
+  isDarkMode: boolean;
+}
+
+const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose, tool, isDarkMode }) => {
+  const [copiedText, setCopiedText] = useState<string | null>(null);
+
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedText(label);
+      setTimeout(() => setCopiedText(null), 2000);
+      toast.success(`Copied ${label} to clipboard`);
+    } catch (error) {
+      toast.error("Failed to copy to clipboard");
+    }
+  };
+
+  if (!tool?.helpInfo) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={clsx(
+        "max-w-2xl max-h-[90vh] overflow-y-auto",
+        isDarkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
+      )}>
+        <DialogHeader>
+          <DialogTitle className={clsx(
+            "flex items-center gap-3 text-xl",
+            isDarkMode ? "text-white" : "text-gray-900"
+          )}>
+            <img
+              src={tool.icon}
+              alt={tool.name}
+              className="size-8"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            {tool.helpInfo.title}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          <p className={clsx(
+            "text-base",
+            isDarkMode ? "text-gray-300" : "text-gray-600"
+          )}>
+            {tool.helpInfo.description}
+          </p>
+
+          <div className="space-y-6">
+            {tool.helpInfo.steps.map((step, index) => (
+              <div key={index} className="space-y-3">
+                <h4 className={clsx(
+                  "font-semibold text-lg",
+                  isDarkMode ? "text-white" : "text-gray-900"
+                )}>
+                  {step.title}
+                </h4>
+                <p className={clsx(
+                  "text-base leading-relaxed",
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                )}>
+                  {step.description}
+                </p>
+
+                {step.link && (
+                  <a
+                    href={step.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={clsx(
+                      "inline-flex items-center gap-2 text-base font-medium transition-colors",
+                      isDarkMode
+                        ? "text-cyan-400 hover:text-cyan-300"
+                        : "text-blue-600 hover:text-blue-500"
+                    )}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    {step.link}
+                  </a>
+                )}
+
+                {step.code && (
+                  <div className="relative max-w-full">
+                    <div className={clsx(
+                      "text-sm rounded-lg p-4 whitespace-pre-wrap border",
+                      isDarkMode
+                        ? "bg-gray-800 text-gray-300 border-gray-700"
+                        : "bg-gray-50 text-gray-800 border-gray-200"
+                    )}>
+                      {step.code}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="absolute top-3 right-3 h-8 w-8 p-0"
+                      onClick={() => copyToClipboard(step.code!, "code")}
+                    >
+                      {copiedText === "code" ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {(tool.helpInfo.documentation || tool.helpInfo.supportEmail) && (
+            <div className="pt-6 border-t border-gray-200 dark:border-gray-600">
+              <h4 className={clsx(
+                "font-semibold text-lg mb-4",
+                isDarkMode ? "text-white" : "text-gray-900"
+              )}>
+                Additional Resources
+              </h4>
+              <div className="flex flex-wrap gap-4">
+                {tool.helpInfo.documentation && (
+                  <a
+                    href={tool.helpInfo.documentation}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={clsx(
+                      "inline-flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
+                      isDarkMode
+                        ? "text-cyan-400 hover:text-cyan-300 border-cyan-400/30 hover:border-cyan-400/50"
+                        : "text-blue-600 hover:text-blue-500 border-blue-200 hover:border-blue-300"
+                    )}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Full Documentation
+                  </a>
+                )}
+                {tool.helpInfo.supportEmail && (
+                  <a
+                    href={`mailto:${tool.helpInfo.supportEmail}`}
+                    className={clsx(
+                      "inline-flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors",
+                      isDarkMode
+                        ? "text-cyan-400 hover:text-cyan-300 border-cyan-400/30 hover:border-cyan-400/50"
+                        : "text-blue-600 hover:text-blue-500 border-blue-200 hover:border-blue-300"
+                    )}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Contact Support
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export const tools: ToolType[] = [
   // Communication
@@ -62,6 +242,32 @@ export const tools: ToolType[] = [
       { label: "Phone Number ID", id: "phone_number_id" },
       { label: "Access Token", id: "access_token", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect WhatsApp Business",
+      description: "Send messages via the WhatsApp Business API.",
+      steps: [
+        {
+          title: "1. Log into Meta Business Manager",
+          description: "Go to business.facebook.com and log in with your Meta Business account.",
+          link: "https://business.facebook.com"
+        },
+        {
+          title: "2. Go to WhatsApp → Getting Started",
+          description: "Navigate to the WhatsApp section and open the Getting Started page."
+        },
+        {
+          title: "3. Copy your credentials",
+          description: "Copy your Phone Number ID and Access Token, then paste them into the form and click Connect."
+        },
+        {
+          title: "Alternative",
+          description: "If you don’t have API access yet, apply via Meta for Developers and request a WhatsApp Business API setup.",
+          link: "https://developers.facebook.com/docs/whatsapp"
+        }
+      ],
+      documentation: "https://developers.facebook.com/docs/whatsapp",
+      supportEmail: "support@yourcompany.com"
+    }
   },
 
   // CRM & Sales
@@ -76,6 +282,30 @@ export const tools: ToolType[] = [
       { label: "Domain", id: "domain" },
       { label: "API Token", id: "api_token", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect Pipedrive",
+      description: "Sync leads and deals with your Pipedrive pipeline.",
+      steps: [
+        {
+          title: "1. Log into Pipedrive",
+          description: "Go to your Pipedrive account."
+        },
+        {
+          title: "2. Get your API Token",
+          description: "Click your profile (top-right) → Personal Preferences → API, then copy your API Token."
+        },
+        {
+          title: "3. Enter your credentials",
+          description: "Enter your domain (e.g., yourcompany.pipedrive.com) and paste the API Token into the form."
+        },
+        {
+          title: "4. Connect",
+          description: "Click Connect to complete setup."
+        }
+      ],
+      documentation: "https://developers.pipedrive.com/docs/api/v1",
+      supportEmail: "support@yourcompany.com"
+    }
   },
   {
     id: "hubspot",
@@ -87,6 +317,27 @@ export const tools: ToolType[] = [
     params: [
       { label: "API Key", id: "api_key", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect HubSpot CRM",
+      description: "Sync your HubSpot contacts and deals.",
+      steps: [
+        {
+          title: "1. Log into HubSpot",
+          description: "Go to Settings → Integrations → API Key, then generate or copy your existing API Key.",
+          link: "https://app.hubspot.com"
+        },
+        {
+          title: "2. Paste your API Key",
+          description: "Paste it into the API Key field and click Connect."
+        },
+        {
+          title: "Alternative (Private Apps)",
+          description: "If API Keys are unavailable, go to Settings → Integrations → Private Apps, create a new app, copy the Access Token, and paste it into the same field."
+        }
+      ],
+      documentation: "https://developers.hubspot.com/docs/api/crm/contacts",
+      supportEmail: "support@yourcompany.com"
+    }
   },
   {
     id: "salesforce",
@@ -98,6 +349,26 @@ export const tools: ToolType[] = [
       { label: "Instance URL", id: "instance_url" },
       { label: "Access Token", id: "access_token", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect Salesforce",
+      description: "Integrate Salesforce CRM data with your account.",
+      steps: [
+        {
+          title: "1. Log into Salesforce",
+          description: "Open Salesforce and go to Setup → Apps → App Manager."
+        },
+        {
+          title: "2. Create or open a Connected App",
+          description: "Copy your Instance URL and Access Token, then paste both into the connection form."
+        },
+        {
+          title: "Alternative",
+          description: "If you don’t have an Access Token, generate a Security Token under Setup → Users → Profiles."
+        }
+      ],
+      documentation: "https://developer.salesforce.com/docs/",
+      supportEmail: "support@yourcompany.com"
+    }
   },
 
   // Email & Communication
@@ -114,6 +385,28 @@ export const tools: ToolType[] = [
       { label: "Email Username", id: "email_username" },
       { label: "Email Password", id: "email_password", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect Email (SMTP)",
+      description: "Send automated follow-up emails using your email provider’s SMTP settings.",
+      steps: [
+        {
+          title: "1. Find SMTP settings",
+          description: "Locate SMTP details in your provider’s help section (e.g., Gmail → smtp.gmail.com, Port 465 or 587)."
+        },
+        {
+          title: "2. Enter credentials",
+          description: "Enter SMTP Server, Port, Email Username, and Password (or App Password if required)."
+        },
+        {
+          title: "3. Connect",
+          description: "Click Connect to verify your credentials."
+        },
+        {
+          title: "Alternative (Outlook)",
+          description: "Use Outlook SMTP: smtp.office365.com, Port 587."
+        }
+      ]
+    }
   },
 
   // Calendar & Scheduling
@@ -128,6 +421,30 @@ export const tools: ToolType[] = [
       { label: "Calendar ID", id: "calendar_id" },
       { label: "Access Token", id: "access_token", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect Google Calendar",
+      description: "Schedule appointments automatically via your Google Calendar.",
+      steps: [
+        {
+          title: "1. Open Google Calendar",
+          description: "Hover over your calendar → click Settings and sharing."
+        },
+        {
+          title: "2. Copy Calendar ID",
+          description: "Scroll to Integrate Calendar and copy your Calendar ID."
+        },
+        {
+          title: "3. Create an OAuth token",
+          description: "In Google Cloud Console, create an OAuth token or API key."
+        },
+        {
+          title: "4. Connect",
+          description: "Paste both values into the form and click Connect."
+        }
+      ],
+      documentation: "https://developers.google.com/calendar/api/v3/reference",
+      supportEmail: "support@yourcompany.com"
+    }
   },
   {
     id: "calendly",
@@ -139,6 +456,26 @@ export const tools: ToolType[] = [
     params: [
       { label: "API Key", id: "api_key", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect Calendly",
+      description: "Book meetings through Calendly integration.",
+      steps: [
+        {
+          title: "1. Log into Calendly",
+          description: "Go to Account → Integrations."
+        },
+        {
+          title: "2. Get your API Key",
+          description: "Find your Personal Access Token (API Key), copy it, and paste it into the form."
+        },
+        {
+          title: "3. Connect",
+          description: "Click Connect to finalize setup."
+        }
+      ],
+      documentation: "https://developer.calendly.com/",
+      supportEmail: "support@yourcompany.com"
+    }
   },
   {
     id: "acuity-scheduling",
@@ -150,6 +487,22 @@ export const tools: ToolType[] = [
       { label: "User ID", id: "user_id" },
       { label: "API Key", id: "api_key", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect Acuity Scheduling",
+      description: "Schedule appointments with Acuity.",
+      steps: [
+        {
+          title: "1. Log into Acuity Scheduling",
+          description: "Go to Integrations → API."
+        },
+        {
+          title: "2. Copy credentials",
+          description: "Copy your User ID and API Key, paste both into the form, and click Connect."
+        }
+      ],
+      documentation: "https://developers.acuityscheduling.com/",
+      supportEmail: "support@yourcompany.com"
+    }
   },
 
   // Automation & Workflows
@@ -163,6 +516,18 @@ export const tools: ToolType[] = [
     params: [
       { label: "Webhook URL", id: "webhook" },
     ],
+    helpInfo: {
+      title: "How to connect Make.com",
+      description: "Automate workflows through webhooks.",
+      steps: [
+        { title: "1. Log into Make.com", description: "Create a new Scenario." },
+        { title: "2. Add Webhook", description: "Choose Webhooks → Custom Webhook." },
+        { title: "3. Copy Webhook URL", description: "Copy the generated URL and paste it into the form." },
+        { title: "4. Connect", description: "Click Connect to finalize." }
+      ],
+      documentation: "https://www.make.com/en/help/",
+      supportEmail: "support@yourcompany.com"
+    }
   },
   {
     id: "zapier",
@@ -174,6 +539,17 @@ export const tools: ToolType[] = [
     params: [
       { label: "Webhook URL", id: "webhook" },
     ],
+    helpInfo: {
+      title: "How to connect Zapier",
+      description: "Automate workflows with 6000+ apps using Zapier.",
+      steps: [
+        { title: "1. Log into Zapier", description: "Create a new Zap and choose Webhooks by Zapier." },
+        { title: "2. Select Catch Hook", description: "Zapier will generate a unique Webhook URL." },
+        { title: "3. Copy and paste URL", description: "Paste the Webhook URL into the form and click Connect." }
+      ],
+      documentation: "https://platform.zapier.com/docs",
+      supportEmail: "support@yourcompany.com"
+    }
   },
 
   // E-commerce
@@ -188,6 +564,18 @@ export const tools: ToolType[] = [
       { label: "Shop Domain", id: "shop_domain" },
       { label: "Access Token", id: "access_token", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect Shopify",
+      description: "Sync data from your Shopify store.",
+      steps: [
+        { title: "1. Log into Shopify Admin", description: "Go to Apps → App & Sales Channel Settings → Develop Apps." },
+        { title: "2. Create or open app", description: "From API credentials, copy your Admin API Access Token." },
+        { title: "3. Enter credentials", description: "Enter your Shop Domain (e.g., yourstore.myshopify.com) and paste the Access Token." },
+        { title: "4. Connect", description: "Click Connect to finalize setup." }
+      ],
+      documentation: "https://shopify.dev/docs/api",
+      supportEmail: "support@yourcompany.com"
+    }
   },
   {
     id: "woocommerce",
@@ -200,6 +588,17 @@ export const tools: ToolType[] = [
       { label: "Consumer Key", id: "consumer_key", isSecret: true },
       { label: "Consumer Secret", id: "consumer_secret", isSecret: true },
     ],
+    helpInfo: {
+      title: "How to connect WooCommerce",
+      description: "Connect your WooCommerce store using REST API credentials.",
+      steps: [
+        { title: "1. Log into WordPress Admin", description: "Go to WooCommerce → Settings → Advanced → REST API." },
+        { title: "2. Create API Key", description: "Create a new API Key with Read/Write access." },
+        { title: "3. Copy credentials", description: "Copy the Consumer Key and Secret, enter your Store URL, and click Connect." }
+      ],
+      documentation: "https://woocommerce.github.io/woocommerce-rest-api-docs/",
+      supportEmail: "support@yourcompany.com"
+    }
   },
 
   // Analytics
@@ -224,6 +623,8 @@ const Tools = () => {
   const [selectedCustomTool, setSelectedCustomTool] = useState<CustomTool | null>(null);
   const [connectedTools, setConnectedTools] = useState<ConnectedTool[]>([]);
   const [customTools, setCustomTools] = useState<CustomTool[]>([]);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [selectedHelpTool, setSelectedHelpTool] = useState<ToolType | null>(null);
 
   useEffect(() => {
     setIsDarkMode(document.body.classList.contains("dark"));
@@ -280,6 +681,16 @@ const Tools = () => {
     setIsCustomModalOpen(true);
   };
 
+  const openHelpModal = (tool: ToolType) => {
+    setSelectedHelpTool(tool);
+    setIsHelpModalOpen(true);
+  };
+
+  const closeHelpModal = () => {
+    setIsHelpModalOpen(false);
+    setSelectedHelpTool(null);
+  };
+
   return (
     <SettingsLayout isOverlayShown={false}>
       <div className="bg-white dark:bg-gray-900 rounded-md px-8 py-4">
@@ -326,7 +737,7 @@ const Tools = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {categoryTools.map((tool) => {
                   const connectedTool = connectedTools.find((ct) => ct.tool_id === tool.id);
                   const isSelected = !!connectedTool;
@@ -439,23 +850,44 @@ const Tools = () => {
                             {tool.category}
                           </Badge>
 
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className={clsx(
-                              "h-8 px-3 text-xs transition-all duration-300",
-                              isSelected
-                                ? isDarkMode
-                                  ? "text-green-400 hover:text-green-300"
-                                  : "text-emerald-600 hover:text-emerald-500"
-                                : isDarkMode
-                                  ? "text-cyan-400 hover:text-cyan-300"
-                                  : "text-cyan-600 hover:text-cyan-500"
+                          <div className="flex items-center gap-2">
+                            {tool.helpInfo && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className={clsx(
+                                  "h-8 w-8 p-0 transition-all duration-300",
+                                  isDarkMode
+                                    ? "text-gray-400 hover:text-cyan-300"
+                                    : "text-gray-500 hover:text-cyan-600"
+                                )}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openHelpModal(tool);
+                                }}
+                              >
+                                <HelpCircle className="w-4 h-4" />
+                              </Button>
                             )}
-                          >
-                            {isSelected ? "Added" : "Add"}
-                          </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className={clsx(
+                                "h-8 px-3 text-xs transition-all duration-300",
+                                isSelected
+                                  ? isDarkMode
+                                    ? "text-green-400 hover:text-green-300"
+                                    : "text-emerald-600 hover:text-emerald-500"
+                                  : isDarkMode
+                                    ? "text-cyan-400 hover:text-cyan-300"
+                                    : "text-cyan-600 hover:text-cyan-500"
+                              )}
+                            >
+                              {isSelected ? "Added" : "Add"}
+                            </Button>
+                          </div>
                         </div>
+
                       </CardContent>
                     </Card>
                   )
@@ -494,7 +926,7 @@ const Tools = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {customTools.map((tool, index) => {
                 return (
                   <Card
@@ -599,6 +1031,12 @@ const Tools = () => {
         setCustomTools={setCustomTools}
         setIsOpen={setIsCustomModalOpen}
         setSelectedTool={setSelectedCustomTool}
+      />
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={closeHelpModal}
+        tool={selectedHelpTool}
+        isDarkMode={isDarkMode}
       />
     </SettingsLayout>
   );
