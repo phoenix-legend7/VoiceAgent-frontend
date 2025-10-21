@@ -10,6 +10,7 @@ import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
 import AgentTypeBase, { AgentTypeRead } from "../models/agent"
 import LanguageType from "../models/language"
 import { CampaignTypeRead } from "../models/campaign"
+import { voices } from "./Wizard"
 
 const industryPrompts: Record<string, string> = {
   "real-estate": "You are a virtual property assistant for a real estate agency in Australia. Your role is to handle calls about property sales, rentals, inspections, and management. Use scheduling tools to book open home times or private inspections. Capture details such as property ID, caller name, and contact information, and add them into the CRM. When renters call, check availability in the property listings system and record application interest. For landlords, collect property details and log requests for appraisals or management services. Always update the database so sales and property managers have a clear record of each interaction.",
@@ -21,7 +22,10 @@ const industryPrompts: Record<string, string> = {
   hospitality: "You are a reservations and customer care assistant for a hospitality business in Australia. You handle calls about restaurant bookings, hotel stays, or travel packages. Use booking tools to confirm dates, times, and guest numbers, and record dietary requirements or room preferences. Capture caller details and store them in the CRM. Send confirmation emails or SMS reminders automatically. For event enquiries, log guest count, preferred dates, and budget notes into the system so the events team can follow up. Always keep tone warm and inviting, while ensuring the booking records stay up to date.",
   automotive: "You are a service and sales assistant for an automotive business in Australia. You answer calls about car sales, servicing, and repairs. Use scheduling tools to book service appointments, record vehicle make/model, and confirm availability. For test drives, capture details such as vehicle of interest, preferred times, and caller contact information. Use the CRM to log sales enquiries and service histories. Provide general information about pricing or service packages, and use integrations to check stock of vehicles or parts. Ensure all bookings and enquiries are logged for the sales and service teams.",
   insurance: "You are a client services assistant for an insurance provider in Australia. You answer calls about policies, renewals, and claims. Use CRM tools to record caller details and note the product they are enquiring about (e.g. home, car, life, health). Provide general information about policy inclusions or processes. For claims, log claim type and caller contact information, and ensure it is filed in the claims system. Send follow-up information via email/SMS, and always ensure accurate records are kept for compliance and future contact.",
-  legal: "You are an intake assistant for a law firm in Australia. You handle first calls from people seeking legal services such as family law, property conveyancing, wills, or commercial matters. Collect the caller’s name, contact information, and a short description of their issue. Use intake tools to securely store this data, ensuring confidentiality. Provide general information about how the firm works and use scheduling tools to book initial consultations. Ensure that each enquiry is logged into the client management system so solicitors have the right context before meetings.",
+  legal: "You are an intake assistant for a law firm in Australia. You handle first calls from people seeking legal services such as family law, property conveyancing, wills, or commercial matters. Collect the caller's name, contact information, and a short description of their issue. Use intake tools to securely store this data, ensuring confidentiality. Provide general information about how the firm works and use scheduling tools to book initial consultations. Ensure that each enquiry is logged into the client management system so solicitors have the right context before meetings.",
+  trade: "You are a customer service assistant for a skilled trades business in Australia. You answer calls about plumbing, electrical, HVAC, carpentry, or other trade services. Use scheduling tools to book service appointments, record customer details, and capture the nature of the job required. For emergency calls, prioritize urgent requests and log them in the dispatch system. Provide general information about services, pricing, and availability. Use CRM tools to track customer history and service records. Ensure all bookings and service requests are logged for the trades team to follow up efficiently.",
+  solar: "You are a sales and support assistant for a solar energy company in Australia. You answer calls about solar panel installations, energy savings, government rebates, and system maintenance. Use scheduling tools to book site assessments and installations. Capture customer details, property information, and energy usage requirements in the CRM. Provide information about solar benefits, financing options, and warranty coverage. Use lead management tools to track sales opportunities and follow up on quotes. Ensure all enquiries are logged for the sales and installation teams to provide timely service.",
+  other: "You are a helpful customer service assistant. You answer calls professionally and assist customers with their enquiries. Use your training and available tools to provide accurate information and support. Capture customer details and interaction summaries in the CRM system. Schedule appointments or follow-ups as needed. Maintain a friendly and professional tone while ensuring all customer interactions are properly documented for future reference.",
 }
 
 const generatePresignedUrl = async (filename: string) => {
@@ -104,7 +108,29 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
     { id: 6, title: "Configuring campaign", icon: Settings },
   ]
 
-  const numberSteps = useMemo(() => agentData.phoneSetup.option === "twilio" ? 6 : 2, [agentData.phoneSetup.option])
+  const numberSteps = useMemo(() => {
+    // Check if phone setup is properly configured
+    const hasPhoneSetup = agentData.phoneSetup && 
+      agentData.phoneSetup.option === "twilio" &&
+      agentData.phoneSetup.twilioSid &&
+      agentData.phoneSetup.twilioApiKey &&
+      agentData.phoneSetup.twilioPhoneNumber
+    
+    // Check if knowledge base files exist
+    const hasKnowledgeFiles = agentData.knowledgeBase?.files && agentData.knowledgeBase.files.length > 0
+    
+    let steps = 2 // Always have: Uploading files (if any), Creating agent
+    
+    if (hasKnowledgeFiles) {
+      steps += 1 // Uploading files step
+    }
+    
+    if (hasPhoneSetup) {
+      steps += 4 // Phone import, Voice config, Campaign creation, Campaign config
+    }
+    
+    return steps
+  }, [agentData.phoneSetup, agentData.knowledgeBase])
 
   // Check theme from localStorage
   useEffect(() => {
@@ -120,19 +146,42 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
 
   useEffect(() => {
     const createKnowledges = async () => {
-      const files = (agentData.knowledgeBase.files || []) as File[]
+      const files = (agentData.knowledgeBase?.files || []) as File[]
+      if (files.length === 0) {
+        // Skip knowledge base creation if no files uploaded
+        return []
+      }
       const ids = await Promise.all(files.map((file) => createKnowledge(file)))
       setCurrentStep(1)
       return ids.filter(id => id !== undefined)
     }
     const createAgent = async (files: string[]) => {
+      // Handle case where industry might be skipped (default to technology)
+      const industryPrompt = industryPrompts[agentData.industry] || industryPrompts.technology
+      
+      // Build prompt with user-provided description if available
+      let prompt = `You are ${agentData.agentName}.\n\n${industryPrompt}`
+      
+      if (agentData.description) {
+        // Use the compiled description from wizard
+        prompt += `\n\nAdditional context:\n"""\n${agentData.description}\n"""`
+      } else {
+        // Fallback to individual fields
+        if (agentData.purpose) {
+          prompt += `\n\nYour primary purpose is:\n"""\n${agentData.purpose}\n"""`
+        }
+        if (agentData.personality) {
+          prompt += `\n\nYour personality is: ${agentData.personality}.`
+        }
+      }
+
       const payload: AgentTypeBase = {
         name: agentData.agentName,
         config: {
-          prompt: `You are ${agentData.agentName}.\n\n${industryPrompts[agentData.industry]}\n\nYour primary purpose is:\n"""\n${agentData.purpose}\n""".\n\n${agentData.personality ? `Your personality is: ${agentData.personality}.` : ''}`,
+          prompt,
           voice: {
             provider: 'elevenlabs',
-            voice_id: agentData.voice,
+            voice_id: agentData.voice || voices[0].id, // Default to first voice if none selected
           },
           flow: {},
           first_message: agentData.greeting || `Hello! I'm ${agentData.agentName}. How can I help you today?`,
@@ -190,12 +239,24 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       try {
         const files = await createKnowledges()
         const agent = await createAgent(files)
-        if (agentData.phoneSetup.option === "twilio") {
+        
+        // Only setup phone integration if phone setup was not skipped
+        const hasPhoneSetup = agentData.phoneSetup && 
+          agentData.phoneSetup.option === "twilio" &&
+          agentData.phoneSetup.twilioSid &&
+          agentData.phoneSetup.twilioApiKey &&
+          agentData.phoneSetup.twilioPhoneNumber
+        
+        if (hasPhoneSetup) {
           const phone = await importPhone()
           await configuringVoice(agent, phone)
           const campaign = await createCampaign(phone)
           await configureCampaign(campaign, phone)
+        } else {
+          // Skip phone setup steps if no phone configuration provided
+          setCurrentStep(6)
         }
+        
         setTimeout(() => {
           onComplete()
         }, 1000)
@@ -355,7 +416,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
                 )}>
                   Overall Progress
                 </span>
-                <span className="text-[#F26AE1] font-bold">{Math.round(currentStep / numberSteps)}%</span>
+                <span className="text-[#F26AE1] font-bold">{Math.round((currentStep / numberSteps) * 100)}%</span>
               </div>
               <Progress value={currentStep / numberSteps} className={clsx(
                 "h-3",
@@ -385,65 +446,82 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
 
             {/* Step List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {buildingSteps.map((step, index) => {
-                const Icon = step.icon
-                const isCompleted = index < currentStep
-                const isActive = index === currentStep
+              {(() => {
+                const hasKnowledgeFiles = agentData.knowledgeBase?.files && agentData.knowledgeBase.files.length > 0
+                const hasPhoneSetup = agentData.phoneSetup && 
+                  agentData.phoneSetup.option === "twilio" &&
+                  agentData.phoneSetup.twilioSid &&
+                  agentData.phoneSetup.twilioApiKey &&
+                  agentData.phoneSetup.twilioPhoneNumber
+                
+                // Filter steps based on what's being configured
+                const relevantSteps = buildingSteps.filter((_, index) => {
+                  if (index === 0) return hasKnowledgeFiles // Uploading files
+                  if (index === 1) return true // Creating agent (always shown)
+                  if (index >= 2) return hasPhoneSetup // Phone-related steps
+                  return false
+                })
+                
+                return relevantSteps.map((step, index) => {
+                  const Icon = step.icon
+                  const isCompleted = index < currentStep
+                  const isActive = index === currentStep
 
-                return (
-                  <div
-                    key={step.id}
-                    className={clsx(
-                      "flex items-center space-x-3 p-3 rounded-lg transition-all border",
-                      isActive && [
-                        isDark
-                          ? "bg-gradient-to-r from-[#F26AE1]/20 to-[#A38AFF]/20 border-[#F26AE1]/30"
-                          : "bg-gradient-to-r from-[#F26AE1]/10 to-[#A38AFF]/10 border-[#F26AE1]/40"
-                      ],
-                      isCompleted && !isActive && [
-                        isDark
-                          ? "bg-green-500/10 border-green-500/20"
-                          : "bg-green-100 border-green-300/50"
-                      ],
-                      !isCompleted && !isActive && [
-                        isDark
-                          ? "bg-gray-700/50 border-gray-600"
-                          : "bg-gray-50 border-gray-200"
-                      ]
-                    )}
-                  >
+                  return (
                     <div
+                      key={step.id}
                       className={clsx(
-                        "w-8 h-8 rounded-full flex items-center justify-center",
-                        isActive && "bg-gradient-to-r from-[#F26AE1] to-[#A38AFF] animate-glow",
-                        isCompleted && !isActive && "bg-green-500",
+                        "flex items-center space-x-3 p-3 rounded-lg transition-all border",
+                        isActive && [
+                          isDark
+                            ? "bg-gradient-to-r from-[#F26AE1]/20 to-[#A38AFF]/20 border-[#F26AE1]/30"
+                            : "bg-gradient-to-r from-[#F26AE1]/10 to-[#A38AFF]/10 border-[#F26AE1]/40"
+                        ],
+                        isCompleted && !isActive && [
+                          isDark
+                            ? "bg-green-500/10 border-green-500/20"
+                            : "bg-green-100 border-green-300/50"
+                        ],
                         !isCompleted && !isActive && [
-                          isDark ? "bg-gray-600" : "bg-gray-300"
+                          isDark
+                            ? "bg-gray-700/50 border-gray-600"
+                            : "bg-gray-50 border-gray-200"
                         ]
                       )}
                     >
-                      {isCompleted ? (
-                        <CheckCircle className="w-4 h-4 text-white" />
-                      ) : (
-                        <Icon className={clsx(
-                          "w-4 h-4 text-white",
-                          isActive && "animate-spin-slow"
-                        )} />
-                      )}
+                      <div
+                        className={clsx(
+                          "w-8 h-8 rounded-full flex items-center justify-center",
+                          isActive && "bg-gradient-to-r from-[#F26AE1] to-[#A38AFF] animate-glow",
+                          isCompleted && !isActive && "bg-green-500",
+                          !isCompleted && !isActive && [
+                            isDark ? "bg-gray-600" : "bg-gray-300"
+                          ]
+                        )}
+                      >
+                        {isCompleted ? (
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        ) : (
+                          <Icon className={clsx(
+                            "w-4 h-4 text-white",
+                            isActive && "animate-spin-slow"
+                          )} />
+                        )}
+                      </div>
+                      <span
+                        className={clsx(
+                          "font-medium",
+                          isActive && [isDark ? "text-white" : "text-gray-900"],
+                          isCompleted && !isActive && "text-green-600",
+                          !isCompleted && !isActive && [isDark ? "text-gray-400" : "text-gray-500"]
+                        )}
+                      >
+                        {step.title}
+                      </span>
                     </div>
-                    <span
-                      className={clsx(
-                        "font-medium",
-                        isActive && [isDark ? "text-white" : "text-gray-900"],
-                        isCompleted && !isActive && "text-green-600",
-                        !isCompleted && !isActive && [isDark ? "text-gray-400" : "text-gray-500"]
-                      )}
-                    >
-                      {step.title}
-                    </span>
-                  </div>
-                )
-              })}
+                  )
+                })
+              })()}
             </div>
           </CardContent>
         </Card>

@@ -32,7 +32,7 @@ interface WizardProps {
   onComplete: (agentData: any) => void
 }
 
-const voices = [
+export const voices = [
   {
     id: "21m00Tcm4TlvDq8ikWAM",
     name: "Rachel",
@@ -94,6 +94,9 @@ const industries = [
   { id: "automotive", name: "Automotive", icon: "🚗", description: "Car sales, repairs, and services" },
   { id: "insurance", name: "Insurance", icon: "🛡️", description: "Insurance policies and claims" },
   { id: "legal", name: "Legal", icon: "⚖️", description: "Law firms and legal services" },
+  { id: "trade", name: "Trade", icon: "🧰", description: "Skilled trades: plumbing, electrical, HVAC, and more" },
+  { id: "solar", name: "Solar", icon: "☀️", description: "Solar sales, installation, and support" },
+  { id: "other", name: "Other", icon: "✨", description: "Not listed? Pick Other and describe your focus later" },
 ]
 
 export default function Wizard({ onComplete }: WizardProps) {
@@ -232,6 +235,14 @@ export default function Wizard({ onComplete }: WizardProps) {
         voiceType: formData.voice,
         tone: formData.personality,
         primaryGoal: formData.purpose,
+        description:
+          [
+            formData.purpose && `Purpose: ${formData.purpose}`,
+            formData.personality && `Personality: ${formData.personality}`,
+            formData.greeting && `Greeting: ${formData.greeting}`,
+          ]
+            .filter(Boolean)
+            .join("\n"),
       })
     }
   }
@@ -1194,6 +1205,19 @@ export default function Wizard({ onComplete }: WizardProps) {
     }
   }
 
+  const isSkippable = (step: number) => {
+    // Allow skipping for industry, voice, telephony, and later optional steps
+    return step === 2 || step === 4 || step === 5 || step === 6 || step === 7
+  }
+
+  const handleSkip = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1)
+    } else {
+      handleNext()
+    }
+  }
+
   return (
     <div className={`min-h-screen ${theme.background} relative overflow-hidden flex items-center justify-center p-4`}>
       {/* Theme Toggle Button */}
@@ -1337,7 +1361,23 @@ export default function Wizard({ onComplete }: WizardProps) {
               </>
             )}
           </Button>
-          <Button
+          <div className="flex items-center gap-3">
+            {isSkippable(currentStep) && (
+              <Button
+                variant="outline"
+                onClick={handleSkip}
+                className={clsx(
+                  "h-14 px-6 text-lg border-2",
+                  isDarkMode
+                    ? "text-white border-gray-600 bg-black/50 hover:bg-gray-700 hover:border-cyan-400"
+                    : "text-gray-900 border-gray-300 bg-white hover:bg-gray-100 hover:border-blue-400"
+                )}
+                style={{ boxShadow: "0 0 15px rgba(0, 255, 255, 0.3)" }}
+              >
+                Skip
+              </Button>
+            )}
+            <Button
             onClick={handleNext}
             disabled={!canProceed()}
             className="flex items-center gap-3 h-14 px-8 text-lg text-white border-0 transition-all duration-200 disabled:opacity-50"
@@ -1357,7 +1397,8 @@ export default function Wizard({ onComplete }: WizardProps) {
                 <ArrowRight className="w-5 h-5" />
               </>
             )}
-          </Button>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
