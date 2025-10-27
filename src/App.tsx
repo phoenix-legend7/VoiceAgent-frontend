@@ -21,6 +21,7 @@ import LoginScreen from './pages/Login'
 import Wizard from './pages/Wizard'
 import BuildingAnimation from './pages/AgentBuilding'
 import OAuthCallback from './pages/OAuthCallback'
+import AdminDashboard from './pages/AdminDashboard'
 
 const WizardRoute = () => {
   const [agentData, setAgentData] = useState<any>();
@@ -76,6 +77,7 @@ function App() {
               <Route path="/campaigns/:id" element={<CampaignDetails />} />
               <Route path="/knowledge" element={<AgentKnowledge />} />
               <Route path="/histories" element={<CallLogs />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/settings/*" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
             </Route>

@@ -12,4 +12,5 @@ export interface UserModel {
   auto_refill: boolean;
   auto_refill_amount: number;
   auto_threshold: number;
+  is_superuser: boolean;
 };

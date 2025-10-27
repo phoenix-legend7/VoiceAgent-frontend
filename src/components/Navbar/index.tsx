@@ -11,10 +11,12 @@ import {
   FaHistory,
   FaPhoneAlt,
   FaUsers,
+  FaShieldAlt,
 } from "react-icons/fa";
 // import { LiaExternalLinkAltSolid } from "react-icons/lia"
 // import { PiSparkle } from "react-icons/pi"
 import NavLink from "./NavLink";
+import { useAuth } from "../../core/authProvider";
 // import settingsItems from "../../consts/settings";
 
 // const SettingsButtonGroup = () => {
@@ -96,6 +98,10 @@ interface Props {
 
 const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const { currentUser } = useAuth();
+  
+  // Check if current user is admin
+  const isAdmin = currentUser?.is_superuser === true;
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -191,6 +197,14 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
           icon={<FaCog size={20} />}
           label="Settings"
         />
+        {isAdmin && (
+          <NavLink
+            id="tour-admin"
+            href="/admin"
+            icon={<FaShieldAlt size={20} />}
+            label="Admin Dashboard"
+          />
+        )}
         {/* <SettingsButtonGroup /> */}
         {/* <NavLink
           href="https://millisai.mintlify.app/"
