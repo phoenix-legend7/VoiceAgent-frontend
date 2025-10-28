@@ -179,7 +179,7 @@ const AdminDashboard = () => {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="border-gray-400 dark:border-gray-600">
                     <TableHead className="w-[300px]">User</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Role</TableHead>
@@ -189,7 +189,7 @@ const AdminDashboard = () => {
                 </TableHeader>
                 <TableBody>
                   {paginatedUsers.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow className="border-gray-400 dark:border-gray-600" key={user.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar>
@@ -394,6 +394,15 @@ const AdminDashboard = () => {
               {users.filter(user => user.is_active).length}
             </div>
             <div className="text-sm text-gray-600 mt-1">Currently active</div>
+          </div>
+        </Card>
+
+        <Card title="Inactive Users" icon={<Power size={20} />}>
+          <div className="p-6 text-center">
+            <div className="text-3xl font-bold text-red-600">
+              {users.filter(user => !user.is_active).length}
+            </div>
+            <div className="text-sm text-gray-600 mt-1">Not active</div>
           </div>
         </Card>
       </div>
