@@ -96,7 +96,7 @@ const AdminDashboard = () => {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2
-    }).format(credit)
+    }).format(credit / 100)
   }
 
   const getInitials = (firstName: string | null, lastName: string | null) => {
