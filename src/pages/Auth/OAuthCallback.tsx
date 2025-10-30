@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../core/axiosInstance";
-import { Loading } from "../Layout/Loading";
-import { getUserByToken, useAuth } from "../core/authProvider";
+import { toast } from "react-toastify";
+import axiosInstance from "../../core/axiosInstance";
+import { Loading } from "../../Layout/Loading";
+import { getUserByToken, useAuth } from "../../core/authProvider";
 
 const OAuthCallback = () => {
   const navigate = useNavigate();
@@ -29,6 +30,10 @@ const OAuthCallback = () => {
         }
       } catch (error) {
         console.error("Error handling OAuth success:", error);
+        navigate("/login");
+        setTimeout(() => {
+          toast.error("Failed to login. Please try again.");
+        }, 1000);
       }
     };
     handleOAuth();

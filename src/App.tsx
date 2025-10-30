@@ -17,10 +17,11 @@ import Tools from './pages/Settings/Tools'
 import Transactions from './pages/Settings/Transactions'
 import Dashboard from './pages/Dashboard'
 import CampaignScheduling from './pages/CampaignSchedule'
-import LoginScreen from './pages/Login'
+import LoginScreen from './pages/Auth/Login'
+import SignupScreen from './pages/Auth/Signup'
 import Wizard from './pages/Wizard'
 import BuildingAnimation from './pages/AgentBuilding'
-import OAuthCallback from './pages/OAuthCallback'
+import OAuthCallback from './pages/Auth/OAuthCallback'
 import AdminDashboard from './pages/AdminDashboard'
 
 const WizardRoute = () => {
@@ -86,6 +87,7 @@ function App() {
           <>
             {/* <Route path="/" element={<Home />} /> */}
             <Route path='/login' element={<LoginScreen />} />
+            <Route path='/signup' element={<SignupScreen />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </>
         )}

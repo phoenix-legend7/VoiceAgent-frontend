@@ -12,27 +12,6 @@ import { Users, Trash2, Shield, AlertTriangle, Search, Power } from 'lucide-reac
 import { toast } from 'react-toastify'
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar'
 
-/**
- * Admin Dashboard Component
- * 
- * This component provides admin functionality to view and manage users.
- * 
- * Setup Instructions:
- * 1. Update the admin check logic in both this component and the Navbar component
- * 2. Replace 'admin@example.com' with your actual admin email or implement proper role-based access
- * 3. Ensure your backend API has the following endpoints:
- *    - GET /admin/users - Returns list of all users
- *    - DELETE /admin/users/:id - Deletes a user
- *    - PATCH /admin/users/:id/status - Updates user status
- *    - GET /admin/stats - Returns user statistics
- * 4. Make sure your backend validates admin permissions for these endpoints
- * 
- * Features:
- * - View all users with their details
- * - Delete users with confirmation dialog
- * - Display user statistics
- * - Responsive design with proper error handling
- */
 const AdminDashboard = () => {
   const { currentUser } = useAuth()
   const [users, setUsers] = useState<UserRead[]>([])
