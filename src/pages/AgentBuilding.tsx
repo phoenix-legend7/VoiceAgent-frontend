@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 import axios from "axios"
 import clsx from "clsx"
+import { useNavigate } from "react-router-dom"
 
 import { toast, ToastContainer } from "react-toastify"
 import { Progress } from "../components/ui/progress"
@@ -95,6 +96,7 @@ interface BuildingAnimationProps {
 }
 
 export default function BuildingAnimation({ agentData, onComplete }: BuildingAnimationProps) {
+  const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
   const [matrixChars, setMatrixChars] = useState<string[]>([])
   const [isDark, setIsDark] = useState(true)
@@ -110,25 +112,25 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
 
   const numberSteps = useMemo(() => {
     // Check if phone setup is properly configured
-    const hasPhoneSetup = agentData.phoneSetup && 
+    const hasPhoneSetup = agentData.phoneSetup &&
       agentData.phoneSetup.option === "twilio" &&
       agentData.phoneSetup.twilioSid &&
       agentData.phoneSetup.twilioApiKey &&
       agentData.phoneSetup.twilioPhoneNumber
-    
+
     // Check if knowledge base files exist
     const hasKnowledgeFiles = agentData.knowledgeBase?.files && agentData.knowledgeBase.files.length > 0
-    
+
     let steps = 2 // Always have: Uploading files (if any), Creating agent
-    
+
     if (hasKnowledgeFiles) {
       steps += 1 // Uploading files step
     }
-    
+
     if (hasPhoneSetup) {
       steps += 4 // Phone import, Voice config, Campaign creation, Campaign config
     }
-    
+
     return steps
   }, [agentData.phoneSetup, agentData.knowledgeBase])
 
@@ -158,10 +160,10 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
     const createAgent = async (files: string[]) => {
       // Handle case where industry might be skipped (default to technology)
       const industryPrompt = industryPrompts[agentData.industry] || industryPrompts.technology
-      
+
       // Build prompt with user-provided description if available
       let prompt = `You are ${agentData.agentName}.\n\n${industryPrompt}`
-      
+
       if (agentData.description) {
         // Use the compiled description from wizard
         prompt += `\n\nAdditional context:\n"""\n${agentData.description}\n"""`
@@ -222,6 +224,24 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       setCurrentStep(4)
     }
     const createCampaign = async (phone: string) => {
+      // Check if payment method exists before creating campaign
+      try {
+        const paymentMethodsResponse = await axiosInstance.get("/billing/payment-methods")
+        const paymentMethods = paymentMethodsResponse.data.payment_methods || []
+
+        if (paymentMethods.length === 0) {
+          toast.warning("Please add a payment method before creating a campaign")
+          navigate("/settings/billing")
+          throw new Error("Payment method required")
+        }
+      } catch (error: any) {
+        if (error.message === "Payment method required") {
+          throw error
+        }
+        // If payment check fails for other reasons, still allow creation but log the error
+        console.error('Failed to check payment methods:', error)
+      }
+
       const response = await axiosInstance.post(
         `/campaigns`,
         { name: `Campaign for ${phone}` }
@@ -237,16 +257,32 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
     }
     const startProgress = async () => {
       try {
+        // Check if payment method exists before creating agent
+        try {
+          const paymentMethodsResponse = await axiosInstance.get("/billing/payment-methods")
+          const paymentMethods = paymentMethodsResponse.data.payment_methods || []
+
+          if (paymentMethods.length === 0) {
+            toast.warning("Please add a payment method before creating an agent")
+            navigate("/settings/billing")
+            onComplete()
+            return
+          }
+        } catch (error) {
+          // If payment check fails, still allow creation but log the error
+          console.error('Failed to check payment methods:', error)
+        }
+
         const files = await createKnowledges()
         const agent = await createAgent(files)
-        
+
         // Only setup phone integration if phone setup was not skipped
-        const hasPhoneSetup = agentData.phoneSetup && 
+        const hasPhoneSetup = agentData.phoneSetup &&
           agentData.phoneSetup.option === "twilio" &&
           agentData.phoneSetup.twilioSid &&
           agentData.phoneSetup.twilioApiKey &&
           agentData.phoneSetup.twilioPhoneNumber
-        
+
         if (hasPhoneSetup) {
           const phone = await importPhone()
           await configuringVoice(agent, phone)
@@ -256,7 +292,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
           // Skip phone setup steps if no phone configuration provided
           setCurrentStep(6)
         }
-        
+
         setTimeout(() => {
           onComplete()
         }, 1000)
@@ -366,8 +402,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
             key={i}
             className={clsx(
               "absolute w-1 h-1 rounded-full animate-float-hologram",
-              isDark 
-                ? 'bg-gradient-to-r from-cyan-400 to-purple-400' 
+              isDark
+                ? 'bg-gradient-to-r from-cyan-400 to-purple-400'
                 : 'bg-gradient-to-r from-blue-500 to-purple-500'
             )}
             style={{
@@ -403,8 +439,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
         {/* Progress Section */}
         <Card className={clsx(
           "border backdrop-blur-sm mb-8",
-          isDark 
-            ? 'bg-gray-800/90 border-gray-700' 
+          isDark
+            ? 'bg-gray-800/90 border-gray-700'
             : 'bg-white/90 border-gray-200 shadow-lg'
         )}>
           <CardContent className="p-8">
@@ -448,12 +484,12 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {(() => {
                 const hasKnowledgeFiles = agentData.knowledgeBase?.files && agentData.knowledgeBase.files.length > 0
-                const hasPhoneSetup = agentData.phoneSetup && 
+                const hasPhoneSetup = agentData.phoneSetup &&
                   agentData.phoneSetup.option === "twilio" &&
                   agentData.phoneSetup.twilioSid &&
                   agentData.phoneSetup.twilioApiKey &&
                   agentData.phoneSetup.twilioPhoneNumber
-                
+
                 // Filter steps based on what's being configured
                 const relevantSteps = buildingSteps.filter((_, index) => {
                   if (index === 0) return hasKnowledgeFiles // Uploading files
@@ -461,7 +497,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
                   if (index >= 2) return hasPhoneSetup // Phone-related steps
                   return false
                 })
-                
+
                 return relevantSteps.map((step, index) => {
                   const Icon = step.icon
                   const isCompleted = index < currentStep
@@ -530,8 +566,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className={clsx(
             "border backdrop-blur-sm",
-            isDark 
-              ? 'bg-gray-800/90 border-gray-700' 
+            isDark
+              ? 'bg-gray-800/90 border-gray-700'
               : 'bg-white/90 border-gray-200 shadow-lg'
           )}>
             <CardContent className="p-6">
@@ -563,8 +599,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
 
           <Card className={clsx(
             "border backdrop-blur-sm",
-            isDark 
-              ? 'bg-gray-800/90 border-gray-700' 
+            isDark
+              ? 'bg-gray-800/90 border-gray-700'
               : 'bg-white/90 border-gray-200 shadow-lg'
           )}>
             <CardContent className="p-6">
@@ -602,8 +638,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
 
           <Card className={clsx(
             "border backdrop-blur-sm",
-            isDark 
-              ? 'bg-gray-800/90 border-gray-700' 
+            isDark
+              ? 'bg-gray-800/90 border-gray-700'
               : 'bg-white/90 border-gray-200 shadow-lg'
           )}>
             <CardContent className="p-6">
@@ -633,8 +669,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
         {/* System Metrics */}
         <Card className={clsx(
           "border backdrop-blur-sm",
-          isDark 
-            ? 'bg-gray-800/90 border-gray-700' 
+          isDark
+            ? 'bg-gray-800/90 border-gray-700'
             : 'bg-white/90 border-gray-200 shadow-lg'
         )}>
           <CardContent className="p-6">

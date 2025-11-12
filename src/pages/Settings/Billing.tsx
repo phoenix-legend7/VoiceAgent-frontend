@@ -152,14 +152,17 @@ const CardSetupForm = ({ onSuccess, onCancel }: { onSuccess: () => void; onCance
 
 const PaymentMethodCard = ({
   paymentMethod,
-  onRemove
+  onRemove,
+  canRemove
 }: {
   paymentMethod: PaymentMethod;
   onRemove: (id: string) => void;
+  canRemove: boolean;
 }) => {
   const [loading, setLoading] = useState(false);
 
   const handleRemove = async () => {
+    if (!canRemove) return;
     setLoading(true);
     try {
       await axiosInstance.delete(`/billing/payment-methods/${paymentMethod.id}`);
@@ -192,8 +195,12 @@ const PaymentMethodCard = ({
       </div>
       <button
         onClick={handleRemove}
-        disabled={loading}
-        className="text-red-500 hover:text-red-700 p-2 disabled:opacity-50"
+        disabled={loading || !canRemove}
+        className={`p-2 disabled:opacity-50 disabled:cursor-not-allowed ${canRemove
+            ? "text-red-500 hover:text-red-700"
+            : "text-gray-400 cursor-not-allowed"
+          }`}
+        title={!canRemove ? "At least one payment method is required" : "Remove payment method"}
       >
         <FaTrash />
       </button>
@@ -460,6 +467,7 @@ const Billing = () => {
                           key={method.id}
                           paymentMethod={method}
                           onRemove={handleRemovePaymentMethod}
+                          canRemove={paymentMethods.length > 1}
                         />
                       ))}
                       <div className="pt-4">

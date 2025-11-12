@@ -2,6 +2,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useRef, useState } from "react
 import { FaEllipsisV, FaPlus, FaUserAlt } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
 import { createPortal } from "react-dom"
+import { toast } from "react-toastify"
 
 import StatusBadge from "../components/StatusBadge"
 import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
@@ -120,13 +121,14 @@ interface CreateAgentModalProps {
   setIsCreateAgentModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
-const CreateAgentModal: FC<CreateAgentModalProps> = ({ 
+const CreateAgentModal: FC<CreateAgentModalProps> = ({
   isCreateAgentModalOpen,
   isOverlayShow,
   setIsChanged,
   setIsOverlayShow,
   setIsCreateAgentModalOpen
 }) => {
+  const navigate = useNavigate()
   const [createAgentName, setCreateAgentName] = useState('')
 
   const onClose = () => {
@@ -136,6 +138,18 @@ const CreateAgentModal: FC<CreateAgentModalProps> = ({
   const handleCreate = async () => {
     setIsOverlayShow(true)
     try {
+      // Check if payment method exists
+      const paymentMethodsResponse = await axiosInstance.get("/billing/payment-methods")
+      const paymentMethods = paymentMethodsResponse.data.payment_methods || []
+
+      if (paymentMethods.length === 0) {
+        toast.warning("Please add a payment method before creating an agent")
+        navigate("/settings/billing")
+        setIsOverlayShow(false)
+        onClose()
+        return
+      }
+
       await axiosInstance.post(
         `/agent`,
         {

@@ -1,6 +1,7 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { FaBullhorn, FaPlus, FaTrash } from "react-icons/fa"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 
 import { CampaignStatusBadge } from "../components/StatusBadge"
 import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
@@ -26,6 +27,7 @@ const CreateCampaignModal: FC<CreateCampaignModalProps> = ({
   setIsOverlayShow,
   setIsCreateCampaignModalOpen
 }) => {
+  const navigate = useNavigate()
   const [createCampaignName, setCreateCampaignName] = useState('')
 
   const onClose = () => {
@@ -35,6 +37,18 @@ const CreateCampaignModal: FC<CreateCampaignModalProps> = ({
   const handleCreate = async () => {
     setIsOverlayShow(true)
     try {
+      // Check if payment method exists
+      const paymentMethodsResponse = await axiosInstance.get("/billing/payment-methods")
+      const paymentMethods = paymentMethodsResponse.data.payment_methods || []
+
+      if (paymentMethods.length === 0) {
+        toast.warning("Please add a payment method before creating a campaign")
+        navigate("/settings/billing")
+        setIsOverlayShow(false)
+        onClose()
+        return
+      }
+
       await axiosInstance.post(
         `/campaigns`,
         { name: createCampaignName }
