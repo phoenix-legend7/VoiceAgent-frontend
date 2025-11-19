@@ -13,4 +13,5 @@ export interface UserModel {
   auto_refill_amount: number;
   auto_threshold: number;
   is_superuser: boolean;
+  api_keys: Record<string, string> | null;
 };

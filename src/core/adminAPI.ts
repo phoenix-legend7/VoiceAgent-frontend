@@ -51,5 +51,33 @@ export const adminAPI = {
       handleAxiosError('Failed to fetch user statistics', error)
       throw error
     }
+  },
+
+  // Update API keys
+  updateApiKeys: async (apiKeys: Record<string, string>): Promise<{
+    api_keys: Record<string, string>;
+    message: string;
+  }> => {
+    try {
+      const response = await axiosInstance.put('/user/api-keys', { api_keys: apiKeys })
+      return response.data
+    } catch (error) {
+      handleAxiosError('Failed to update API keys', error)
+      throw error
+    }
+  },
+
+  // Delete API key
+  deleteApiKey: async (keyName: string): Promise<{
+    api_keys: Record<string, string>;
+    message: string;
+  }> => {
+    try {
+      const response = await axiosInstance.delete(`/user/api-keys/${keyName}`)
+      return response.data
+    } catch (error) {
+      handleAxiosError('Failed to delete API key', error)
+      throw error
+    }
   }
 }
