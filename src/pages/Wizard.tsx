@@ -1,35 +1,206 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 import { Textarea } from "../components/ui/textarea"
-import { Badge } from "../components/ui/badge"
 import {
   ArrowRight,
   ArrowLeft,
   Sparkles,
   Bot,
-  MessageSquare,
-  Settings,
   Mic,
   Volume2,
-  Play,
-  Pause,
   Phone,
-  Database,
   Sun,
   Moon,
   AlarmClock,
+  CreditCard,
+  Hash,
+  Plug,
+  CheckCircle2,
+  Play,
+  Pause,
+  Loader2,
 } from "lucide-react"
 import clsx from "clsx"
 import { countryPhoneOptions } from "../consts/countryPhones"
+import { toast, ToastContainer } from "react-toastify"
+import VoiceType from "../models/voice"
+import { adminAPI } from "../core/adminAPI"
+import { useAuth } from "../core/authProvider"
+import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
+import { loadStripe } from '@stripe/stripe-js'
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements
+} from '@stripe/react-stripe-js'
+
+// Initialize Stripe
+const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY || '')
 
 interface WizardProps {
   onComplete: (agentData: any) => void
+}
+
+interface PaymentMethod {
+  id: string;
+  type: string;
+  card: {
+    brand: string;
+    last4: string;
+    exp_month: number;
+    exp_year: number;
+  };
+  is_default: boolean;
+}
+
+// Payment Form Component - Defined outside to prevent recreation on each render
+interface PaymentFormProps {
+  isDarkMode: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+const PaymentForm = ({ isDarkMode, onClose, onSuccess }: PaymentFormProps) => {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const cardElementOptions = useMemo(() => ({
+    style: {
+      base: {
+        fontSize: '16px',
+        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+        color: isDarkMode ? '#f8fafc' : '#1e293b',
+        backgroundColor: 'transparent',
+        '::placeholder': {
+          color: isDarkMode ? '#94a3b8' : '#64748b',
+        },
+        ':-webkit-autofill': {
+          color: isDarkMode ? '#f8fafc' : '#1e293b',
+        },
+      },
+      invalid: {
+        color: '#ef4444',
+        iconColor: '#ef4444',
+      },
+      complete: {
+        color: isDarkMode ? '#10b981' : '#059669',
+        iconColor: isDarkMode ? '#10b981' : '#059669',
+      },
+    },
+  }), [isDarkMode])
+
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
+    event.preventDefault()
+
+    if (!stripe || !elements) return
+
+    setLoading(true)
+    setError(null)
+
+    const cardElement = elements.getElement(CardElement)
+
+    if (!cardElement) {
+      setError('Card element not found')
+      setLoading(false)
+      return
+    }
+
+    // Create payment method
+    const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
+      type: 'card',
+      card: cardElement,
+    })
+
+    if (stripeError) {
+      setError(stripeError.message || 'An error occurred')
+      setLoading(false)
+      return
+    }
+
+    try {
+      // Send payment method to backend
+      const payload = {
+        payment_method_id: paymentMethod.id
+      }
+      await axiosInstance.post("/billing/setup-payment-method", payload)
+      toast.success("Payment method added successfully!")
+      onClose()
+      onSuccess()
+    } catch (err) {
+      handleAxiosError("Failed to add payment method", err)
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }, [stripe, elements, onClose, onSuccess])
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className={clsx(
+        "p-4 rounded-lg border-2",
+        isDarkMode ? "border-cyan-400 bg-black/30" : "border-cyan-600 bg-white/50"
+      )}
+        style={{
+          boxShadow: isDarkMode
+            ? "0 0 10px rgba(0, 255, 255, 0.3)"
+            : "0 0 10px rgba(14,165,233,0.2)",
+        }}>
+        <CardElement options={cardElementOptions} />
+      </div>
+
+      {error && (
+        <div className={clsx("text-sm p-3 rounded-lg", isDarkMode ? "bg-red-500/20 text-red-300" : "bg-red-50 text-red-700")}>
+          {error}
+        </div>
+      )}
+
+      <div className="flex gap-3 justify-end">
+        <Button
+          type="button"
+          onClick={onClose}
+          variant="outline"
+          className={clsx(
+            "border-2",
+            isDarkMode
+              ? "text-white border-gray-600 bg-black/50 hover:bg-gray-700 hover:border-cyan-400"
+              : "text-gray-900 border-gray-300 bg-white hover:bg-gray-100 hover:border-blue-400"
+          )}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={!stripe || loading}
+          className="text-white border-0 transition-all duration-200 disabled:opacity-50"
+          style={{
+            background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
+            boxShadow: "0 0 30px #FF00FF, 0 0 60px #00FFFF",
+          }}
+        >
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Adding...
+            </>
+          ) : (
+            <>
+              <CreditCard className="w-4 h-4 mr-2" />
+              Add Card
+            </>
+          )}
+        </Button>
+      </div>
+    </form>
+  )
 }
 
 export const voices = [
@@ -83,25 +254,9 @@ export const voices = [
   }
 ]
 
-const industries = [
-  { id: "real-estate", name: "Real Estate", icon: "🏠", description: "Property sales, rentals, and management" },
-  { id: "healthcare", name: "Healthcare", icon: "🏥", description: "Medical practices and health services" },
-  { id: "ecommerce", name: "E-commerce", icon: "🛒", description: "Online retail and product sales" },
-  { id: "finance", name: "Finance", icon: "💰", description: "Banking, loans, and financial services" },
-  { id: "education", name: "Education", icon: "🎓", description: "Schools, courses, and training" },
-  { id: "technology", name: "Technology", icon: "💻", description: "Software, IT, and tech services" },
-  { id: "hospitality", name: "Hospitality", icon: "🏨", description: "Hotels, restaurants, and travel" },
-  { id: "automotive", name: "Automotive", icon: "🚗", description: "Car sales, repairs, and services" },
-  { id: "insurance", name: "Insurance", icon: "🛡️", description: "Insurance policies and claims" },
-  { id: "legal", name: "Legal", icon: "⚖️", description: "Law firms and legal services" },
-  { id: "trade", name: "Trade", icon: "🧰", description: "Skilled trades: plumbing, electrical, HVAC, and more" },
-  { id: "solar", name: "Solar", icon: "☀️", description: "Solar sales, installation, and support" },
-  { id: "other", name: "Other", icon: "✨", description: "Not listed? Pick Other and describe your focus later" },
-]
 
 export default function Wizard({ onComplete }: WizardProps) {
   const [currentStep, setCurrentStep] = useState(1)
-  const [isPlaying, setIsPlaying] = useState<string | null>(null)
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
   const [sparkParticles, setSparkParticles] = useState<
@@ -111,17 +266,24 @@ export default function Wizard({ onComplete }: WizardProps) {
     Array<{ id: number; x1: number; y1: number; x2: number; y2: number }>
   >([])
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  // ElevenLabs state
+  const [elevenlabsVoices, setElevenlabsVoices] = useState<VoiceType[]>([])
+  const [isTestingConnection, setIsTestingConnection] = useState(false)
+  const [isPlayingVoice, setIsPlayingVoice] = useState<string | null>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const { currentUser } = useAuth();
+
+  // Billing state
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
+  const [isLoadingPaymentMethods, setIsLoadingPaymentMethods] = useState(false)
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
+
+  // Tools state
+  const [connectedTools, setConnectedTools] = useState<Array<{ id: string; tool_id: string; name: string; description: string }>>([])
+  const [isLoadingTools, setIsLoadingTools] = useState(false)
+
 
   const [formData, setFormData] = useState({
-    agentName: "",
-    industry: "",
-    purpose: "",
-    voice: "",
-    personality: "",
-    phoneNumber: "",
-    greeting: "",
-    // New fields
     phoneSetup: {
       option: "twilio", // "purchase" or "twilio"
       twilioSid: "",
@@ -131,13 +293,22 @@ export default function Wizard({ onComplete }: WizardProps) {
       twilioCountry: "US",
       twilioApiKey: "",
     },
+    selectedPhoneNumber: "",
+    elevenlabsApiKey: "",
+    billingConfirmed: false,
+    agentName: "",
+    industry: "",
+    purpose: "",
+    voice: "",
+    personality: "",
+    greeting: "",
     knowledgeBase: {
       files: [] as File[],
     },
+    tools: [] as string[],
   })
 
-  const totalSteps = 7
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const totalSteps = 6
   const navigate = useNavigate()
 
   // Get screen dimensions
@@ -204,27 +375,55 @@ export default function Wizard({ onComplete }: WizardProps) {
     return () => clearInterval(interval)
   }, [dimensions, isDarkMode])
 
-  const playVoiceSample = (voice: any) => {
-    if (isPlaying === voice.id) {
-      audioRef.current?.pause();
-      audioRef.current = null;
-      setIsPlaying(null);
-    } else {
-      if (audioRef.current) {
-        audioRef.current.pause(); // stop any previous audio
-        audioRef.current.src = voice.preview_url;
-        audioRef.current.play();
-        audioRef.current.onended = () => {
-          setIsPlaying(null);
-        };
-        audioRef.current.onerror = (e: any) => {
-          console.error("Error playing audio:", e);
-          setIsPlaying(null);
-        }
-      }
-      setIsPlaying(voice.id);
+  useEffect(() => {
+    if (currentUser?.api_keys?.elevenlabs) {
+      setFormData({
+        ...formData,
+        elevenlabsApiKey: currentUser.api_keys.elevenlabs,
+      })
     }
-  }
+  }, [currentUser])
+
+  // Fetch payment methods when step 4 is shown
+  useEffect(() => {
+    if (currentStep === 4) {
+      fetchPaymentMethods()
+    }
+  }, [currentStep])
+
+  // Fetch connected tools when step 6 is shown
+  useEffect(() => {
+    if (currentStep === 6) {
+      fetchConnectedTools()
+    }
+  }, [currentStep])
+
+  const fetchConnectedTools = useCallback(async () => {
+    setIsLoadingTools(true)
+    try {
+      const response = await axiosInstance.get("/tools")
+      setConnectedTools(response.data || [])
+    } catch (error) {
+      console.error('Failed to fetch connected tools:', error)
+      // Don't show error toast here, just log it
+    } finally {
+      setIsLoadingTools(false)
+    }
+  }, [])
+
+  const fetchPaymentMethods = useCallback(async () => {
+    setIsLoadingPaymentMethods(true)
+    try {
+      const response = await axiosInstance.get("/billing/payment-methods")
+      setPaymentMethods(response.data.payment_methods || [])
+    } catch (error) {
+      console.error('Failed to fetch payment methods:', error)
+      // Don't show error toast here, just log it
+    } finally {
+      setIsLoadingPaymentMethods(false)
+    }
+  }, [])
+
 
   const handleNext = () => {
     if (currentStep < totalSteps) {
@@ -232,6 +431,10 @@ export default function Wizard({ onComplete }: WizardProps) {
     } else {
       onComplete({
         ...formData,
+        phoneSetup: {
+          ...formData.phoneSetup,
+          twilioPhoneNumber: formData.selectedPhoneNumber || formData.phoneSetup.twilioPhoneNumber,
+        },
         voiceType: formData.voice,
         tone: formData.personality,
         primaryGoal: formData.purpose,
@@ -261,63 +464,140 @@ export default function Wizard({ onComplete }: WizardProps) {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  const testElevenLabsConnection = async () => {
+    if (!formData.elevenlabsApiKey.trim()) {
+      toast.warning("Please enter an API key first")
+      return
+    }
+
+    setIsTestingConnection(true)
+    setElevenlabsVoices([])
+
+    try {
+      const response = await fetch("https://api.elevenlabs.io/v1/voices", {
+        method: "GET",
+        headers: {
+          "xi-api-key": formData.elevenlabsApiKey.trim(),
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Invalid API key. Please check your ElevenLabs API key.")
+        }
+        throw new Error(`Failed to fetch voices: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      const voices = data.voices || []
+
+      if (voices.length === 0) {
+        toast.warning("No ElevenLabs voices found. Please check your API key.")
+      } else {
+        const elevenlabsVoicesList: VoiceType[] = voices.map((voice: any) => ({
+          name: voice.name || voice.voice_id,
+          provider: "elevenlabs",
+          voice_id: voice.voice_id,
+          preview_url: voice.preview_url || undefined,
+          language: voice.labels?.language || undefined,
+          category: voice.category || undefined,
+        }))
+
+        toast.success(`Successfully connected! Found ${elevenlabsVoicesList.length} voices.`)
+        setElevenlabsVoices(elevenlabsVoicesList)
+
+        await adminAPI.updateApiKeys({
+          elevenlabs: formData.elevenlabsApiKey.trim()
+        })
+      }
+    } catch (error: any) {
+      handleAxiosError("Failed to connect to ElevenLabs", error);
+      setElevenlabsVoices([])
+    } finally {
+      setIsTestingConnection(false)
+    }
+  }
+
+  const playVoicePreview = (voice: VoiceType) => {
+    if (!voice.preview_url) return
+
+    if (isPlayingVoice === voice.voice_id) {
+      audioRef.current?.pause()
+      audioRef.current = null
+      setIsPlayingVoice(null)
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+
+      const audio = new Audio(voice.preview_url)
+      audioRef.current = audio
+      setIsPlayingVoice(voice.voice_id)
+
+      audio.onended = () => {
+        setIsPlayingVoice(null)
+        audioRef.current = null
+      }
+
+      audio.onerror = () => {
+        toast.error("Failed to play voice preview")
+        setIsPlayingVoice(null)
+        audioRef.current = null
+      }
+
+      audio.play()
+    }
+  }
+
   const getStepContent = () => {
     const stepConfigs = [
       {
-        icon: Bot,
-        title: "Let's create your AI agent",
-        subtitle: "First, give your agent a memorable name",
-        description: "This will be how customers know your AI assistant. Choose something friendly and professional.",
-        gradient: "from-blue-500 to-purple-600",
+        icon: Phone,
+        title: "Connect phone system",
+        subtitle: "Step 1 of 6",
+        description: "Connect your phone system to enable calling capabilities for your AI agent.",
+        gradient: "from-blue-500 to-cyan-600",
         color: "#00FFFF",
       },
       {
-        icon: Settings,
-        title: "What industry are you in?",
-        subtitle: "Help us customize your agent's expertise",
-        description: "We'll pre-load industry-specific knowledge and conversation patterns.",
-        gradient: "from-green-500 to-blue-600",
+        icon: Hash,
+        title: "Choose a number",
+        subtitle: "Step 2 of 6",
+        description: "Select a phone number for your AI agent to use for making and receiving calls.",
+        gradient: "from-green-500 to-emerald-600",
         color: "#00FF00",
       },
       {
-        icon: MessageSquare,
-        title: "What's your agent's main purpose?",
-        subtitle: "Define your agent's primary mission",
-        description: "Be specific about what you want your agent to accomplish in conversations.",
+        icon: Mic,
+        title: "Connect ElevenLabs",
+        subtitle: "Step 3 of 6",
+        description: "Connect your ElevenLabs account to enable high-quality voice generation.",
         gradient: "from-purple-500 to-pink-600",
         color: "#FF00FF",
       },
       {
-        icon: Mic,
-        title: "Choose the perfect voice",
-        subtitle: "Your agent's voice sets the tone",
-        description: "Listen to samples and pick the voice that matches your brand personality.",
+        icon: CreditCard,
+        title: "Check billing",
+        subtitle: "Step 4 of 6",
+        description: "Verify your billing information and payment method to ensure uninterrupted service.",
         gradient: "from-orange-500 to-red-600",
         color: "#FFFF00",
       },
-      // NEW STEPS
       {
-        icon: Phone,
-        title: "Connect your Twilio account",
-        subtitle: "Configure calling capabilities with Twilio",
-        description: "Enter your Twilio credentials to enable calling and SMS for your agent.",
-        gradient: "from-green-500 to-cyan-600",
-        color: "#00FF00",
-      },
-      {
-        icon: Database,
-        title: "Train your agent",
-        subtitle: "Upload knowledge and training data",
-        description: "Give your agent the information it needs to help your customers effectively.",
-        gradient: "from-purple-500 to-blue-600",
+        icon: Bot,
+        title: "Create agent",
+        subtitle: "Step 5 of 6",
+        description: "Configure your AI agent with a name, purpose, voice, and personality.",
+        gradient: "from-indigo-500 to-purple-600",
         color: "#8A2BE2",
       },
       {
-        icon: Sparkles,
-        title: "Final touches",
-        subtitle: "Add personality and greeting",
-        description: "Make your agent uniquely yours with custom personality traits and greetings.",
-        gradient: "from-pink-500 to-purple-600",
+        icon: Plug,
+        title: "Connect tools",
+        subtitle: "Step 6 of 6",
+        description: "Connect external tools and integrations to extend your agent's capabilities.",
+        gradient: "from-pink-500 to-rose-600",
         color: "#FF0080",
       },
     ]
@@ -405,30 +685,130 @@ export default function Wizard({ onComplete }: WizardProps) {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <Label
-                htmlFor="agentName"
-                className={clsx("text-lg", theme.textPrimary)}
-                style={{ textShadow: theme.textShadow }}
-              >
-                Agent Name
-              </Label>
-              <Input
-                id="agentName"
-                placeholder="e.g., Sarah, Alex, or CustomerBot"
-                value={formData.agentName}
-                onChange={(e) => updateFormData("agentName", e.target.value)}
-                className={clsx(
-                  "text-xl h-14 border-2",
-                  theme.inputBg,
-                  theme.inputText,
-                  theme.inputPlaceholder
-                )}
-                style={{
-                  border: `2px solid ${theme.inputBorder}`,
-                  boxShadow: theme.inputShadow,
-                }}
-              />
+            <div className="space-y-6">
+              {formData.phoneSetup.option === "twilio" && (
+                <div className="space-y-4">
+                  <div>
+                    <Label
+                      className={clsx(
+                        "text-sm mb-2 block",
+                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                      )}
+                    >
+                      Region
+                    </Label>
+                    <select
+                      value={formData.phoneSetup.twilioRegion}
+                      onChange={(e) =>
+                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioRegion: e.target.value })
+                      }
+                      className={clsx(
+                        "w-full p-3 rounded-lg border-2",
+                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                        theme.inputBg, theme.inputText
+                      )}
+                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                    >
+                      <option value="us-west">US West</option>
+                      <option value="us-east">US East</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label
+                      className={clsx(
+                        "text-sm mb-2 block",
+                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                      )}
+                    >
+                      Country
+                    </Label>
+                    <select
+                      value={formData.phoneSetup.twilioCountry}
+                      onChange={(e) =>
+                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioCountry: e.target.value })
+                      }
+                      className={clsx(
+                        "w-full p-3 rounded-lg border-2",
+                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                        theme.inputBg, theme.inputText
+                      )}
+                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                    >
+                      {countryPhoneOptions.map((country, index) => (
+                        <option key={index} value={country.value}>{country.value}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label
+                      className={clsx(
+                        "text-sm mb-2 block",
+                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                      )}
+                    >
+                      Twilio Account SID
+                    </Label>
+                    <Input
+                      value={formData.phoneSetup.twilioSid}
+                      onChange={(e) =>
+                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioSid: e.target.value })
+                      }
+                      placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      className={clsx(
+                        "border-2",
+                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                        theme.inputBg, theme.inputText
+                      )}
+                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      className={clsx(
+                        "text-sm mb-2 block",
+                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                      )}
+                    >
+                      Twilio API Key
+                    </Label>
+                    <Input
+                      value={formData.phoneSetup.twilioApiKey}
+                      onChange={(e) =>
+                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioApiKey: e.target.value })
+                      }
+                      className={clsx(
+                        "border-2",
+                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                        theme.inputBg, theme.inputText
+                      )}
+                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      className={clsx(
+                        "text-sm mb-2 block",
+                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                      )}
+                    >
+                      Twilio API Secret
+                    </Label>
+                    <Input
+                      type="password"
+                      value={formData.phoneSetup.twilioSecret}
+                      onChange={(e) =>
+                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioSecret: e.target.value })
+                      }
+                      className={clsx(
+                        "border-2",
+                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                        theme.inputBg, theme.inputText
+                      )}
+                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )
@@ -465,46 +845,33 @@ export default function Wizard({ onComplete }: WizardProps) {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {industries.map((industry) => {
-                const isSelected = formData.industry === industry.id;
-
-                return (
-                  <Card
-                    key={industry.id}
-                    className={clsx(
-                      "cursor-pointer transition-all duration-300 hover:scale-105",
-                      isSelected
-                        ? isDarkMode
-                          ? "bg-green-500/20 border-green-400"
-                          : "bg-emerald-100 border-emerald-400"
-                        : isDarkMode
-                          ? "bg-black/50 border-gray-600 hover:border-green-400"
-                          : "bg-white/70 border-gray-300 hover:border-emerald-400"
-                    )}
-                    style={{
-                      boxShadow: isSelected
-                        ? isDarkMode
-                          ? "0 0 30px #00FF00"
-                          : "0 0 30px rgba(16,185,129,0.5)"
-                        : isDarkMode
-                          ? "0 0 10px rgba(0, 255, 0, 0.3)"
-                          : "0 0 10px rgba(16,185,129,0.2)",
-                    }}
-                    onClick={() => updateFormData("industry", industry.id)}
-                  >
-                    <CardContent className="p-4 text-center">
-                      <div className="text-3xl mb-2">{industry.icon}</div>
-                      <h3 className={clsx("font-semibold mb-1", theme.textPrimary)}>
-                        {industry.name}
-                      </h3>
-                      <p className={clsx("text-xs", theme.textTertiary)}>
-                        {industry.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+            <div className="space-y-4">
+              <Label
+                htmlFor="phoneNumber"
+                className={clsx("text-lg", theme.textPrimary)}
+                style={{ textShadow: theme.textShadow }}
+              >
+                Phone Number
+              </Label>
+              <Input
+                id="phoneNumber"
+                placeholder="+12345678990"
+                value={formData.selectedPhoneNumber}
+                onChange={(e) => updateFormData("selectedPhoneNumber", e.target.value)}
+                className={clsx(
+                  "text-xl h-14 border-2",
+                  theme.inputBg,
+                  theme.inputText,
+                  theme.inputPlaceholder
+                )}
+                style={{
+                  border: `2px solid ${theme.inputBorder}`,
+                  boxShadow: theme.inputShadow,
+                }}
+              />
+              <p className={clsx("text-sm", theme.textTertiary)}>
+                Enter the phone number you want to use for your AI agent.
+              </p>
             </div>
           </div>
         )
@@ -541,35 +908,193 @@ export default function Wizard({ onComplete }: WizardProps) {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <Label
-                htmlFor="purpose"
-                className={clsx("text-lg", theme.textPrimary)}
-                style={{ textShadow: theme.textShadow }}
-              >
-                Primary Purpose
-              </Label>
-              <Textarea
-                id="purpose"
-                placeholder="e.g., Answer questions about our products, schedule appointments, qualify leads, provide customer support..."
-                value={formData.purpose}
-                onChange={(e) => updateFormData("purpose", e.target.value)}
-                className={clsx(
-                  "min-h-[120px] text-lg border-2",
-                  theme.inputBg,
-                  theme.inputText,
-                  theme.inputPlaceholder
-                )}
-                style={{
-                  border: `2px solid ${theme.inputBorder}`,
-                  boxShadow: theme.inputShadow,
-                }}
-              />
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <Label
+                  htmlFor="elevenlabsKey"
+                  className={clsx("text-lg", theme.textPrimary)}
+                  style={{ textShadow: theme.textShadow }}
+                >
+                  ElevenLabs API Key
+                </Label>
+                <div className="flex gap-3">
+                  <Input
+                    id="elevenlabsKey"
+                    type="password"
+                    placeholder="Enter your ElevenLabs API key"
+                    value={formData.elevenlabsApiKey}
+                    onChange={(e) => updateFormData("elevenlabsApiKey", e.target.value)}
+                    className={clsx(
+                      "text-xl h-14 border-2 flex-1",
+                      theme.inputBg,
+                      theme.inputText,
+                      theme.inputPlaceholder
+                    )}
+                    style={{
+                      border: `2px solid ${theme.inputBorder}`,
+                      boxShadow: theme.inputShadow,
+                    }}
+                  />
+                  <Button
+                    onClick={testElevenLabsConnection}
+                    disabled={!formData.elevenlabsApiKey.trim() || isTestingConnection}
+                    className="h-14 px-8 text-lg text-white border-0 transition-all duration-200 disabled:opacity-50"
+                    style={{
+                      background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
+                      boxShadow: "0 0 30px #FF00FF, 0 0 60px #00FFFF",
+                    }}
+                  >
+                    {isTestingConnection ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Testing...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5 mr-2" />
+                        Test Connection
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <p className={clsx("text-sm", theme.textTertiary)}>
+                  You can find your API key in your ElevenLabs account settings.
+                </p>
+              </div>
+
+              {/* Loading spark animation */}
+              {isTestingConnection && (
+                <div className="relative h-32 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles className="w-12 h-12 animate-pulse" style={{ color: stepConfig.color }} />
+                  </div>
+                  <div className="absolute inset-0">
+                    {Array.from({ length: 20 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="absolute w-1 h-1 rounded-full animate-ping"
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          backgroundColor: stepConfig.color,
+                          animationDelay: `${Math.random() * 2}s`,
+                          animationDuration: `${1 + Math.random()}s`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <p className={clsx("text-lg font-semibold relative z-10", theme.textSecondary)}>
+                    Fetching available voices...
+                  </p>
+                </div>
+              )}
+
+              {/* Voices list */}
+              {elevenlabsVoices.length > 0 && (
+                <div className="space-y-4">
+                  <Label className={clsx("text-lg", theme.textPrimary)}>
+                    Select a Voice
+                  </Label>
+                  <div className="grid gap-3 max-h-96 overflow-y-auto">
+                    {elevenlabsVoices.map((voice) => {
+                      const isSelected = formData.voice === voice.voice_id
+                      const isPlaying = isPlayingVoice === voice.voice_id
+
+                      return (
+                        <Card
+                          key={voice.voice_id}
+                          className={clsx(
+                            "cursor-pointer transition-all duration-300",
+                            isSelected
+                              ? isDarkMode
+                                ? "bg-purple-500/20 border-purple-400"
+                                : "bg-purple-100 border-purple-400"
+                              : isDarkMode
+                                ? "bg-black/50 border-gray-600 hover:border-purple-400"
+                                : "bg-white/70 border-gray-300 hover:border-purple-400"
+                          )}
+                          style={{
+                            boxShadow: isSelected
+                              ? isDarkMode
+                                ? "0 0 30px #FF00FF"
+                                : "0 0 30px rgba(147,51,234,0.5)"
+                              : isDarkMode
+                                ? "0 0 10px rgba(255, 0, 255, 0.3)"
+                                : "0 0 10px rgba(147,51,234,0.2)",
+                          }}
+                          onClick={() => updateFormData("voice", voice.voice_id)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 flex-1">
+                                <Volume2
+                                  className={clsx(
+                                    "w-6 h-6",
+                                    isDarkMode ? 'text-purple-400' : 'text-purple-600'
+                                  )}
+                                />
+                                <div className="flex-1">
+                                  <h3 className={clsx("font-bold text-lg", theme.textPrimary)}>
+                                    {voice.name}
+                                  </h3>
+                                  {voice.category && (
+                                    <p className={clsx("text-sm", theme.textTertiary)}>
+                                      {voice.category}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                              {voice.preview_url && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    playVoicePreview(voice)
+                                  }}
+                                  className={clsx(
+                                    "ml-4",
+                                    isDarkMode
+                                      ? 'border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black'
+                                      : 'border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white'
+                                  )}
+                                  style={{
+                                    boxShadow: isDarkMode
+                                      ? "0 0 15px #FF00FF"
+                                      : "0 0 15px rgba(147,51,234,0.4)",
+                                  }}
+                                >
+                                  {isPlaying ? (
+                                    <>
+                                      <Pause className="w-4 h-4 mr-2" />
+                                      Playing
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Play className="w-4 h-4 mr-2" />
+                                      Preview
+                                    </>
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )
 
       case 4:
+        const availableCredit = ((currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)) / 100
+        const creditInCents = (currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)
+        const needsPaymentMethod = creditInCents < 100 && paymentMethods.length === 0
+        const showPaymentMethods = creditInCents < 100 && paymentMethods.length > 0
+
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
@@ -601,122 +1126,265 @@ export default function Wizard({ onComplete }: WizardProps) {
               </p>
             </div>
 
-            <div className="grid gap-4">
-              {voices.map((voice) => {
-                const isSelected = formData.voice === voice.id;
+            <div className="space-y-6">
+              {/* Credit Balance Card */}
+              <Card
+                className={clsx(
+                  "transition-all duration-300",
+                  isDarkMode ? "bg-black/50 border-gray-600" : "bg-white/70 border-gray-300"
+                )}
+                style={{
+                  boxShadow: isDarkMode
+                    ? "0 0 10px rgba(255, 255, 0, 0.3)"
+                    : "0 0 10px rgba(245,158,11,0.2)",
+                }}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className={clsx("font-bold text-lg mb-1", theme.textPrimary)}>
+                        Available Credit
+                      </h3>
+                      <p className={clsx("text-3xl font-bold", creditInCents < 100 ? "text-red-500" : "text-green-500")}>
+                        ${availableCredit.toFixed(2)}
+                      </p>
+                    </div>
+                    <CreditCard className={clsx("w-12 h-12", isDarkMode ? "text-orange-400" : "text-orange-600")} />
+                  </div>
+                  {creditInCents < 100 && (
+                    <div className={clsx(
+                      "p-3 rounded-lg",
+                      isDarkMode ? "bg-red-500/20 border border-red-500/50" : "bg-red-50 border border-red-200"
+                    )}>
+                      <p className={clsx("text-sm", isDarkMode ? "text-red-300" : "text-red-700")}>
+                        ⚠️ Your credit is below $1.00. Please add a payment method to continue.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-                return (
-                  <Card
-                    key={voice.id}
-                    className={clsx(
-                      "cursor-pointer transition-all duration-300 hover:scale-102",
-                      isSelected
-                        ? isDarkMode
-                          ? "bg-yellow-500/20 border-yellow-400"
-                          : "bg-amber-100 border-amber-400"
-                        : isDarkMode
-                          ? "bg-black/50 border-gray-600 hover:border-yellow-400"
-                          : "bg-white/70 border-gray-300 hover:border-amber-400"
-                    )}
-                    style={{
-                      boxShadow: isSelected
-                        ? isDarkMode
-                          ? "0 0 30px #FFFF00"
-                          : "0 0 30px rgba(245,158,11,0.5)"
-                        : isDarkMode
-                          ? "0 0 10px rgba(255, 255, 0, 0.3)"
-                          : "0 0 10px rgba(245,158,11,0.2)",
-                    }}
-                    onClick={() => updateFormData("voice", voice.id)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4">
-                            <Volume2
-                              className={clsx(
-                                "w-6 h-6",
-                                isDarkMode ? 'text-yellow-400' : 'text-amber-600'
-                              )}
-                            />
-                            <div>
-                              <h3 className={clsx("font-bold text-xl", theme.textPrimary)}>
-                                {voice.name}
-                              </h3>
-                              <p className={clsx("mb-1", theme.textTertiary)}>
-                                {voice.description}
-                              </p>
-                              <div className="flex gap-2">
-                                <Badge
-                                  variant="outline"
-                                  className={clsx(
-                                    isDarkMode
-                                      ? 'border-yellow-400 text-yellow-400'
-                                      : 'border-amber-500 text-amber-600'
+              {/* Payment Methods Section - Show if credit < $1 */}
+              {showPaymentMethods && (
+                <Card
+                  className={clsx(
+                    "transition-all duration-300",
+                    isDarkMode ? "bg-black/50 border-gray-600" : "bg-white/70 border-gray-300"
+                  )}
+                  style={{
+                    boxShadow: isDarkMode
+                      ? "0 0 10px rgba(255, 255, 0, 0.3)"
+                      : "0 0 10px rgba(245,158,11,0.2)",
+                  }}
+                >
+                  <CardContent className="p-6">
+                    <h3 className={clsx("font-bold text-lg mb-4", theme.textPrimary)}>
+                      Your Payment Methods
+                    </h3>
+                    {isLoadingPaymentMethods ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin" style={{ color: stepConfig.color }} />
+                      </div>
+                    ) : paymentMethods.length > 0 ? (
+                      <div className="space-y-3">
+                        {paymentMethods.map((method) => (
+                          <div
+                            key={method.id}
+                            className={clsx(
+                              "p-4 rounded-lg border-2 flex items-center justify-between",
+                              method.is_default
+                                ? isDarkMode
+                                  ? "bg-orange-500/20 border-orange-400"
+                                  : "bg-orange-100 border-orange-400"
+                                : isDarkMode
+                                  ? "bg-black/30 border-gray-600"
+                                  : "bg-gray-50 border-gray-300"
+                            )}
+                          >
+                            <div className="flex items-center gap-3">
+                              <CreditCard className={clsx("w-5 h-5", isDarkMode ? "text-gray-400" : "text-gray-600")} />
+                              <div>
+                                <p className={clsx("font-semibold", theme.textPrimary)}>
+                                  {method.card.brand.toUpperCase()} •••• {method.card.last4}
+                                </p>
+                                <p className={clsx("text-sm", theme.textTertiary)}>
+                                  Expires {method.card.exp_month}/{method.card.exp_year}
+                                  {method.is_default && (
+                                    <span className={clsx("ml-2 px-2 py-0.5 rounded text-xs", isDarkMode ? "bg-orange-500/30 text-orange-300" : "bg-orange-200 text-orange-700")}>
+                                      Default
+                                    </span>
                                   )}
-                                >
-                                  {voice.accent}
-                                </Badge>
-                                <Badge
-                                  variant="outline"
-                                  className={clsx(
-                                    isDarkMode
-                                      ? 'border-purple-400 text-purple-400'
-                                      : 'border-violet-500 text-violet-600'
-                                  )}
-                                >
-                                  {voice.personality}
-                                </Badge>
+                                </p>
                               </div>
                             </div>
                           </div>
-                        </div>
-
-                        {!!voice.preview_url && (
-                          <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              playVoiceSample(voice)
-                            }}
-                            className={clsx(
-                              "ml-4",
-                              isDarkMode
-                                ? 'border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'
-                                : 'border-amber-500 text-amber-600 hover:bg-amber-500 hover:text-white'
-                            )}
-                            style={{
-                              boxShadow: isDarkMode
-                                ? "0 0 15px #FFFF00"
-                                : "0 0 15px rgba(245,158,11,0.4)",
-                            }}
-                          >
-                            {isPlaying === voice.id ? (
-                              <>
-                                <Pause className="w-5 h-5 mr-2" />
-                                Playing...
-                              </>
-                            ) : (
-                              <>
-                                <Play className="w-5 h-5 mr-2" />
-                                Preview
-                              </>
-                            )}
-                          </Button>
-                        )}
+                        ))}
                       </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
+                    ) : (
+                      <p className={clsx("text-sm text-center py-4", theme.textTertiary)}>
+                        No payment methods found.
+                      </p>
+                    )}
+                    <div className="mt-4 pt-4 border-t" style={{ borderColor: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" }}>
+                      <Button
+                        onClick={() => setShowPaymentForm(true)}
+                        variant="outline"
+                        className={clsx(
+                          "w-full border-2",
+                          isDarkMode
+                            ? "text-white border-cyan-400 bg-black/50 hover:bg-cyan-500/20 hover:border-cyan-300"
+                            : "text-gray-900 border-cyan-600 bg-white hover:bg-cyan-50 hover:border-cyan-500"
+                        )}
+                        style={{
+                          boxShadow: isDarkMode
+                            ? "0 0 10px rgba(0, 255, 255, 0.3)"
+                            : "0 0 10px rgba(14,165,233,0.2)",
+                        }}
+                      >
+                        <CreditCard className="w-4 h-4 mr-2" />
+                        Add Payment Method
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
-            <audio
-              ref={audioRef}
-              onEnded={() => setIsPlaying(null)}
-              className="hidden"
-            />
+              {/* Payment Form Card */}
+              {showPaymentForm && (
+                <Card
+                  className={clsx(
+                    "transition-all duration-300",
+                    isDarkMode ? "bg-black/50 border-gray-600" : "bg-white/70 border-gray-300"
+                  )}
+                  style={{
+                    boxShadow: isDarkMode
+                      ? "0 0 10px rgba(255, 255, 0, 0.3)"
+                      : "0 0 10px rgba(245,158,11,0.2)",
+                  }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className={clsx("font-bold text-lg", theme.textPrimary)}>
+                        Add Payment Method
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowPaymentForm(false)}
+                        className={clsx(
+                          isDarkMode ? "text-gray-400 hover:text-white" : "text-gray-600 hover:text-gray-900"
+                        )}
+                      >
+                        ×
+                      </Button>
+                    </div>
+                    {showPaymentForm && (
+                      <Elements stripe={stripePromise}>
+                        <PaymentForm
+                          isDarkMode={isDarkMode}
+                          onClose={() => setShowPaymentForm(false)}
+                          onSuccess={fetchPaymentMethods}
+                        />
+                      </Elements>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Require Payment Method Message */}
+              {needsPaymentMethod && !showPaymentForm && (
+                <Card
+                  className={clsx(
+                    "transition-all duration-300 border-2",
+                    isDarkMode ? "bg-red-500/20 border-red-400" : "bg-red-50 border-red-400"
+                  )}
+                  style={{
+                    boxShadow: isDarkMode
+                      ? "0 0 20px rgba(239, 68, 68, 0.5)"
+                      : "0 0 20px rgba(239, 68, 68, 0.3)",
+                  }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className={clsx("w-12 h-12 rounded-full flex items-center justify-center", isDarkMode ? "bg-red-500/30" : "bg-red-100")}>
+                        <CreditCard className={clsx("w-6 h-6", isDarkMode ? "text-red-400" : "text-red-600")} />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className={clsx("font-bold text-lg mb-1", isDarkMode ? "text-red-300" : "text-red-700")}>
+                          Payment Method Required
+                        </h3>
+                        <p className={clsx("text-sm mb-4", isDarkMode ? "text-red-300" : "text-red-700")}>
+                          Your credit is below $1.00 and you don't have a payment method. Please add a payment method to continue.
+                        </p>
+                        <Button
+                          onClick={() => setShowPaymentForm(true)}
+                          className={clsx(
+                            "text-white border-0",
+                            isDarkMode
+                              ? "bg-red-500 hover:bg-red-600"
+                              : "bg-red-600 hover:bg-red-700"
+                          )}
+                        >
+                          <CreditCard className="w-4 h-4 mr-2" />
+                          Add Payment Method
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Billing Confirmation Card - Only show if credit >= $1 or payment method exists */}
+              {!needsPaymentMethod && (
+                <Card
+                  className={clsx(
+                    "cursor-pointer transition-all duration-300",
+                    formData.billingConfirmed
+                      ? isDarkMode
+                        ? "bg-orange-500/20 border-orange-400"
+                        : "bg-orange-100 border-orange-400"
+                      : isDarkMode
+                        ? "bg-black/50 border-gray-600 hover:border-orange-400"
+                        : "bg-white/70 border-gray-300 hover:border-orange-400"
+                  )}
+                  style={{
+                    boxShadow: formData.billingConfirmed
+                      ? isDarkMode
+                        ? "0 0 30px #FFFF00"
+                        : "0 0 30px rgba(245,158,11,0.5)"
+                      : isDarkMode
+                        ? "0 0 10px rgba(255, 255, 0, 0.3)"
+                        : "0 0 10px rgba(245,158,11,0.2)",
+                  }}
+                  onClick={() => updateFormData("billingConfirmed", !formData.billingConfirmed)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <CheckCircle2
+                        className={clsx(
+                          "w-8 h-8",
+                          formData.billingConfirmed
+                            ? isDarkMode ? 'text-orange-400' : 'text-orange-600'
+                            : isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                        )}
+                      />
+                      <div className="flex-1">
+                        <h3 className={clsx("font-bold text-lg mb-1", theme.textPrimary)}>
+                          I have verified my billing information
+                        </h3>
+                        <p className={clsx("text-sm", theme.textTertiary)}>
+                          {creditInCents >= 100
+                            ? "You have sufficient credit to continue."
+                            : paymentMethods.length > 0
+                              ? "Your payment method is set up and ready."
+                              : "Make sure you have a valid payment method set up to ensure uninterrupted service."}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
         )
 
@@ -742,248 +1410,8 @@ export default function Wizard({ onComplete }: WizardProps) {
                 {stepConfig.title}
               </h2>
               <p
-                className={clsx(
-                  "text-xl",
-                  isDarkMode ? "text-green-300" : "text-green-600",
-                )}
-                style={{ textShadow: "0 0 10px #00FF00" }}
-              >
-                {stepConfig.subtitle}
-              </p>
-              <p className={clsx("max-w-md mx-auto", theme.textTertiary)}>
-                {stepConfig.description}
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              {/* <div>
-                <label
-                  className={clsx(
-                    "block text-lg mb-4 font-medium",
-                    isDarkMode ? "text-green-300" : "text-green-600"
-                  )}
-                >
-                  Choose your setup:
-                </label>
-                <div className="space-y-4">
-                  <div
-                    className={clsx(
-                      "p-6 border-2 rounded-lg cursor-pointer transition-all duration-300",
-                      formData.phoneSetup.option === "purchase"
-                        ? "border-green-400 bg-green-500/10"
-                        : "border-gray-600 hover:border-green-400"
-                    )}
-                    style={{
-                      boxShadow: formData.phoneSetup.option === "purchase" ? "0 0 20px rgba(0, 255, 0, 0.3)" : "none",
-                    }}
-                    onClick={() => updateFormData("phoneSetup", { ...formData.phoneSetup, option: "purchase" })}
-                  >
-                    <h3 className={clsx("font-bold text-lg mb-2", theme.textPrimary)}>
-                      🚀 Purchase New Number
-                    </h3>
-                    <p className={theme.textTertiary}>
-                      Purchase a new number after setup (~$3/month)
-                    </p>
-                  </div>
-                  <div
-                    className={clsx(
-                      "p-6 border-2 rounded-lg cursor-pointer transition-all duration-300",
-                      formData.phoneSetup.option === "twilio"
-                        ? "border-green-400 bg-green-500/10"
-                        : "border-gray-600 hover:border-green-400"
-                    )}
-                    style={{
-                      boxShadow: formData.phoneSetup.option === "twilio" ? "0 0 20px rgba(0, 255, 0, 0.3)" : "none",
-                    }}
-                    onClick={() => updateFormData("phoneSetup", { ...formData.phoneSetup, option: "twilio" })}
-                  >
-                    <h3 className={clsx("font-bold text-lg mb-2", theme.textPrimary)}>
-                      📱 Import from Twilio
-                    </h3>
-                    <p className={theme.textTertiary}>
-                      Connect your existing Twilio account and numbers
-                    </p>
-                  </div>
-                </div>
-              </div> */}
-
-              {formData.phoneSetup.option === "twilio" && (
-                <div className="space-y-4">
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-green-300" : "text-green-600"
-                      )}
-                    >
-                      Region
-                    </Label>
-                    <select
-                      value={formData.phoneSetup.twilioRegion}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioRegion: e.target.value })
-                      }
-                      className={clsx(
-                        "w-full p-3 rounded-lg",
-                        isDarkMode ? "border-green-400" : "border-green-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 0, ${isDarkMode ? 0.3 : 0.7})` }}
-                    >
-                      <option value="us-west">US West</option>
-                      <option value="us-east">US East</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-green-300" : "text-green-600"
-                      )}
-                    >
-                      Country
-                    </Label>
-                    <select
-                      value={formData.phoneSetup.twilioCountry}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioCountry: e.target.value })
-                      }
-                      className={clsx(
-                        "w-full p-3 rounded-lg",
-                        isDarkMode ? "border-green-400" : "border-green-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 0, ${isDarkMode ? 0.3 : 0.7})` }}
-                    >
-                      {countryPhoneOptions.map((country, index) => (
-                        <option key={index} value={country.value}>{country.value}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-green-300" : "text-green-600"
-                      )}
-                    >
-                      Phone Number
-                    </Label>
-                    <Input
-                      value={formData.phoneSetup.twilioPhoneNumber}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioPhoneNumber: e.target.value })
-                      }
-                      placeholder="+12345678990"
-                      className={clsx(
-                        "border-2",
-                        isDarkMode ? "border-green-400" : "border-green-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 0, ${isDarkMode ? 0.3 : 0.7})` }}
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-green-300" : "text-green-600"
-                      )}
-                    >
-                      Twilio API Key
-                    </Label>
-                    <Input
-                      value={formData.phoneSetup.twilioApiKey}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioApiKey: e.target.value })
-                      }
-                      className={clsx(
-                        "border-2",
-                        isDarkMode ? "border-green-400" : "border-green-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 0, ${isDarkMode ? 0.3 : 0.7})` }}
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-green-300" : "text-green-600"
-                      )}
-                    >
-                      Twilio Account SID
-                    </Label>
-                    <Input
-                      value={formData.phoneSetup.twilioSid}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioSid: e.target.value })
-                      }
-                      placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      className={clsx(
-                        "border-2",
-                        isDarkMode ? "border-green-400" : "border-green-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 0, ${isDarkMode ? 0.3 : 0.7})` }}
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-green-300" : "text-green-600"
-                      )}
-                    >
-                      Twilio API Secret
-                    </Label>
-                    <Input
-                      type="password"
-                      value={formData.phoneSetup.twilioSecret}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioSecret: e.target.value })
-                      }
-                      className={clsx(
-                        "border-2",
-                        isDarkMode ? "border-green-400" : "border-green-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 0, ${isDarkMode ? 0.3 : 0.7})` }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )
-
-      case 6:
-        return (
-          <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <div
-                className={clsx(
-                  "w-20 h-20 bg-gradient-to-r rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse",
-                  stepConfig.gradient
-                )}
-                style={{
-                  boxShadow: `0 0 30px ${stepConfig.color}, 0 0 60px ${stepConfig.color}`,
-                }}
-              >
-                <stepConfig.icon className="w-10 h-10 text-white" />
-              </div>
-              <h2
-                className={clsx("text-3xl font-bold", theme.textPrimary)}
-                style={{ textShadow: isDarkMode ? `0 0 20px ${stepConfig.color}` : 'none' }}
-              >
-                {stepConfig.title}
-              </h2>
-              <p
-                className={clsx(
-                  "text-xl",
-                  isDarkMode ? "text-purple-300" : "text-purple-600",
-                )}
-                style={{ textShadow: isDarkMode ? "0 0 10px #8A2BE2" : 'none' }}
+                className={clsx("text-xl", theme.textSecondary)}
+                style={{ textShadow: isDarkMode ? `0 0 10px ${stepConfig.color}` : 'none' }}
               >
                 {stepConfig.subtitle}
               </p>
@@ -994,90 +1422,102 @@ export default function Wizard({ onComplete }: WizardProps) {
 
             <div className="space-y-6">
               <div>
-                <Label
-                  className={clsx(
-                    "text-lg mb-3 block",
-                    isDarkMode ? "text-purple-300" : "text-purple-600"
-                  )}
-                  style={{ textShadow: isDarkMode ? "0 0 10px #8A2BE2" : "none" }}
-                >
-                  Upload Training Documents
+                <Label htmlFor="agentName" className={clsx("text-lg", theme.textPrimary)}>
+                  Agent Name
                 </Label>
-                <div
-                  className="border-2 border-dashed border-purple-400 rounded-lg p-8 text-center hover:border-purple-300 transition-colors cursor-pointer select-none"
-                  onClick={() => fileInputRef.current?.click()}
-                  style={{ boxShadow: "0 0 20px rgba(138, 43, 226, 0.3)" }}
-                >
-                  <Database className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                  <p
+                <Input
+                  id="agentName"
+                  placeholder="e.g., Sarah, Alex, or CustomerBot"
+                  value={formData.agentName}
+                  onChange={(e) => updateFormData("agentName", e.target.value)}
+                  className={clsx("h-12 border-2", theme.inputBg, theme.inputText, theme.inputPlaceholder)}
+                  style={{ border: `2px solid ${theme.inputBorder}`, boxShadow: theme.inputShadow }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="purpose" className={clsx("text-lg", theme.textPrimary)}>
+                  Agent Purpose
+                </Label>
+                <Textarea
+                  id="purpose"
+                  placeholder="e.g., Answer questions about our products, schedule appointments, qualify leads..."
+                  value={formData.purpose}
+                  onChange={(e) => updateFormData("purpose", e.target.value)}
+                  className={clsx("min-h-[100px] border-2", theme.inputBg, theme.inputText, theme.inputPlaceholder)}
+                  style={{ border: `2px solid ${theme.inputBorder}`, boxShadow: theme.inputShadow }}
+                />
+              </div>
+              {/* Only show voice selection if no voice was selected in step 3 */}
+              {!formData.voice && (
+                <div>
+                  <Label htmlFor="voice" className={clsx("text-lg mb-3 block", theme.textPrimary)}>
+                    Voice (optional)
+                  </Label>
+                  <div className="grid gap-3">
+                    {voices.slice(0, 3).map((voice) => {
+                      const isSelected = formData.voice === voice.id;
+                      return (
+                        <Card
+                          key={voice.id}
+                          className={clsx(
+                            "cursor-pointer transition-all duration-300",
+                            isSelected
+                              ? isDarkMode ? "bg-indigo-500/20 border-indigo-400" : "bg-indigo-100 border-indigo-400"
+                              : isDarkMode ? "bg-black/50 border-gray-600" : "bg-white/70 border-gray-300"
+                          )}
+                          onClick={() => updateFormData("voice", voice.id)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                              <Volume2 className={clsx("w-5 h-5", isDarkMode ? 'text-indigo-400' : 'text-indigo-600')} />
+                              <div className="flex-1">
+                                <h3 className={clsx("font-semibold", theme.textPrimary)}>{voice.name}</h3>
+                                <p className={clsx("text-sm", theme.textTertiary)}>{voice.accent}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Show selected voice info if voice was selected in step 3 */}
+              {formData.voice && (
+                <div>
+                  <Label className={clsx("text-lg mb-3 block", theme.textPrimary)}>
+                    Selected Voice
+                  </Label>
+                  <Card
                     className={clsx(
-                      "font-semibold mb-2",
-                      isDarkMode ? "text-white" : "text-purple-600"
+                      "transition-all duration-300",
+                      isDarkMode ? "bg-indigo-500/20 border-indigo-400" : "bg-indigo-100 border-indigo-400"
                     )}
                   >
-                    Drop files here or click to upload
-                  </p>
-                  <p className={clsx("text-sm", theme.textTertiary)}>
-                    PDF, DOC, TXT files up to 10MB each
-                  </p>
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.txt"
-                    className="hidden"
-                    ref={fileInputRef}
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || [])
-                      updateFormData("knowledgeBase", { ...formData.knowledgeBase, files })
-                    }}
-                  />
-                </div>
-                {formData.knowledgeBase.files.length > 0 && (
-                  <div className="mt-4">
-                    <p
-                      className={clsx(
-                        "text-sm mb-2",
-                        isDarkMode ? "text-purple-300" : "text-purple-600"
-                      )}
-                    >
-                      Uploaded files:
-                    </p>
-                    <div className="space-y-2">
-                      {formData.knowledgeBase.files.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between bg-purple-500/10 p-2 rounded border border-purple-400/30"
-                        >
-                          <span
-                            className={clsx(
-                              "text-sm",
-                              isDarkMode ? "text-white" : "text-purple-500"
-                            )}
-                          >
-                            {file.name}
-                          </span>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              const newFiles = formData.knowledgeBase.files.filter((_, i) => i !== index)
-                              updateFormData("knowledgeBase", { ...formData.knowledgeBase, files: newFiles })
-                            }}
-                            className="text-red-400 hover:text-red-300"
-                          >
-                            Remove
-                          </Button>
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Volume2 className={clsx("w-5 h-5", isDarkMode ? 'text-indigo-400' : 'text-indigo-600')} />
+                        <div className="flex-1">
+                          <h3 className={clsx("font-semibold", theme.textPrimary)}>
+                            {elevenlabsVoices.find(v => v.voice_id === formData.voice)?.name ||
+                              voices.find(v => v.id === formData.voice)?.name ||
+                              'Selected Voice'}
+                          </h3>
+                          <p className={clsx("text-sm", theme.textTertiary)}>
+                            Voice selected from ElevenLabs
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </div>
           </div>
         )
 
-      case 7:
+      case 6:
         // This becomes the final step (personality/greeting)
         return (
           <div className="space-y-8">
@@ -1100,11 +1540,8 @@ export default function Wizard({ onComplete }: WizardProps) {
                 {stepConfig.title}
               </h2>
               <p
-                className={clsx(
-                  "text-xl",
-                  isDarkMode ? "text-pink-300" : "text-pink-600",
-                )}
-                style={{ textShadow: isDarkMode ? "0 0 10px #FF0080" : 'none' }}
+                className={clsx("text-xl", theme.textSecondary)}
+                style={{ textShadow: isDarkMode ? `0 0 10px ${stepConfig.color}` : 'none' }}
               >
                 {stepConfig.subtitle}
               </p>
@@ -1112,59 +1549,53 @@ export default function Wizard({ onComplete }: WizardProps) {
                 {stepConfig.description}
               </p>
             </div>
+
             <div className="space-y-6">
-              <div>
-                <Label
-                  htmlFor="personality"
-                  className={clsx(
-                    "text-lg mb-3 block",
-                    isDarkMode ? "text-pink-300" : "text-pink-600"
-                  )}
-                  style={{ textShadow: isDarkMode ? "0 0 10px #FF0080" : "none" }}
-                >
-                  Personality Traits (optional)
-                </Label>
-                <Input
-                  id="personality"
-                  placeholder="e.g., Friendly and helpful, Professional and direct, Warm and empathetic"
-                  value={formData.personality}
-                  onChange={(e) => updateFormData("personality", e.target.value)}
-                  className={clsx(
-                    "h-12 text-lg border-2",
-                    isDarkMode ? "bg-black/50 text-white placeholder:text-gray-400" : "bg-white/70 text-gray-800 placeholder:text-gray-600"
-                  )}
-                  style={{
-                    border: "2px solid #FF0080",
-                    boxShadow: isDarkMode ? "0 0 20px #FF0080, inset 0 0 20px rgba(255, 0, 128, 0.1)" : "none",
-                  }}
-                />
-              </div>
-              <div>
-                <Label
-                  htmlFor="greeting"
-                  className={clsx(
-                    "text-lg mb-3 block",
-                    isDarkMode ? "text-pink-300" : "text-pink-600"
-                  )}
-                  style={{ textShadow: isDarkMode ? "0 0 10px #FF0080" : "none" }}
-                >
-                  Custom Greeting (optional)
-                </Label>
-                <Textarea
-                  id="greeting"
-                  placeholder="e.g., Hi! I'm here to help you with any questions about our services. How can I assist you today?"
-                  value={formData.greeting}
-                  onChange={(e) => updateFormData("greeting", e.target.value)}
-                  className={clsx(
-                    "min-h-[100px] text-lg border-2",
-                    isDarkMode ? "bg-black/50 text-white placeholder:text-gray-400" : "bg-white/70 text-gray-800 placeholder:text-gray-600"
-                  )}
-                  style={{
-                    border: "2px solid #FF0080",
-                    boxShadow: isDarkMode ? "0 0 20px #FF0080, inset 0 0 20px rgba(255, 0, 128, 0.1)" : "none",
-                  }}
-                />
-              </div>
+              {isLoadingTools ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin" style={{ color: stepConfig.color }} />
+                </div>
+              ) : connectedTools.length > 0 ? (
+                <div className="space-y-4">
+                  <Label className={clsx("text-lg", theme.textPrimary)}>
+                    Configured Tools
+                  </Label>
+                  <div className="grid gap-3">
+                    {connectedTools.map((tool) => (
+                      <Card
+                        key={tool.id}
+                        className={clsx(
+                          "transition-all duration-300",
+                          isDarkMode ? "bg-black/50 border-gray-600" : "bg-white/70 border-gray-300"
+                        )}
+                        style={{
+                          boxShadow: isDarkMode
+                            ? "0 0 10px rgba(255, 255, 0, 0.3)"
+                            : "0 0 10px rgba(245,158,11,0.2)",
+                        }}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <Plug className={clsx("w-5 h-5", isDarkMode ? 'text-pink-400' : 'text-pink-600')} />
+                            <div className="flex-1">
+                              <h3 className={clsx("font-semibold", theme.textPrimary)}>{tool.name}</h3>
+                              {tool.description && (
+                                <p className={clsx("text-sm", theme.textTertiary)}>{tool.description}</p>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className={clsx("text-center", theme.textTertiary)}>
+                    You can connect tools and integrations later from the Settings page.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )
@@ -1177,37 +1608,36 @@ export default function Wizard({ onComplete }: WizardProps) {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return formData.agentName.trim() !== ""
-      case 2:
-        return formData.industry !== ""
-      case 3:
-        return formData.purpose.trim() !== ""
-      case 4:
-        return formData.voice !== ""
-      case 5:
-        if (formData.phoneSetup.option === "purchase") {
-          return true
-        }
         return (
           formData.phoneSetup.twilioSid &&
           formData.phoneSetup.twilioApiKey &&
-          formData.phoneSetup.twilioCountry &&
-          formData.phoneSetup.twilioPhoneNumber &&
-          formData.phoneSetup.twilioRegion &&
           formData.phoneSetup.twilioSecret
         )
-      case 6:
-        return true // Knowledge base is optional
-      case 7:
-        return true // Final touches are optional
+      case 2: // Choose a number
+        return formData.selectedPhoneNumber.trim() !== ""
+      case 3: // Connect ElevenLabs
+        return formData.elevenlabsApiKey.trim() !== "" && formData.voice !== "" && formData.voice !== ""
+      case 4: // Check billing
+        const creditInCents = (currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)
+        const needsPaymentMethod = creditInCents < 100 && paymentMethods.length === 0
+        // If payment method is required but not present, can't proceed
+        if (needsPaymentMethod) {
+          return false
+        }
+        // Otherwise, require billing confirmation
+        return formData.billingConfirmed
+      case 5: // Create agent
+        return formData.agentName.trim() !== "" && formData.purpose.trim() !== ""
+      case 6: // Connect tools
+        return true // Tools are optional
       default:
         return false
     }
   }
 
   const isSkippable = (step: number) => {
-    // Allow skipping for industry, voice, telephony, and later optional steps
-    return step === 2 || step === 4 || step === 5 || step === 6 || step === 7
+    // Allow skipping for optional steps
+    return step === 6 // Tools are optional
   }
 
   const handleSkip = () => {
@@ -1354,7 +1784,7 @@ export default function Wizard({ onComplete }: WizardProps) {
                 <AlarmClock className="w-5 h-5" />
                 Not now
               </>
-            ): (
+            ) : (
               <>
                 <ArrowLeft className="w-5 h-5" />
                 Back
@@ -1378,29 +1808,30 @@ export default function Wizard({ onComplete }: WizardProps) {
               </Button>
             )}
             <Button
-            onClick={handleNext}
-            disabled={!canProceed()}
-            className="flex items-center gap-3 h-14 px-8 text-lg text-white border-0 transition-all duration-200 disabled:opacity-50"
-            style={{
-              background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
-              boxShadow: "0 0 30px #FF00FF, 0 0 60px #00FFFF",
-            }}
-          >
-            {currentStep === totalSteps ? (
-              <>
-                Create Agent
-                <Sparkles className="w-5 h-5" />
-              </>
-            ) : (
-              <>
-                Next
-                <ArrowRight className="w-5 h-5" />
-              </>
-            )}
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="flex items-center gap-3 h-14 px-8 text-lg text-white border-0 transition-all duration-200 disabled:opacity-50"
+              style={{
+                background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
+                boxShadow: "0 0 30px #FF00FF, 0 0 60px #00FFFF",
+              }}
+            >
+              {currentStep === totalSteps ? (
+                <>
+                  Create Agent
+                  <Sparkles className="w-5 h-5" />
+                </>
+              ) : (
+                <>
+                  Next
+                  <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </Button>
           </div>
         </div>
       </div>
+      <ToastContainer newestOnTop limit={3} />
     </div>
   )
 }

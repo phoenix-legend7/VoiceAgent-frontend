@@ -198,6 +198,8 @@ const Agents = () => {
   const [isChanged, setIsChanged] = useState(false)
   const [isCreateAgentModalOpen, setIsCreateAgentModalOpen] = useState(false)
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     const fetchAgents = async () => {
       setIsOverlayShow(true)
@@ -215,7 +217,8 @@ const Agents = () => {
   }, [isChanged])
 
   const handleOpenCreateAgentModal = () => {
-    setIsCreateAgentModalOpen(true)
+    // setIsCreateAgentModalOpen(true)
+    navigate("/wizard")
   }
 
   return (
