@@ -10,6 +10,24 @@ import { ConnectedTool, tools as totalTools } from "../../Settings/Tools"
 import ToolModal from "./ToolModal"
 import CalendarSelectionModal from "./CalendarSelectionModal"
 import { CalendarConfig } from "../../Settings/Calendars"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
+
+const renderToolIcon = (iconProp: any) => {
+  if (!iconProp) return <Cog className="size-5" />;
+  if (typeof iconProp === 'string') {
+    return (
+      <img
+        src={iconProp}
+        alt="tool icon"
+        className="size-5"
+        style={{ display: 'block' }}
+        onError={e => { (e.target as HTMLImageElement).src = ""; }}
+      />
+    )
+  }
+  const Icon = iconProp;
+  return <Icon className="size-5" />;
+};
 
 interface Props {
   agent: AgentTypeRead
@@ -56,7 +74,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
       toast.success('Function deleted')
       setAgent({ ...agent, tools })
     } catch (error) {
-      handleAxiosError('Failed to delte function', error)
+      handleAxiosError('Failed to delete function', error)
     } finally {
       setIsOverlayShow(false)
     }
@@ -130,34 +148,54 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
             {agent.tools?.map((tool, index) => {
               const connectedTool = connectedTools.find(ct => ct.id === tool.id);
               if (!connectedTool) return;
-              const Icon = totalTools.find(t => t.id === connectedTool.tool_id)?.icon ?? Cog
+              const iconProp = totalTools.find(t => t.id === connectedTool.tool_id)?.icon ?? Cog
               return (
                 <div
                   key={`tool-${index}`}
                   className="flex items-center gap-2 px-4 py-1"
                 >
                   <div className="size-8 p-1.5 text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-md">
-                    <Icon className="size-5" />
+                    {renderToolIcon(iconProp)}
                   </div>
                   <div className="font-semibold truncate text-nowrap" style={{ width: 'calc(100% - 96px)' }}>
                     {connectedTool.name}
                   </div>
                   <div className="flex items-center ml-auto mr-0">
-                    <button
-                      className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
-                      onClick={() => {
-                        setSelectedTool(tool)
-                        setShowToolModal(true)
-                      }}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
-                      onClick={() => handleDeleteTool(tool.id)}
-                    >
-                      <FaRegTrashAlt />
-                    </button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                            onClick={() => {
+                              setSelectedTool(tool)
+                              setShowToolModal(true)
+                            }}
+                            aria-label="Edit tool"
+                          >
+                            <FaEdit />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Edit tool settings</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                            onClick={() => handleDeleteTool(tool.id)}
+                            aria-label="Delete tool"
+                          >
+                            <FaRegTrashAlt />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Delete tool</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               )
@@ -234,12 +272,22 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                     <div className="text-gray-600 dark:text-gray-400 text-sm">{calendar.provider}</div>
                   </div>
                   <div className="flex items-center">
-                    <button
-                      className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
-                      onClick={() => setShowCalendarModal(true)}
-                    >
-                      <FaEdit />
-                    </button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                            onClick={() => setShowCalendarModal(true)}
+                            aria-label="Manage calendar"
+                          >
+                            <FaEdit />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Manage calendar settings</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               )

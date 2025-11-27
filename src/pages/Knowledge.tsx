@@ -16,6 +16,7 @@ import Content from "../Layout/Content";
 import Modal from "../library/ModalProvider";
 import { KnowledgeRead } from "../models/knowledge";
 import { formatFileSize } from "../utils/helpers";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 
 interface CreateKnowledgeModalProps {
   isOpen: boolean;
@@ -269,12 +270,22 @@ const KnowledgeAction: FC<KnowledgeActionProps> = ({
 
   return (
     <div className="ml-auto mr-0 relative w-fit">
-      <button
-        className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
-        onClick={() => setIsOpen(true)}
-      >
-        <FaEllipsisV />
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
+              onClick={() => setIsOpen(true)}
+              aria-label="Knowledge actions"
+            >
+              <FaEllipsisV />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Knowledge actions</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {isOpen && (
         <div className="absolute right-full top-1/2 -translate-y-[66%] bg-gray-100 dark:bg-gray-950 rounded-md shadow-md py-2 z-50">
           <div className="flex flex-col">

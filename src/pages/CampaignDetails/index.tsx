@@ -29,6 +29,7 @@ import ImportRecordModal from "./ImportRecordsModal";
 import AddRecordModal from "./AddRecordModal";
 import ConfirmStartCampaign from "./ConfirmStart";
 import SetCallerPhone from "./SetCallerPhone";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../components/ui/tooltip";
 
 const CampaignDetails = () => {
   const { id } = useParams();
@@ -258,12 +259,22 @@ const CampaignDetails = () => {
                         )?.label
                       }
                       <div>
-                        <button
-                          className="text-gray-600 dark:text-gray-400 rounded hover:bg-gray-800/50 size-8 cursor-pointer flex items-center justify-center transition-all duration-300"
-                          onClick={() => setIsCallerPhoneModalOpen(true)}
-                        >
-                          <FaEdit />
-                        </button>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                className="text-gray-600 dark:text-gray-400 rounded hover:bg-gray-800/50 size-8 cursor-pointer flex items-center justify-center transition-all duration-300"
+                                onClick={() => setIsCallerPhoneModalOpen(true)}
+                                aria-label="Edit caller phone"
+                              >
+                                <FaEdit />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit caller phone</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </div>
                   ) : (
@@ -327,12 +338,22 @@ const CampaignDetails = () => {
                           ))}
                         </TableCell>
                         <TableCell>
-                          <button
-                            className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/80 dark:hover:bg-red-500/20 rounded-full transition-all duration-300"
-                            onClick={() => handleDeleteRecord(record.phone)}
-                          >
-                            <FaTrash />
-                          </button>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button
+                                  className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/80 dark:hover:bg-red-500/20 rounded-full transition-all duration-300"
+                                  onClick={() => handleDeleteRecord(record.phone)}
+                                  aria-label="Delete record"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Delete record</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </TableCell>
                       </TableRow>
                     ))}

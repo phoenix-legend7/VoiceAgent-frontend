@@ -18,6 +18,7 @@ import { PurchaseModal } from "./PurchaseModal";
 import { SetAgentModal } from "./SetAgentModal";
 import { SetAgentConfigModal } from "./SetAgentConfigModal";
 import { TaggingModal } from "./TaggingModal";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../components/ui/tooltip";
 
 interface ActionProps {
   phone: PhoneTypeRead;
@@ -78,12 +79,22 @@ const PhoneAction: React.FC<ActionProps> = ({
   return (
     <>
       <div className="ml-auto mr-0 relative w-fit">
-        <button
-          className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
-          onClick={() => setIsOpen(true)}
-        >
-          <FaEllipsisV />
-        </button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
+                onClick={() => setIsOpen(true)}
+                aria-label="Phone number actions"
+              >
+                <FaEllipsisV />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Phone number actions</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         {isOpen && (
           <div className="absolute right-full top-1/2 -translate-y-[66%] bg-white dark:bg-gray-950 border dark:border-0 border-gray-300 rounded-md shadow-md py-2 z-50">
             <div className="flex flex-col text-nowrap">
@@ -97,7 +108,7 @@ const PhoneAction: React.FC<ActionProps> = ({
                 className="px-4 py-1.5 cursor-pointer text-left text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-800"
                 onClick={handleTagging}
               >
-                Tagging
+                Manage Tags
               </button>
               <button
                 className="px-4 py-1.5 cursor-pointer text-left text-red-700 dark:text-red-300 hover:bg-gray-200 dark:hover:bg-gray-800"

@@ -10,6 +10,7 @@ import { AgentTypeRead, ToolType } from "../../../models/agent"
 import { ConnectedTool, tools as totalTools } from "../../Settings/Tools"
 import { SelectOptionType } from "../../../models/common"
 import { Cog } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
 
 interface ToolModalProps {
   agent: AgentTypeRead
@@ -179,14 +180,22 @@ const ToolModal: FC<ToolModalProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <div>
-                <button
-                  className="cursor-pointer rounded hover:bg-gray-700/20 p-2 transition-all duration-300"
-                  title="The function will always trigger at the end, even with incomplete data. Ensure your webhook handles these cases. Example use cases: capturing leads to CRM, saving records after the call."
-                >
-                  <FaInfoCircle className="text-gray-600 dark:text-gray-400" />
-                </button>
-              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="cursor-pointer rounded hover:bg-gray-700/20 p-2 transition-all duration-300"
+                      type="button"
+                      aria-label="Information about Run Function After Call"
+                    >
+                      <FaInfoCircle className="text-gray-600 dark:text-gray-400" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p>The function will always trigger at the end, even with incomplete data. Ensure your webhook handles these cases. Example use cases: capturing leads to CRM, saving records after the call.</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <SwtichWithLabel
                 onChange={(e) => setRunFunctionAfterCall(e)}
                 value={runFunctionAfterCall}
@@ -238,7 +247,7 @@ const ToolModal: FC<ToolModalProps> = ({
               onChange={() => setPreActionPhrase(undefined)}
             />
             <div className="flex flex-col w-full border-b border-gray-400 dark:border-gray-600 py-2">
-              <div>Disable</div>
+              <div>No Pre-Action Phrase</div>
               <div className="text-xs text-gray-600 dark:text-gray-400">
                 The agent will execute the action silently without saying anything.
               </div>
@@ -252,7 +261,7 @@ const ToolModal: FC<ToolModalProps> = ({
               onChange={() => setPreActionPhrase('flexible')}
             />
             <div className="flex flex-col w-full border-b border-gray-400 dark:border-gray-600 py-2">
-              <div>Flexiable</div>
+              <div>Flexible</div>
               <div className="text-xs text-gray-600 dark:text-gray-400">
                 The agent will generate a phrase based on the examples provided, adjusting for context and language.
               </div>
@@ -299,13 +308,23 @@ const ToolModal: FC<ToolModalProps> = ({
                   className="flex items-center gap-2 text-sm border border-gray-400 dark:border-gray-700 rounded px-2 py-1"
                 >
                   <div className="flex-1">{value}</div>
-                  <button
-                    type="button"
-                    className="text-red-600 hover:text-red-400 cursor-pointer transition-all duration-300"
-                    onClick={() => setPreActionPhraseValues(preActionPhraseValues.filter((_, i) => i !== index))}
-                  >
-                    <FaTrash />
-                  </button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          className="text-red-600 hover:text-red-400 cursor-pointer transition-all duration-300"
+                          onClick={() => setPreActionPhraseValues(preActionPhraseValues.filter((_, i) => i !== index))}
+                          aria-label="Remove phrase"
+                        >
+                          <FaTrash />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Remove phrase</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               ))}
             </div>

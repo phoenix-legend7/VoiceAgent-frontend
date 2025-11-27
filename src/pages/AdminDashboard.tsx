@@ -11,6 +11,7 @@ import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, Pagi
 import { Users, Trash2, Shield, AlertTriangle, Search, Power } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip'
 
 const AdminDashboard = () => {
   const { currentUser } = useAuth()
@@ -218,19 +219,33 @@ const AdminDashboard = () => {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button
-                            variant={user.is_active ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => handleToggleActive(user.id)}
-                          >
-                            <Power className="h-4 w-4" />
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant={user.is_active ? "outline" : "default"}
+                                  size="sm"
+                                  onClick={() => handleToggleActive(user.id)}
+                                  aria-label={user.is_active ? "Deactivate user" : "Activate user"}
+                                >
+                                  <Power className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{user.is_active ? "Deactivate user" : "Activate user"}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <TooltipTrigger asChild>
+                                    <Button variant="destructive" size="sm" aria-label="Delete user">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
                                 <AlertDialogTitle>
@@ -255,7 +270,12 @@ const AdminDashboard = () => {
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
-                          </AlertDialog>
+                              </AlertDialog>
+                              <TooltipContent>
+                                <p>Delete user</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
                       </TableCell>
                     </TableRow>

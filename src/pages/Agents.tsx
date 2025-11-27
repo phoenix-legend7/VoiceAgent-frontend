@@ -12,6 +12,7 @@ import Table, { TableCell, TableRow } from "../library/Table"
 import { AgentTypeRead } from "../models/agent"
 import Content from "../Layout/Content"
 import { formatDateTime } from "../utils/helpers"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip"
 
 interface EditAgentActionProps {
   agent: AgentTypeRead
@@ -68,19 +69,29 @@ const EditAgentAction: React.FC<EditAgentActionProps> = ({ agent, setIsChanged, 
 
   return (
     <div className="ml-auto mr-0 relative w-fit">
-      <button
-        ref={buttonRef}
-        className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
-        onClick={() => {
-          if (buttonRef.current) {
-            const rect = buttonRef.current.getBoundingClientRect()
-            setMenuPosition({ top: rect.bottom + 8 + window.scrollY, left: rect.right + window.scrollX })
-          }
-          setIsOpen(true)
-        }}
-      >
-        <FaEllipsisV />
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              ref={buttonRef}
+              className="cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 p-2 rounded-md transition-all duration-300 agent-action-button"
+              onClick={() => {
+                if (buttonRef.current) {
+                  const rect = buttonRef.current.getBoundingClientRect()
+                  setMenuPosition({ top: rect.bottom + 8 + window.scrollY, left: rect.right + window.scrollX })
+                }
+                setIsOpen(true)
+              }}
+              aria-label="Agent actions"
+            >
+              <FaEllipsisV />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Agent actions</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {isOpen && createPortal(
         <div
           className="fixed z-50 bg-gray-50 dark:bg-gray-950 rounded-md shadow-md py-2"

@@ -2,6 +2,7 @@ import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
 import { FaBullhorn, FaPlus, FaTrash } from "react-icons/fa"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip"
 
 import { CampaignStatusBadge } from "../components/StatusBadge"
 import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
@@ -178,12 +179,22 @@ const Campaigns = () => {
                     <TableCell>{formatDateTime(campaign.created_at)}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <button
-                          className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/80 dark:hover:bg-red-500/20 rounded-full transition-all duration-300"
-                          onClick={() => handleDeleteCampaign(campaign.id)}
-                        >
-                          <FaTrash />
-                        </button>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                className="p-3 cursor-pointer text-red-500 hover:text-white hover:bg-red-500/80 dark:hover:bg-red-500/20 rounded-full transition-all duration-300"
+                                onClick={() => handleDeleteCampaign(campaign.id)}
+                                aria-label="Delete campaign"
+                              >
+                                <FaTrash />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete campaign</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </TableCell>
                   </TableRow>

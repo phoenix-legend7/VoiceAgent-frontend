@@ -6,6 +6,7 @@ import Table, { TableCell, TableRow } from "../../../library/Table"
 import { AgentTypeRead } from "../../../models/agent"
 import { CalendarConfig } from "../../Settings/Calendars"
 import { FaRegTrashAlt } from "react-icons/fa"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../components/ui/tooltip"
 
 interface CalendarSelectionModalProps {
   agent: AgentTypeRead
@@ -199,13 +200,23 @@ const CalendarSelectionModal: FC<CalendarSelectionModalProps> = ({
                   <TableCell>{calendar.provider}</TableCell>
                   <TableCell className="break-all">{calendar.event_type_id}</TableCell>
                   <TableCell>
-                    <button
-                      className="cursor-pointer text-red-600 hover:text-red-400 hover:bg-red-700/10 px-4 py-1.5 rounded transition-all duration-300"
-                      onClick={() => calendar.id && handleRemoveCalendar(calendar.id)}
-                      disabled={isOverlayShow}
-                    >
-                      <FaRegTrashAlt />
-                    </button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            className="cursor-pointer text-red-600 hover:text-red-400 hover:bg-red-700/10 size-8 flex items-center justify-center rounded-full transition-all duration-300"
+                            onClick={() => calendar.id && handleRemoveCalendar(calendar.id)}
+                            disabled={isOverlayShow}
+                            aria-label="Remove calendar"
+                          >
+                            <FaRegTrashAlt />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Remove calendar</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                 </TableRow>
               ))}

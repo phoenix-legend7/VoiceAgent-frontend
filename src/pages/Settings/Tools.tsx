@@ -17,6 +17,7 @@ import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import axiosInstance from "../../core/axiosInstance";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../components/ui/tooltip";
 
 export interface ConnectedTool {
   id: string;
@@ -852,22 +853,32 @@ const Tools = () => {
 
                           <div className="flex items-center gap-2">
                             {tool.helpInfo && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className={clsx(
-                                  "h-8 w-8 p-0 transition-all duration-300",
-                                  isDarkMode
-                                    ? "text-gray-400 hover:text-cyan-300"
-                                    : "text-gray-500 hover:text-cyan-600"
-                                )}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openHelpModal(tool);
-                                }}
-                              >
-                                <HelpCircle className="w-4 h-4" />
-                              </Button>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className={clsx(
+                                        "h-8 w-8 p-0 transition-all duration-300",
+                                        isDarkMode
+                                          ? "text-gray-400 hover:text-cyan-300"
+                                          : "text-gray-500 hover:text-cyan-600"
+                                      )}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        openHelpModal(tool);
+                                      }}
+                                      aria-label="View help information"
+                                    >
+                                      <HelpCircle className="w-4 h-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>View help information</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             )}
                             <Button
                               size="sm"

@@ -5,6 +5,7 @@ import { BiWorld } from "react-icons/bi"
 import { BsSoundwave } from "react-icons/bs"
 import { FaPencil } from "react-icons/fa6"
 import { toast } from "react-toastify"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../components/ui/tooltip"
 
 import StatusBadge from "../../components/StatusBadge"
 import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
@@ -115,25 +116,45 @@ const AgentDetails = () => {
                         value={editAgentName}
                         onChange={(e) => setEditAgentName(e.target.value)}
                       />
-                      <button
-                        className="p-3 rounded-md cursor-pointer bg-transparent text-sky-600 hover:bg-sky-500/10 transition-all duration-300"
-                        onClick={handleEditAgentName}
-                      >
-                        <FaCheck />
-                      </button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="p-3 rounded-md cursor-pointer bg-transparent text-sky-600 hover:bg-sky-500/10 transition-all duration-300"
+                              onClick={handleEditAgentName}
+                              aria-label="Save agent name"
+                            >
+                              <FaCheck />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Save agent name</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg sm:text-2xl font-semibold">{agent.name}</h2>
-                      <button
-                        className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 cursor-pointer transition-all duration-300"
-                        onClick={() => {
-                          setIsEditAgentName(true)
-                          setEditAgentName(agent.name)
-                        }}
-                      >
-                        <FaPencil />
-                      </button>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 cursor-pointer transition-all duration-300"
+                              onClick={() => {
+                                setIsEditAgentName(true)
+                                setEditAgentName(agent.name)
+                              }}
+                              aria-label="Edit agent name"
+                            >
+                              <FaPencil />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Edit agent name</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   )}
                 </div>
@@ -141,12 +162,22 @@ const AgentDetails = () => {
                 <div className="flex items-center gap-2 text-xs sm:text-sm rounded bg-gray-300 dark:bg-gray-800 p-1">
                   <div className="bg-gray-400 dark:bg-gray-700 px-2 py-1 text-xs rounded">ID</div>
                   <div>{id}</div>
-                  <div
-                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 transition-all duration-300 p-1"
-                    onClick={handleClickCopyId}
-                  >
-                    <FaRegCopy />
-                  </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 transition-all duration-300 p-1"
+                          onClick={handleClickCopyId}
+                          aria-label="Copy agent ID"
+                        >
+                          <FaRegCopy />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Copy agent ID</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
               <StatusBadge

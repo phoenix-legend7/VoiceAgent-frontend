@@ -7,6 +7,7 @@ import { CreditCard, Laptop, LogOut, MoonStar, Sun, User, Zap } from "lucide-rea
 import Navbar from "../components/Navbar"
 import OnboardingTour from "../components/OnboardingTour"
 import { useAuth } from "../core/authProvider"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip"
 
 type ThemeType = "light" | "dark" | "system"
 
@@ -67,12 +68,22 @@ const ThemeModeSwitch = () => {
 
   return (
     <div className="relative" id="theme-mode-switch">
-      <button
-        className="rounded cursor-pointer px-2 py-1.5 hover:bg-sky-600/10 transition-all duration-300"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {renderIcon()}
-      </button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="rounded cursor-pointer px-2 py-1.5 hover:bg-sky-600/10 transition-all duration-300"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Switch theme"
+            >
+              {renderIcon()}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <span>Switch theme</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       {/* Show menu when clicked with animation */}
       <div className={clsx(
         "absolute top-full right-0 w-40 rounded-md overflow-hidden transition-all duration-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 z-50",

@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { FaTimes } from "react-icons/fa";
 import { RoundedButton, TransparentButton } from "./Button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip";
 
 interface ModalProps {
   headerIcon?: ReactNode;
@@ -78,12 +79,21 @@ const Modal: React.FC<ModalProps> = ({
               {headerIcon}
               {title && <h2 className="text-lg md:text-2xl font-bold">{title}</h2>}
               {!hideCloseButton && (
-                <button
-                  className="absolute right-0 top-0 p-2 rounded hover:bg-red-700/20 transition-all duration-300 cursor-pointer"
-                  onClick={onClose}
-                >
-                  <FaTimes />
-                </button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        className="absolute right-0 top-0 p-2 rounded hover:bg-red-700/20 transition-all duration-300 cursor-pointer"
+                        onClick={onClose}
+                      >
+                        <FaTimes />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Close modal</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </div>
 

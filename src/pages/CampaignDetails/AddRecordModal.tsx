@@ -5,6 +5,7 @@ import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import Modal from "../../library/ModalProvider"
 import { CampaignTypeRead } from "../../models/campaign"
 import { InputBox } from "../../library/FormField"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../components/ui/tooltip"
 
 interface AddRecordsModalProps {
   campaign: CampaignTypeRead
@@ -122,12 +123,22 @@ const AddRecordModal: FC<AddRecordsModalProps> = ({
                 value={metadata[key]}
                 disabled
               />
-              <button
-                className="cursor-pointer p-3 rounded-lg hover:bg-gray-300/50 dark:hover:bg-gray-800/50 transition-all duration-300"
-                onClick={() => handleDeleteMetadata(key)}
-              >
-                <FaTrash />
-              </button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="cursor-pointer p-3 rounded-lg hover:bg-gray-300/50 dark:hover:bg-gray-800/50 transition-all duration-300"
+                      onClick={() => handleDeleteMetadata(key)}
+                      aria-label="Remove metadata"
+                    >
+                      <FaTrash />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Remove metadata</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           ))}
           <div className="flex gap-2 items-center">
@@ -145,12 +156,22 @@ const AddRecordModal: FC<AddRecordsModalProps> = ({
               placeholder='i.e. "John Doe", "h5XpN@example.com"'
               inputClassName="bg-transparent"
             />
-            <button
-              className="cursor-pointer p-3 rounded-lg hover:bg-gray-300/50 dark:hover:bg-gray-800/50 transition-all duration-300"
-              onClick={handleAddMetadata}
-            >
-              <FaPlus />
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="cursor-pointer p-3 rounded-lg hover:bg-gray-300/50 dark:hover:bg-gray-800/50 transition-all duration-300"
+                    onClick={handleAddMetadata}
+                    aria-label="Add metadata"
+                  >
+                    <FaPlus />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Add metadata</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>
