@@ -101,7 +101,7 @@ interface Props {
 const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
   const [isMobile, setIsMobile] = useState(false);
   const { currentUser } = useAuth();
-  
+
   // Check if current user is admin
   const isAdmin = currentUser?.is_superuser === true;
 
@@ -149,14 +149,19 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
     <div
       className={clsx(
         "fixed md:static flex flex-col justify-between items-center bg-white dark:bg-gray-950 left-0 bottom-0 z-50 dark:text-white border-r border-gray-200 dark:border-gray-800 transition-all duration-300",
-        isOpen ? "min-w-72" : "navbar overflow-hidden",
+        isOpen ? "min-w-72" : "navbar overflow-hidden min-w-[4rem]",
         isMobile ? "top-0" : "top-16",
-        isMobile && !isOpen ? "w-0 p-0" : "p-4"
+        isMobile && !isOpen ? "w-0 p-0" : "p-4",
       )}
       id="navbar"
     >
       <div className="w-full">
-        <NavLink id="tour-dashboard" href="/" icon={<FaChartBar size={20} />} label="Dashboard" />
+        <NavLink
+          id="tour-dashboard"
+          href="/"
+          icon={<FaChartBar size={20} />}
+          label="Dashboard"
+        />
         <NavLink
           id="tour-agents"
           href="/agents"
@@ -251,7 +256,7 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
           <button
             className={clsx(
               "rounded p-2 cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-100 transition duration-300",
-              { "opacity-0": isMobile }
+              { "opacity-0 pointer-events-none": isMobile }
             )}
             onClick={() => setIsOpen(!isOpen)}
           >

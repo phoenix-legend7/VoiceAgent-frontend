@@ -83,7 +83,7 @@ body {
 }
 
 .navbar .nav-link {
-  @apply gap-0;
+  @apply gap-0 h-12;
 }
 
 .navbar:hover .nav-link {
