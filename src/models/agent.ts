@@ -90,6 +90,7 @@ export interface AgentConfigType {
     name: string
     credentials?: { [key: string]: string }
   }[]
+  calendar_ids?: string[]
   custom_llm_websocket?: string
   language: LanguageType
   vad_threshold?: number

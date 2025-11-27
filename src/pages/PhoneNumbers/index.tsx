@@ -195,7 +195,14 @@ const PhoneNumbers = () => {
                 return (
                   <TableRow key={index}>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <div 
+                        className="flex items-center gap-2 cursor-pointer hover:opacity-70 transition-opacity"
+                        onClick={() => {
+                          setIsSetAgentModalOpen(true);
+                          setSelectedPhone(phoneNumber);
+                        }}
+                        title="Click to assign agent"
+                      >
                         {/* bg: rgb(29, 41, 57), text-color: rgb(151, 161, 186) */}
                         <div className="p-3 rounded-md flex items-center justify-center bg-gray-300 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                           <FaPhoneAlt size={14} />

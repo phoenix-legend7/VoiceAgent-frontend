@@ -12,9 +12,10 @@ interface InputBoxProps {
   inputClassName?: string;
   disabled?: boolean;
   invalidText?: string;
+  type?: string;
 }
 
-export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBlur, onKeyDown, placeholder, className, disabled, inputClassName, invalidText }) => {
+export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBlur, onKeyDown, placeholder, className, disabled, inputClassName, invalidText, type = 'text' }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -34,7 +35,7 @@ export const InputBox: React.FC<InputBoxProps> = ({ label, value, onChange, onBl
         </label>
       )}
       <input
-        type="text"
+        type={type}
         className={clsx(
           inputClassName,
           'rounded-md border w-full py-2 px-3 focus:outline-none transition-all duration-300',

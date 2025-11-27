@@ -11,11 +11,14 @@ import Campaigns from './pages/Campaigns'
 import CampaignDetails from './pages/CampaignDetails'
 import AgentKnowledge from './pages/Knowledge'
 import CallLogs from './pages/CallLogs'
+import UrlScraper from './pages/UrlScraper'
+import AutomationLibrary from './pages/AutomationLibrary'
 import AccountInfo from './pages/Settings/AccountInfo'
 import Billing from './pages/Settings/Billing'
 import Credentials from './pages/Settings/Credentials'
 import Tools from './pages/Settings/Tools'
 import Transactions from './pages/Settings/Transactions'
+import Calendars from './pages/Settings/Calendars'
 import Dashboard from './pages/Dashboard'
 import CampaignScheduling from './pages/CampaignSchedule'
 import LoginScreen from './pages/Auth/Login'
@@ -54,6 +57,7 @@ const Settings = () => {
       <Route path="credentials" element={<Credentials />} />
       <Route path="billing" element={<Billing />} />
       <Route path="tools" element={<Tools />} />
+      <Route path="calendars" element={<Calendars />} />
       <Route path="transactions" element={<Transactions />} />
       <Route path="*" element={<Navigate to="/settings/account" />} />
     </Routes>
@@ -79,6 +83,8 @@ function App() {
               <Route path="/campaign-schedule" element={<CampaignScheduling />} />
               <Route path="/campaigns/:id" element={<CampaignDetails />} />
               <Route path="/knowledge" element={<AgentKnowledge />} />
+              <Route path="/url-scraper" element={<UrlScraper />} />
+              <Route path="/automation-library" element={<AutomationLibrary />} />
               <Route path="/histories" element={<CallLogs />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/settings/*" element={<Settings />} />

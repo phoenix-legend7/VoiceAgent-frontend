@@ -7,9 +7,9 @@ import axiosInstance, { handleAxiosError } from "../../../core/axiosInstance"
 import Card from "../../../library/Card"
 import { AgentTypeRead, ToolType } from "../../../models/agent"
 import { ConnectedTool, tools as totalTools } from "../../Settings/Tools"
-import AppToolModal from "./AppToolModal"
-import AppToolConfigModal from "./AppToolConfigModal"
 import ToolModal from "./ToolModal"
+import CalendarSelectionModal from "./CalendarSelectionModal"
+import { CalendarConfig } from "../../Settings/Calendars"
 
 interface Props {
   agent: AgentTypeRead
@@ -20,11 +20,11 @@ interface Props {
 
 const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow }) => {
   const [showToolModal, setShowToolModal] = useState(false)
-  const [showAppToolModal, setShowAppToolModal] = useState(false)
+  const [showCalendarModal, setShowCalendarModal] = useState(false)
   // const [selectedTool, setSelectedTool] = useState<{ name: string, type: string } | null>(null)
   const [selectedTool, setSelectedTool] = useState<ToolType | null>(null)
-  const [selectedAppTool, setSelectedAppTool] = useState<string | null>(null)
   const [connectedTools, setConnectedTools] = useState<ConnectedTool[]>([])
+  const [calendars, setCalendars] = useState<CalendarConfig[]>([])
 
   useEffect(() => {
     const fetchConnectedTools = async () => {
@@ -36,7 +36,16 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
         toast.error(`Failed to fetch tools: ${(error as Error).message}`);
       }
     };
+    const fetchCalendars = async () => {
+      try {
+        const response = await axiosInstance.get("/calendars");
+        setCalendars(response.data || []);
+      } catch (error) {
+        console.error('Failed to fetch calendars:', error);
+      }
+    };
     fetchConnectedTools();
+    fetchCalendars();
   }, []);
 
   const handleDeleteTool = async (id: string) => {
@@ -98,34 +107,11 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
   //     setIsOverlayShow(false)
   //   }
   // }
-  const handleDeleteAppFunc = async (name: string) => {
-    const appFunctions = agent.config.app_functions?.filter((tool) => tool.name !== name)
-    const editData = {
-      name: agent.name,
-      config: { app_functions: appFunctions }
-    }
-    setIsOverlayShow(true)
-    try {
-      await axiosInstance.put(`/agent/${agent.id}`, editData)
-      toast.success('Function deleted')
-      setAgent({
-        ...agent,
-        config: {
-          ...agent.config,
-          app_functions: appFunctions,
-        }
-      })
-    } catch (error) {
-      handleAxiosError('Failed to delete function', error)
-    } finally {
-      setIsOverlayShow(false)
-    }
-  }
 
   return (
     <>
       <Card title="Tools" className="mt-6" icon={<AiOutlineProduct />}>
-        {(!agent.tools?.length && !agent.config.millis_functions?.length && !agent.config.app_functions?.length) && (
+        {(!agent.tools?.length && !agent.config.millis_functions?.length && !(agent.config.calendar_ids?.length)) && (
           <div className="p-6 m-4 mt-8">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               Connect tools to let agent take action with external systems.
@@ -139,7 +125,7 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
             </button>
           </div>
         )}
-        {(!!agent.tools?.length || !!agent.config.app_functions?.length) && (
+        {(!!agent.tools?.length || !!(agent.config.calendar_ids?.length)) && (
           <div className="py-2">
             {agent.tools?.map((tool, index) => {
               const connectedTool = connectedTools.find(ct => ct.id === tool.id);
@@ -233,35 +219,31 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
                 </div>
               </div>
             ))} */}
-            {agent.config.app_functions?.map((func, index) => (
-              <div
-                key={`func-${index}`}
-                className="flex items-center justify-between gap-2 px-4 py-1"
-              >
-                <div style={{ width: 'calc(100% - 64px)' }}>
-                  <div className="truncate text-nowrap">
-                    {func.name}
+            {agent.config.calendar_ids?.map((calendarId, index) => {
+              const calendar = calendars.find(cal => cal.id === calendarId)
+              if (!calendar) return null
+              return (
+                <div
+                  key={`calendar-${index}`}
+                  className="flex items-center justify-between gap-2 px-4 py-1"
+                >
+                  <div style={{ width: 'calc(100% - 64px)' }}>
+                    <div className="truncate text-nowrap">
+                      {calendar.name}
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-400 text-sm">{calendar.provider}</div>
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400 text-sm">cal.com</div>
+                  <div className="flex items-center">
+                    <button
+                      className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
+                      onClick={() => setShowCalendarModal(true)}
+                    >
+                      <FaEdit />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <button
-                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
-                    onClick={() => {
-                      setShowAppToolModal(true)
-                    }}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-700/20 p-2 rounded transition-colors duration-300"
-                    onClick={() => handleDeleteAppFunc(func.name)}
-                  >
-                    <FaRegTrashAlt />
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
         <hr className="text-gray-300 dark:text-gray-700 my-2" />
@@ -275,19 +257,13 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
           </div>
           <div
             className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-700 transition-all duration-300"
-            onClick={() => setShowAppToolModal(true)}
+            onClick={() => setShowCalendarModal(true)}
           >
             <FaRegCalendarPlus />
-            Add App Tool (cal.com)
+            Manage Calendars
           </div>
         </div>
       </Card>
-      <AppToolModal
-        isOverlayShow={isOverlayShow}
-        showModal={showAppToolModal}
-        setSelectedAppTool={setSelectedAppTool}
-        setShowModal={setShowAppToolModal}
-      />
       <ToolModal
         agent={agent}
         isOverlayShow={isOverlayShow}
@@ -299,13 +275,13 @@ const ToolCard: FC<Props> = ({ agent, isOverlayShow, setAgent, setIsOverlayShow 
         setSelectedTool={setSelectedTool}
         setShowModal={setShowToolModal}
       />
-      <AppToolConfigModal
+      <CalendarSelectionModal
         agent={agent}
         isOverlayShow={isOverlayShow}
-        selectedAppTool={selectedAppTool}
+        showModal={showCalendarModal}
         setAgent={setAgent}
         setIsOverlayShow={setIsOverlayShow}
-        setSelectedAppTool={setSelectedAppTool}
+        setShowModal={setShowCalendarModal}
       />
     </>
   )

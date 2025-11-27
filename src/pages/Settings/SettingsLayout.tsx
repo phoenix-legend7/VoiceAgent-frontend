@@ -32,6 +32,7 @@ const SettingsLayout = ({ children, isOverlayShown }: SettingsLayoutProps) => {
           <TabLink to="/settings/credentials">Credentials</TabLink>
           <TabLink to="/settings/billing">Billing</TabLink>
           <TabLink to="/settings/tools">Tools</TabLink>
+          <TabLink to="/settings/calendars">Calendars</TabLink>
           <TabLink to="/settings/transactions">Transactions</TabLink>
         </div>
         <div className="mt-8">

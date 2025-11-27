@@ -9,9 +9,11 @@ import {
   FaChartBar,
   FaCog,
   FaHistory,
+  FaLink,
   FaPhoneAlt,
   FaUsers,
   FaShieldAlt,
+  FaCogs,
 } from "react-icons/fa";
 // import { LiaExternalLinkAltSolid } from "react-icons/lia"
 // import { PiSparkle } from "react-icons/pi"
@@ -184,6 +186,18 @@ const Navbar: FC<Props> = ({ isOpen, setIsOpen }) => {
           href="/knowledge"
           icon={<FaBook size={20} />}
           label="Agent Knowledge"
+        />
+        <NavLink
+          id="tour-url-scraper"
+          href="/url-scraper"
+          icon={<FaLink size={20} />}
+          label="URL Scraper"
+        />
+        <NavLink
+          id="tour-automation-library"
+          href="/automation-library"
+          icon={<FaCogs size={20} />}
+          label="Automation Library"
         />
         <NavLink
           id="tour-logs"

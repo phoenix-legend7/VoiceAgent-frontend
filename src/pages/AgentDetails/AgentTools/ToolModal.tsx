@@ -23,6 +23,23 @@ interface ToolModalProps {
   setShowModal: Dispatch<SetStateAction<boolean>>
 }
 
+const renderToolIcon = (iconProp: any) => {
+  if (!iconProp) return <Cog className="size-5" />;
+  if (typeof iconProp === 'string') {
+    return (
+      <img
+        src={iconProp}
+        alt="tool icon"
+        className="size-5"
+        style={{ display: 'block' }}
+        onError={e => { (e.target as HTMLImageElement).src = ""; }}
+      />
+    )
+  }
+  const Icon = iconProp;
+  return <Icon className="size-5" />;
+};
+
 const ToolModal: FC<ToolModalProps> = ({
   agent,
   isOverlayShow,
@@ -62,13 +79,14 @@ const ToolModal: FC<ToolModalProps> = ({
     connectedTools
       .filter(ct => !agent.tools.find(t => t.id === ct.id))
       .map((ct) => {
-        const Icon = totalTools.find(t => t.id === ct.tool_id)?.icon ?? Cog
+        const matchedTool = totalTools.find(t => t.id === ct.tool_id)
+        const iconProp = matchedTool?.icon ?? Cog
         return {
           label: ct.name,
           value: ct.id,
           icon: (
             <div className="size-8 p-1.5 text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-md">
-              <Icon className="size-5" />
+              {renderToolIcon(iconProp)}
             </div>
           ),
         }

@@ -218,6 +218,14 @@ const AgentDetails = () => {
                 setAgent={setAgent}
                 setIsOverlayShow={setIsOverlayShow}
               />
+              <KnowledgeCard
+                agent={agent}
+                isOverlayShow={isOverlayShow}
+                knowledges={knowledges}
+                setAgent={setAgent}
+                setIsChanged={setIsKnowledgeChanged}
+                setIsOverlayShow={setIsOverlayShow}
+              />
               <WebhookSettings
                 agent={agent}
                 setAgent={setAgent}
@@ -236,14 +244,6 @@ const AgentDetails = () => {
             </div>
             <div className="p-3 w-full xl:w-1/3">
               <CallAgent agent={agent} />
-              <KnowledgeCard
-                agent={agent}
-                isOverlayShow={isOverlayShow}
-                knowledges={knowledges}
-                setAgent={setAgent}
-                setIsChanged={setIsKnowledgeChanged}
-                setIsOverlayShow={setIsOverlayShow}
-              />
               <ToolCard
                 agent={agent}
                 isOverlayShow={isOverlayShow}
