@@ -67,7 +67,7 @@ const PhoneAction: React.FC<ActionProps> = ({
   const handleDelete = async () => {
     setIsOverlayShow(true);
     try {
-      await axiosInstance.delete(`/phones/${phone.id}`);
+      await axiosInstance.delete(`/phone/${phone.id}`);
       setIsChanged((prev) => !prev);
     } catch (error) {
       handleAxiosError('Failed to delete phone', error);
@@ -263,7 +263,7 @@ const PhoneNumbers = () => {
                     </TableCell>
                     <TableCell className="text-gray-600 dark:text-gray-400">us-west</TableCell>
                     <TableCell className="text-gray-600 dark:text-gray-400">
-                      {formatDateTime(phoneNumber.create_at)}
+                      {formatDateTime(phoneNumber.created_at * 1000)}
                     </TableCell>
                     <TableCell>
                       <PhoneAction

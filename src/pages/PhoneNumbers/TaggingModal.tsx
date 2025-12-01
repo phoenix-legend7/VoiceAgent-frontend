@@ -47,7 +47,7 @@ export const TaggingModal: FC<Props> = ({
     if (!phone) return;
     setIsOverlayShow(true);
     try {
-      await axiosInstance.put(`/phones/${phone.id}/tags`, { tags });
+      await axiosInstance.put(`/phone/${phone.id}/tags`, { tags });
       setIsChanged((prev) => !prev);
     } catch (error) {
       handleAxiosError('Failed to save tags', error);

@@ -127,11 +127,7 @@ export const ImportNumberModal: FC<Props> = ({
       }
       setIsOverlayShow(true);
       try {
-        const response = await axiosInstance.post("/phones/import", payload);
-        const data = response.data;
-        if (data !== "ok") {
-          throw new Error(data.details);
-        }
+        await axiosInstance.post("/phones/import", payload);
         setIsChanged((prev) => !prev);
         handleClose();
       } catch (error) {

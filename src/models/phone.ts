@@ -7,7 +7,7 @@ interface PhoneTypeBase {
 }
 
 export interface PhoneTypeRead extends PhoneTypeBase {
-  create_at: number
+  created_at: number
   status: string
   tags?: string[]
 }
