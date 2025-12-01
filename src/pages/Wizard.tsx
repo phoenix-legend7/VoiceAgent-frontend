@@ -1772,7 +1772,7 @@ export default function Wizard({ onComplete }: WizardProps) {
             className={clsx(
               "flex items-center gap-3 h-14 px-8 text-lg border-2 disabled:opacity-50",
               isDarkMode
-                ? "text-white border-gray-600 bg-black/50 hover:bg-gray-700 hover:border-cyan-400"
+                ? "text-white border-gray-600 bg-black/50! hover:bg-gray-700 hover:border-cyan-400"
                 : "text-gray-900 border-gray-300 bg-white hover:bg-gray-100 hover:border-blue-400"
             )}
             style={{
