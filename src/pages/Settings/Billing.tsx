@@ -153,11 +153,15 @@ const CardSetupForm = ({ onSuccess, onCancel }: { onSuccess: () => void; onCance
 const PaymentMethodCard = ({
   paymentMethod,
   onRemove,
-  canRemove
+  canRemove,
+  onSetDefault,
+  canSetDefault,
 }: {
   paymentMethod: PaymentMethod;
   onRemove: (id: string) => void;
   canRemove: boolean;
+  onSetDefault: (id: string) => Promise<void> | void;
+  canSetDefault: boolean;
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -170,6 +174,19 @@ const PaymentMethodCard = ({
     } catch (error) {
       console.error('Failed to remove payment method:', error);
       toast.error(`Failed to remove payment method: ${(error as Error).message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSetDefault = async () => {
+    if (!canSetDefault || paymentMethod.is_default) return;
+    setLoading(true);
+    try {
+      await onSetDefault(paymentMethod.id);
+    } catch (error) {
+      console.error('Failed to set default payment method:', error);
+      toast.error(`Failed to set default payment method: ${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -193,17 +210,30 @@ const PaymentMethodCard = ({
           </div>
         )}
       </div>
-      <button
-        onClick={handleRemove}
-        disabled={loading || !canRemove}
-        className={`p-2 disabled:opacity-50 disabled:cursor-not-allowed ${canRemove
-            ? "text-red-500 hover:text-red-700"
-            : "text-gray-400 cursor-not-allowed"
-          }`}
-        title={!canRemove ? "At least one payment method is required" : "Remove payment method"}
-      >
-        <FaTrash />
-      </button>
+      <div className="flex items-center gap-2">
+        {!paymentMethod.is_default && canSetDefault && (
+          <button
+            onClick={handleSetDefault}
+            disabled={loading}
+            className="cursor-pointer px-3 py-1 text-xs rounded-md border border-sky-600 text-sky-600 hover:bg-sky-600/10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Set as default
+          </button>
+        )}
+        <button
+          onClick={handleRemove}
+          disabled={loading || !canRemove}
+          className={clsx(
+            "p-2 disabled:opacity-50 disabled:cursor-not-allowed",
+            canRemove
+              ? "text-red-500 hover:text-red-700"
+              : "text-gray-400 cursor-not-allowed"
+          )}
+          title={!canRemove ? "At least one payment method is required" : "Remove payment method"}
+        >
+          <FaTrash />
+        </button>
+      </div>
     </div>
   );
 };
@@ -252,6 +282,21 @@ const Billing = () => {
 
   const handleRemovePaymentMethod = (id: string) => {
     setPaymentMethods(methods => methods.filter(m => m.id !== id));
+  };
+
+  const handleSetDefaultPaymentMethod = async (id: string) => {
+    try {
+      await axiosInstance.post(`/billing/payment-methods/${id}/default`);
+      setPaymentMethods(methods =>
+        methods.map(m => ({
+          ...m,
+          is_default: m.id === id,
+        }))
+      );
+    } catch (error) {
+      console.error('Failed to set default payment method:', error);
+      toast.error(`Failed to set default payment method: ${(error as Error).message}`);
+    }
   };
 
   const handleAutoRefillToggle = async () => {
@@ -468,6 +513,8 @@ const Billing = () => {
                           paymentMethod={method}
                           onRemove={handleRemovePaymentMethod}
                           canRemove={paymentMethods.length > 1}
+                          onSetDefault={handleSetDefaultPaymentMethod}
+                          canSetDefault={paymentMethods.length > 1}
                         />
                       ))}
                       <div className="pt-4">
