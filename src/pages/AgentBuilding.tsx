@@ -113,10 +113,14 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
   const numberSteps = useMemo(() => {
     // Check if phone setup is properly configured
     const hasPhoneSetup = agentData.phoneSetup &&
-      agentData.phoneSetup.option === "twilio" &&
-      agentData.phoneSetup.twilioSid &&
-      agentData.phoneSetup.twilioApiKey &&
-      agentData.phoneSetup.twilioPhoneNumber
+      agentData.phoneSetup.provider &&
+      (agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber) &&
+      (
+        (agentData.phoneSetup.provider === "plivo" && agentData.phoneSetup.authId && agentData.phoneSetup.authToken) ||
+        (agentData.phoneSetup.provider === "vanage" && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret) ||
+        (agentData.phoneSetup.provider === "exotel" && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret && agentData.phoneSetup.accountSid && agentData.phoneSetup.appId) ||
+        (agentData.phoneSetup.provider === "twilio" && agentData.phoneSetup.accountSid && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret)
+      )
 
     // Check if knowledge base files exist
     const hasKnowledgeFiles = agentData.knowledgeBase?.files && agentData.knowledgeBase.files.length > 0
@@ -200,17 +204,30 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
     }
     const importPhone = async () => {
       const payload: { [key: string]: string } = {
-        provider: "twilio",
-        region: agentData.phoneSetup.twilioRegion,
-        country: agentData.phoneSetup.twilioCountry,
-        phone: agentData.phoneSetup.twilioPhoneNumber,
-        account_sid: agentData.phoneSetup.twilioSid,
-        api_key: agentData.phoneSetup.twilioApiKey,
-        api_secret: agentData.phoneSetup.twilioSecret,
+        provider: agentData.phoneSetup.provider || "twilio",
+        region: agentData.phoneSetup.region,
+        country: agentData.phoneSetup.country,
+        phone: agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber,
       }
+      
+      if (agentData.phoneSetup.provider === "plivo") {
+        payload.auth_id = agentData.phoneSetup.authId
+        payload.auth_token = agentData.phoneSetup.authToken
+      } else {
+        payload.api_key = agentData.phoneSetup.apiKey
+        payload.api_secret = agentData.phoneSetup.apiSecret
+        if (agentData.phoneSetup.provider !== "vanage") {
+          payload.account_sid = agentData.phoneSetup.accountSid
+        }
+        if (agentData.phoneSetup.provider === "exotel") {
+          payload.subdomain = agentData.phoneSetup.subdomain
+          payload.app_id = agentData.phoneSetup.appId
+        }
+      }
+      
       await axiosInstance.post("/phones/import", payload)
       setCurrentStep(3)
-      return agentData.phoneSetup.twilioPhoneNumber
+      return agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber
     }
     const configuringVoice = async (agent: AgentTypeRead, phone: string) => {
       const response = await axiosInstance.post("/set_phone_agent", {
@@ -278,10 +295,14 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
 
         // Only setup phone integration if phone setup was not skipped
         const hasPhoneSetup = agentData.phoneSetup &&
-          agentData.phoneSetup.option === "twilio" &&
-          agentData.phoneSetup.twilioSid &&
-          agentData.phoneSetup.twilioApiKey &&
-          agentData.phoneSetup.twilioPhoneNumber
+          agentData.phoneSetup.provider &&
+          (agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber) &&
+          (
+            (agentData.phoneSetup.provider === "plivo" && agentData.phoneSetup.authId && agentData.phoneSetup.authToken) ||
+            (agentData.phoneSetup.provider === "vanage" && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret) ||
+            (agentData.phoneSetup.provider === "exotel" && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret && agentData.phoneSetup.accountSid && agentData.phoneSetup.appId) ||
+            (agentData.phoneSetup.provider === "twilio" && agentData.phoneSetup.accountSid && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret)
+          )
 
         if (hasPhoneSetup) {
           const phone = await importPhone()
@@ -485,10 +506,14 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
               {(() => {
                 const hasKnowledgeFiles = agentData.knowledgeBase?.files && agentData.knowledgeBase.files.length > 0
                 const hasPhoneSetup = agentData.phoneSetup &&
-                  agentData.phoneSetup.option === "twilio" &&
-                  agentData.phoneSetup.twilioSid &&
-                  agentData.phoneSetup.twilioApiKey &&
-                  agentData.phoneSetup.twilioPhoneNumber
+                  agentData.phoneSetup.provider &&
+                  (agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber) &&
+                  (
+                    (agentData.phoneSetup.provider === "plivo" && agentData.phoneSetup.authId && agentData.phoneSetup.authToken) ||
+                    (agentData.phoneSetup.provider === "vanage" && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret) ||
+                    (agentData.phoneSetup.provider === "exotel" && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret && agentData.phoneSetup.accountSid && agentData.phoneSetup.appId) ||
+                    (agentData.phoneSetup.provider === "twilio" && agentData.phoneSetup.accountSid && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret)
+                  )
 
                 // Filter steps based on what's being configured
                 const relevantSteps = buildingSteps.filter((_, index) => {

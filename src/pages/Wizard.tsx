@@ -17,7 +17,6 @@ import {
   Phone,
   Sun,
   Moon,
-  AlarmClock,
   CreditCard,
   Hash,
   Plug,
@@ -25,6 +24,7 @@ import {
   Play,
   Pause,
   Loader2,
+  X,
 } from "lucide-react"
 import clsx from "clsx"
 import { countryPhoneOptions } from "../consts/countryPhones"
@@ -285,13 +285,20 @@ export default function Wizard({ onComplete }: WizardProps) {
 
   const [formData, setFormData] = useState({
     phoneSetup: {
-      option: "twilio", // "purchase" or "twilio"
-      twilioSid: "",
-      twilioSecret: "",
-      twilioPhoneNumber: "",
-      twilioRegion: "us-west",
-      twilioCountry: "US",
-      twilioApiKey: "",
+      provider: "twilio", // "twilio", "vanage", "plivo", "exotel"
+      region: "us-west",
+      country: "US",
+      phoneNumber: "",
+      // Twilio/Vonage/Exotel fields
+      apiKey: "",
+      apiSecret: "",
+      accountSid: "",
+      // Exotel specific
+      subdomain: "api.exotel.com",
+      appId: "",
+      // Plivo specific
+      authId: "",
+      authToken: "",
     },
     selectedPhoneNumber: "",
     elevenlabsApiKey: "",
@@ -433,7 +440,7 @@ export default function Wizard({ onComplete }: WizardProps) {
         ...formData,
         phoneSetup: {
           ...formData.phoneSetup,
-          twilioPhoneNumber: formData.selectedPhoneNumber || formData.phoneSetup.twilioPhoneNumber,
+          phoneNumber: formData.selectedPhoneNumber || formData.phoneSetup.phoneNumber,
         },
         voiceType: formData.voice,
         tone: formData.personality,
@@ -686,129 +693,273 @@ export default function Wizard({ onComplete }: WizardProps) {
             </div>
 
             <div className="space-y-6">
-              {formData.phoneSetup.option === "twilio" && (
-                <div className="space-y-4">
-                  <div>
-                    <Label
+              {/* Provider Selection Tabs */}
+              <div className="flex items-center border-b-2" style={{ borderColor: isDarkMode ? "rgba(0, 255, 255, 0.3)" : "rgba(14,165,233,0.3)" }}>
+                {["twilio", "vanage", "plivo", "exotel"].map((provider) => {
+                  const isActive = formData.phoneSetup.provider === provider
+                  return (
+                    <button
+                      key={provider}
+                      onClick={() => updateFormData("phoneSetup", { ...formData.phoneSetup, provider })}
                       className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                        "cursor-pointer w-full border-b-2 transition-all duration-300 px-2 py-1 md:px-4 md:py-2",
+                        isActive
+                          ? isDarkMode 
+                            ? "border-cyan-400 text-cyan-400" 
+                            : "border-cyan-600 text-cyan-600"
+                          : isDarkMode
+                            ? "text-gray-400 border-transparent hover:text-cyan-300"
+                            : "text-gray-600 border-transparent hover:text-cyan-500"
                       )}
+                      style={isActive ? {
+                        textShadow: isDarkMode ? "0 0 10px rgba(0, 255, 255, 0.5)" : "none"
+                      } : {}}
                     >
-                      Region
-                    </Label>
-                    <select
-                      value={formData.phoneSetup.twilioRegion}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioRegion: e.target.value })
-                      }
-                      className={clsx(
-                        "w-full p-3 rounded-lg border-2",
-                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
-                    >
-                      <option value="us-west">US West</option>
-                      <option value="us-east">US East</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
-                      )}
-                    >
-                      Country
-                    </Label>
-                    <select
-                      value={formData.phoneSetup.twilioCountry}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioCountry: e.target.value })
-                      }
-                      className={clsx(
-                        "w-full p-3 rounded-lg border-2",
-                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
-                    >
-                      {countryPhoneOptions.map((country, index) => (
-                        <option key={index} value={country.value}>{country.value}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
-                      )}
-                    >
-                      Twilio Account SID
-                    </Label>
-                    <Input
-                      value={formData.phoneSetup.twilioSid}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioSid: e.target.value })
-                      }
-                      placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                      className={clsx(
-                        "border-2",
-                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
-                      )}
-                    >
-                      Twilio API Key
-                    </Label>
-                    <Input
-                      value={formData.phoneSetup.twilioApiKey}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioApiKey: e.target.value })
-                      }
-                      className={clsx(
-                        "border-2",
-                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      className={clsx(
-                        "text-sm mb-2 block",
-                        isDarkMode ? "text-cyan-300" : "text-cyan-600"
-                      )}
-                    >
-                      Twilio API Secret
-                    </Label>
-                    <Input
-                      type="password"
-                      value={formData.phoneSetup.twilioSecret}
-                      onChange={(e) =>
-                        updateFormData("phoneSetup", { ...formData.phoneSetup, twilioSecret: e.target.value })
-                      }
-                      className={clsx(
-                        "border-2",
-                        isDarkMode ? "border-cyan-400" : "border-cyan-600",
-                        theme.inputBg, theme.inputText
-                      )}
-                      style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
-                    />
-                  </div>
+                      {provider.toUpperCase()}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Common Fields */}
+              <div className="space-y-4">
+                <div>
+                  <Label
+                    className={clsx(
+                      "text-sm mb-2 block",
+                      isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                    )}
+                  >
+                    Region
+                  </Label>
+                  <select
+                    value={formData.phoneSetup.region}
+                    onChange={(e) =>
+                      updateFormData("phoneSetup", { ...formData.phoneSetup, region: e.target.value })
+                    }
+                    className={clsx(
+                      "w-full p-3 rounded-lg border-2",
+                      isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                      theme.inputBg, theme.inputText
+                    )}
+                    style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                  >
+                    <option value="us-west">US West</option>
+                    <option value="us-east">US East</option>
+                  </select>
                 </div>
-              )}
+                <div>
+                  <Label
+                    className={clsx(
+                      "text-sm mb-2 block",
+                      isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                    )}
+                  >
+                    Country
+                  </Label>
+                  <select
+                    value={formData.phoneSetup.country}
+                    onChange={(e) =>
+                      updateFormData("phoneSetup", { ...formData.phoneSetup, country: e.target.value })
+                    }
+                    className={clsx(
+                      "w-full p-3 rounded-lg border-2",
+                      isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                      theme.inputBg, theme.inputText
+                    )}
+                    style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                  >
+                    {countryPhoneOptions.map((country, index) => (
+                      <option key={index} value={country.value}>{country.value}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Plivo Fields */}
+                {formData.phoneSetup.provider === "plivo" && (
+                  <>
+                    <div>
+                      <Label
+                        className={clsx(
+                          "text-sm mb-2 block",
+                          isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                        )}
+                      >
+                        Auth ID
+                      </Label>
+                      <Input
+                        value={formData.phoneSetup.authId}
+                        onChange={(e) =>
+                          updateFormData("phoneSetup", { ...formData.phoneSetup, authId: e.target.value })
+                        }
+                        placeholder="Plivo Auth ID"
+                        className={clsx(
+                          "border-2",
+                          isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                          theme.inputBg, theme.inputText
+                        )}
+                        style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        className={clsx(
+                          "text-sm mb-2 block",
+                          isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                        )}
+                      >
+                        Auth Token
+                      </Label>
+                      <Input
+                        type="password"
+                        value={formData.phoneSetup.authToken}
+                        onChange={(e) =>
+                          updateFormData("phoneSetup", { ...formData.phoneSetup, authToken: e.target.value })
+                        }
+                        placeholder="Plivo Auth Token"
+                        className={clsx(
+                          "border-2",
+                          isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                          theme.inputBg, theme.inputText
+                        )}
+                        style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Twilio/Vonage/Exotel Fields */}
+                {formData.phoneSetup.provider !== "plivo" && (
+                  <>
+                    <div>
+                      <Label
+                        className={clsx(
+                          "text-sm mb-2 block",
+                          isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                        )}
+                      >
+                        API Key
+                      </Label>
+                      <Input
+                        value={formData.phoneSetup.apiKey}
+                        onChange={(e) =>
+                          updateFormData("phoneSetup", { ...formData.phoneSetup, apiKey: e.target.value })
+                        }
+                        placeholder="Provider API Key"
+                        className={clsx(
+                          "border-2",
+                          isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                          theme.inputBg, theme.inputText
+                        )}
+                        style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        className={clsx(
+                          "text-sm mb-2 block",
+                          isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                        )}
+                      >
+                        API {formData.phoneSetup.provider === "exotel" ? "Token" : "Secret"}
+                      </Label>
+                      <Input
+                        type="password"
+                        value={formData.phoneSetup.apiSecret}
+                        onChange={(e) =>
+                          updateFormData("phoneSetup", { ...formData.phoneSetup, apiSecret: e.target.value })
+                        }
+                        placeholder={`${formData.phoneSetup.provider === "exotel" ? "API Token" : "API Secret"}`}
+                        className={clsx(
+                          "border-2",
+                          isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                          theme.inputBg, theme.inputText
+                        )}
+                        style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                      />
+                    </div>
+                    {formData.phoneSetup.provider !== "vanage" && (
+                      <div>
+                        <Label
+                          className={clsx(
+                            "text-sm mb-2 block",
+                            isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                          )}
+                        >
+                          Account SID
+                        </Label>
+                        <Input
+                          value={formData.phoneSetup.accountSid}
+                          onChange={(e) =>
+                            updateFormData("phoneSetup", { ...formData.phoneSetup, accountSid: e.target.value })
+                          }
+                          placeholder="Account SID"
+                          className={clsx(
+                            "border-2",
+                            isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                            theme.inputBg, theme.inputText
+                          )}
+                          style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Exotel Specific Fields */}
+                {formData.phoneSetup.provider === "exotel" && (
+                  <>
+                    <div>
+                      <Label
+                        className={clsx(
+                          "text-sm mb-2 block",
+                          isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                        )}
+                      >
+                        Subdomain
+                      </Label>
+                      <select
+                        value={formData.phoneSetup.subdomain}
+                        onChange={(e) =>
+                          updateFormData("phoneSetup", { ...formData.phoneSetup, subdomain: e.target.value })
+                        }
+                        className={clsx(
+                          "w-full p-3 rounded-lg border-2",
+                          isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                          theme.inputBg, theme.inputText
+                        )}
+                        style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                      >
+                        <option value="api.exotel.com">api.exotel.com (Singapore)</option>
+                        <option value="api.in.exotel.com">api.in.exotel.com (Mumbai)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label
+                        className={clsx(
+                          "text-sm mb-2 block",
+                          isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                        )}
+                      >
+                        App ID
+                      </Label>
+                      <Input
+                        value={formData.phoneSetup.appId}
+                        onChange={(e) =>
+                          updateFormData("phoneSetup", { ...formData.phoneSetup, appId: e.target.value })
+                        }
+                        placeholder="Exotel App ID"
+                        className={clsx(
+                          "border-2",
+                          isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                          theme.inputBg, theme.inputText
+                        )}
+                        style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )
@@ -1608,11 +1759,33 @@ export default function Wizard({ onComplete }: WizardProps) {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return (
-          formData.phoneSetup.twilioSid &&
-          formData.phoneSetup.twilioApiKey &&
-          formData.phoneSetup.twilioSecret
-        )
+        const { provider } = formData.phoneSetup
+        if (provider === "plivo") {
+          return (
+            formData.phoneSetup.authId &&
+            formData.phoneSetup.authToken
+          )
+        } else if (provider === "vanage") {
+          return (
+            formData.phoneSetup.apiKey &&
+            formData.phoneSetup.apiSecret
+          )
+        } else if (provider === "exotel") {
+          return (
+            formData.phoneSetup.apiKey &&
+            formData.phoneSetup.apiSecret &&
+            formData.phoneSetup.accountSid &&
+            formData.phoneSetup.appId &&
+            formData.phoneSetup.subdomain
+          )
+        } else {
+          // Twilio
+          return (
+            formData.phoneSetup.accountSid &&
+            formData.phoneSetup.apiKey &&
+            formData.phoneSetup.apiSecret
+          )
+        }
       case 2: // Choose a number
         return formData.selectedPhoneNumber.trim() !== ""
       case 3: // Connect ElevenLabs
@@ -1781,8 +1954,8 @@ export default function Wizard({ onComplete }: WizardProps) {
           >
             {currentStep === 1 ? (
               <>
-                <AlarmClock className="w-5 h-5" />
-                Not now
+                <X className="w-5 h-5" />
+                Cancel
               </>
             ) : (
               <>
