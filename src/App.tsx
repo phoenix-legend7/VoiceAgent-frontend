@@ -23,12 +23,13 @@ import Dashboard from './pages/Dashboard'
 import CampaignScheduling from './pages/CampaignSchedule'
 import LoginScreen from './pages/Auth/Login'
 import SignupScreen from './pages/Auth/Signup'
-import Wizard from './pages/Wizard'
+import CreateAgentWizard from './pages/CreateAgentWizard'
+import OnboardingWizard from './pages/OnboardingWizard'
 import BuildingAnimation from './pages/AgentBuilding'
 import OAuthCallback from './pages/Auth/OAuthCallback'
 import AdminDashboard from './pages/AdminDashboard'
 
-const WizardRoute = () => {
+const CreateAgentWizardRoute = () => {
   const [agentData, setAgentData] = useState<any>();
 
   const navigate = useNavigate();
@@ -45,8 +46,17 @@ const WizardRoute = () => {
       agentData={agentData}
       onComplete={handleBuildingComplete} />
   ) : (
-    <Wizard onComplete={handleWizardComplete} />
+    <CreateAgentWizard onComplete={handleWizardComplete} />
   );
+};
+
+const OnboardingWizardRoute = () => {
+  const handleOnboardingComplete = useCallback(() => {
+    // Mark onboarding as complete
+    localStorage.setItem('onboarding-complete', 'true');
+  }, []);
+
+  return <OnboardingWizard onComplete={handleOnboardingComplete} />;
 };
 
 const Settings = () => {
@@ -72,7 +82,8 @@ function App() {
       <Routes>
         {currentUser ? (
           <>
-            <Route path='/wizard' element={<WizardRoute />} />
+            <Route path='/onboarding' element={<OnboardingWizardRoute />} />
+            <Route path='/wizard' element={<CreateAgentWizardRoute />} />
             <Route element={<MasterLayout />}>
               <Route path='/login' element={<Navigate to="/" />} />
               <Route path="/" element={<Dashboard />} />

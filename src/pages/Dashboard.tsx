@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Bot,
   TrendingUp,
@@ -66,6 +66,14 @@ export default function Dashboard() {
   );
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const onboardingComplete = localStorage.getItem('onboarding-complete');
+    if (!onboardingComplete && !location.pathname.includes('/onboarding') && !location.pathname.includes('/wizard')) {
+      navigate('/onboarding');
+    }
+  }, [navigate, location.pathname]);
 
   useEffect(() => {
     const fetchAgents = async () => {

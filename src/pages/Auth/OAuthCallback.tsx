@@ -21,7 +21,12 @@ const OAuthCallback = () => {
         saveAuth({ access_token: data.access_token });
         const { data: user } = await getUserByToken(data.access_token);
         setCurrentUser(user);
-        navigate("/");
+        const onboardingComplete = localStorage.getItem('onboarding-complete');
+        if (!onboardingComplete) {
+          navigate("/onboarding");
+        } else {
+          navigate("/");
+        }
       } catch (error) {
         console.error("Error handling OAuth success:", error);
         navigate("/login");

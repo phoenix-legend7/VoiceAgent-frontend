@@ -1,13 +1,14 @@
 import clsx from "clsx"
 import { useEffect, useState } from "react"
 import { FaBars } from "react-icons/fa"
-import { Link, Outlet, useNavigate } from "react-router-dom"
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
 import { CreditCard, Laptop, LogOut, MoonStar, Sun, User, Zap } from "lucide-react"
 import Navbar from "../components/Navbar"
 import OnboardingTour from "../components/OnboardingTour"
 import { useAuth } from "../core/authProvider"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip"
+import ElevenLabsConvAIWidget from "../components/ElevenLabsConvAIWidget"
 
 type ThemeType = "light" | "dark" | "system"
 
@@ -207,6 +208,10 @@ const UserMenu = () => {
 const MasterLayout = () => {
   const [isOpen, setIsOpen] = useState(true)
   const { currentUser } = useAuth()
+  const location = useLocation()
+
+  const isWizardRoute = location.pathname === '/onboarding' || location.pathname === '/wizard'
+  const showWidget = !!currentUser && !isWizardRoute && import.meta.env.VITE_APP_ELEVENLABS_CONVAI_AGENT_ID
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -241,6 +246,15 @@ const MasterLayout = () => {
         <div className="w-full mx-auto overflow-y-auto relative h-[calc(100vh-4rem)]">
           <Outlet />
         </div>
+        {/* ElevenLabs Conversational AI Widget */}
+        {showWidget && (
+          <div className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)]">
+            <ElevenLabsConvAIWidget 
+              agentId={import.meta.env.VITE_APP_ELEVENLABS_CONVAI_AGENT_ID || ""}
+              className="w-full h-[500px]"
+            />
+          </div>
+        )}
         {/* Onboarding tour runs after first login */}
         <OnboardingTour userId={currentUser?.email} />
       </div>

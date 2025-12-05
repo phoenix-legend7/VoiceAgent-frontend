@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import clsx from "clsx"
 import { useNavigate } from "react-router-dom"
 
@@ -11,7 +11,7 @@ import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
 import AgentTypeBase, { AgentTypeRead } from "../models/agent"
 import LanguageType from "../models/language"
 import { CampaignTypeRead } from "../models/campaign"
-import { voices } from "./Wizard"
+import { voices } from "./CreateAgentWizard"
 
 const industryPrompts: Record<string, string> = {
   "real-estate": "You are a virtual property assistant for a real estate agency in Australia. Your role is to handle calls about property sales, rentals, inspections, and management. Use scheduling tools to book open home times or private inspections. Capture details such as property ID, caller name, and contact information, and add them into the CRM. When renters call, check availability in the property listings system and record application interest. For landlords, collect property details and log requests for appraisals or management services. Always update the database so sales and property managers have a clear record of each interaction.",
@@ -111,7 +111,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
   ]
 
   const numberSteps = useMemo(() => {
-    // Check if phone setup is properly configured
+    // Check if phone setup is properly configured (either existing phone or import setup)
+    const hasExistingPhone = agentData.useExistingPhone && agentData.existingPhoneId
     const hasPhoneSetup = agentData.phoneSetup &&
       agentData.phoneSetup.provider &&
       (agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber) &&
@@ -131,12 +132,12 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       steps += 1 // Uploading files step
     }
 
-    if (hasPhoneSetup) {
-      steps += 4 // Phone import, Voice config, Campaign creation, Campaign config
+    if (hasExistingPhone || hasPhoneSetup) {
+      steps += 4 // Phone import (or use existing), Voice config, Campaign creation, Campaign config
     }
 
     return steps
-  }, [agentData.phoneSetup, agentData.knowledgeBase])
+  }, [agentData.phoneSetup, agentData.knowledgeBase, agentData.useExistingPhone, agentData.existingPhoneId])
 
   // Check theme from localStorage
   useEffect(() => {
@@ -203,13 +204,19 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       return response.data
     }
     const importPhone = async () => {
+      // Skip import if using existing phone number
+      if (agentData.useExistingPhone && agentData.existingPhoneId) {
+        setCurrentStep(3)
+        return agentData.existingPhoneId
+      }
+
       const payload: { [key: string]: string } = {
         provider: agentData.phoneSetup.provider || "twilio",
         region: agentData.phoneSetup.region,
         country: agentData.phoneSetup.country,
         phone: agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber,
       }
-      
+
       if (agentData.phoneSetup.provider === "plivo") {
         payload.auth_id = agentData.phoneSetup.authId
         payload.auth_token = agentData.phoneSetup.authToken
@@ -224,10 +231,14 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
           payload.app_id = agentData.phoneSetup.appId
         }
       }
-      
-      await axiosInstance.post("/phones/import", payload)
-      setCurrentStep(3)
-      return agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber
+
+      try {
+        await axiosInstance.post("/phones/import", payload)
+        setCurrentStep(3)
+        return agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber
+      } catch (error) {
+        throw Error(`Failed to import phone: ${((error as AxiosError).response?.data as any)?.detail || 'Unknown error'}`)
+      }
     }
     const configuringVoice = async (agent: AgentTypeRead, phone: string) => {
       const response = await axiosInstance.post("/set_phone_agent", {
@@ -282,7 +293,6 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
           if (paymentMethods.length === 0) {
             toast.warning("Please add a payment method before creating an agent")
             navigate("/settings/billing")
-            onComplete()
             return
           }
         } catch (error) {
@@ -293,7 +303,8 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
         const files = await createKnowledges()
         const agent = await createAgent(files)
 
-        // Only setup phone integration if phone setup was not skipped
+        // Check if using existing phone or need to import
+        const hasExistingPhone = agentData.useExistingPhone && agentData.existingPhoneId
         const hasPhoneSetup = agentData.phoneSetup &&
           agentData.phoneSetup.provider &&
           (agentData.phoneSetup.phoneNumber || agentData.selectedPhoneNumber) &&
@@ -304,7 +315,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
             (agentData.phoneSetup.provider === "twilio" && agentData.phoneSetup.accountSid && agentData.phoneSetup.apiKey && agentData.phoneSetup.apiSecret)
           )
 
-        if (hasPhoneSetup) {
+        if (hasExistingPhone || hasPhoneSetup) {
           const phone = await importPhone()
           await configuringVoice(agent, phone)
           const campaign = await createCampaign(phone)
@@ -314,13 +325,27 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
           setCurrentStep(6)
         }
 
+        // Configure selected tools if any
+        if (agentData.selectedTools && agentData.selectedTools.length > 0) {
+          try {
+            const toolsPayload = agentData.selectedTools.map((toolId: string) => ({
+              id: toolId,
+            }))
+            await axiosInstance.put(`/agent/${agent.id}/tools`, toolsPayload)
+            toast.success('Tools configured successfully')
+          } catch (error) {
+            console.error('Failed to configure tools:', error)
+            toast.warning('Agent created but tool configuration failed. You can configure tools later.')
+          }
+        }
+
         setTimeout(() => {
           onComplete()
         }, 1000)
       } catch (e) {
         handleAxiosError("Failed to build agent", e)
         setTimeout(() => {
-          onComplete()
+          navigate("/wizard")
         }, 5000)
       }
     }

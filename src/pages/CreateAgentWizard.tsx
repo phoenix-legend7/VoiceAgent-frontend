@@ -30,6 +30,7 @@ import clsx from "clsx"
 import { countryPhoneOptions } from "../consts/countryPhones"
 import { toast, ToastContainer } from "react-toastify"
 import VoiceType from "../models/voice"
+import { PhoneTypeRead } from "../models/phone"
 import { adminAPI } from "../core/adminAPI"
 import { useAuth } from "../core/authProvider"
 import axiosInstance, { handleAxiosError } from "../core/axiosInstance"
@@ -44,7 +45,7 @@ import {
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY || '')
 
-interface WizardProps {
+interface CreateAgentWizardProps {
   onComplete: (agentData: any) => void
 }
 
@@ -255,7 +256,7 @@ export const voices = [
 ]
 
 
-export default function Wizard({ onComplete }: WizardProps) {
+export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps) {
   const [currentStep, setCurrentStep] = useState(1)
   const [isDarkMode, setIsDarkMode] = useState(true)
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
@@ -282,6 +283,14 @@ export default function Wizard({ onComplete }: WizardProps) {
   const [connectedTools, setConnectedTools] = useState<Array<{ id: string; tool_id: string; name: string; description: string }>>([])
   const [isLoadingTools, setIsLoadingTools] = useState(false)
 
+  // Phone numbers state
+  const [phoneNumbers, setPhoneNumbers] = useState<PhoneTypeRead[]>([])
+  const [isLoadingPhoneNumbers, setIsLoadingPhoneNumbers] = useState(false)
+
+  // Default voices state
+  const [defaultVoices, setDefaultVoices] = useState<VoiceType[]>([])
+  const [isLoadingDefaultVoices, setIsLoadingDefaultVoices] = useState(false)
+
 
   const [formData, setFormData] = useState({
     phoneSetup: {
@@ -301,6 +310,8 @@ export default function Wizard({ onComplete }: WizardProps) {
       authToken: "",
     },
     selectedPhoneNumber: "",
+    useExistingPhone: false, // Track if user selected existing phone
+    existingPhoneId: "", // ID of selected existing phone
     elevenlabsApiKey: "",
     billingConfirmed: false,
     agentName: "",
@@ -312,7 +323,8 @@ export default function Wizard({ onComplete }: WizardProps) {
     knowledgeBase: {
       files: [] as File[],
     },
-    tools: [] as string[],
+    tools: [] as string[], // Array of tool IDs
+    selectedTools: [] as string[], // Array of selected tool IDs
   })
 
   const totalSteps = 6
@@ -391,6 +403,27 @@ export default function Wizard({ onComplete }: WizardProps) {
     }
   }, [currentUser])
 
+  // Fetch phone numbers when step 1 or 2 is shown
+  useEffect(() => {
+    if (currentStep === 1 || currentStep === 2) {
+      fetchPhoneNumbers()
+    }
+  }, [currentStep])
+
+  // Fetch default voices when step 3 is shown and no ElevenLabs API key
+  useEffect(() => {
+    if (currentStep === 3 && !formData.elevenlabsApiKey.trim()) {
+      fetchDefaultVoices()
+    }
+  }, [currentStep, formData.elevenlabsApiKey])
+
+  // Automatically fetch ElevenLabs voices when step 3 is shown and API key exists
+  useEffect(() => {
+    if (currentStep === 3 && formData.elevenlabsApiKey.trim() && elevenlabsVoices.length === 0 && !isTestingConnection) {
+      testElevenLabsConnection()
+    }
+  }, [currentStep, formData.elevenlabsApiKey])
+
   // Fetch payment methods when step 4 is shown
   useEffect(() => {
     if (currentStep === 4) {
@@ -404,6 +437,33 @@ export default function Wizard({ onComplete }: WizardProps) {
       fetchConnectedTools()
     }
   }, [currentStep])
+
+  const fetchPhoneNumbers = useCallback(async () => {
+    setIsLoadingPhoneNumbers(true)
+    try {
+      const response = await axiosInstance.get("/phones")
+      setPhoneNumbers(response.data || [])
+    } catch (error) {
+      console.error('Failed to fetch phone numbers:', error)
+      // Don't show error toast here, just log it
+    } finally {
+      setIsLoadingPhoneNumbers(false)
+    }
+  }, [])
+
+  const fetchDefaultVoices = useCallback(async () => {
+    setIsLoadingDefaultVoices(true)
+    try {
+      const response = await axiosInstance.get("/voice/custom", {
+        params: { lang_code: "en-US" }
+      })
+      setDefaultVoices(response.data || [])
+    } catch (error) {
+      console.error('Failed to fetch default voices:', error)
+    } finally {
+      setIsLoadingDefaultVoices(false)
+    }
+  }, [])
 
   const fetchConnectedTools = useCallback(async () => {
     setIsLoadingTools(true)
@@ -433,18 +493,26 @@ export default function Wizard({ onComplete }: WizardProps) {
 
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
+    // Skip step 2 if user selected existing phone number
+    if (currentStep === 1 && formData.useExistingPhone && formData.existingPhoneId) {
+      setCurrentStep(3) // Skip to step 3 (ElevenLabs)
+    } else if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
     } else {
       onComplete({
         ...formData,
         phoneSetup: {
           ...formData.phoneSetup,
-          phoneNumber: formData.selectedPhoneNumber || formData.phoneSetup.phoneNumber,
+          phoneNumber: formData.useExistingPhone
+            ? formData.existingPhoneId
+            : (formData.selectedPhoneNumber || formData.phoneSetup.phoneNumber),
         },
+        useExistingPhone: formData.useExistingPhone,
+        existingPhoneId: formData.existingPhoneId,
         voiceType: formData.voice,
         tone: formData.personality,
         primaryGoal: formData.purpose,
+        selectedTools: formData.selectedTools,
         description:
           [
             formData.purpose && `Purpose: ${formData.purpose}`,
@@ -463,7 +531,12 @@ export default function Wizard({ onComplete }: WizardProps) {
       return
     }
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
+      // Skip step 2 if going back from step 3 and existing phone was selected
+      if (currentStep === 3 && formData.useExistingPhone && formData.existingPhoneId) {
+        setCurrentStep(1)
+      } else {
+        setCurrentStep(currentStep - 1)
+      }
     }
   }
 
@@ -561,17 +634,17 @@ export default function Wizard({ onComplete }: WizardProps) {
     const stepConfigs = [
       {
         icon: Phone,
-        title: "Connect phone system",
+        title: "Connect Phone System",
         subtitle: "Step 1 of 6",
-        description: "Connect your phone system to enable calling capabilities for your AI agent.",
+        description: "Connect your phone provider (Twilio, Vonage, Plivo, or Exotel) to enable calling capabilities for your AI agent.",
         gradient: "from-blue-500 to-cyan-600",
         color: "#00FFFF",
       },
       {
         icon: Hash,
-        title: "Choose a number",
+        title: "Choose Phone Number",
         subtitle: "Step 2 of 6",
-        description: "Select a phone number for your AI agent to use for making and receiving calls.",
+        description: "Enter the phone number your AI agent will use for making and receiving calls.",
         gradient: "from-green-500 to-emerald-600",
         color: "#00FF00",
       },
@@ -579,31 +652,31 @@ export default function Wizard({ onComplete }: WizardProps) {
         icon: Mic,
         title: "Connect ElevenLabs",
         subtitle: "Step 3 of 6",
-        description: "Connect your ElevenLabs account to enable high-quality voice generation.",
+        description: "Connect your ElevenLabs API key to access high-quality voice generation. This step is required to create your agent.",
         gradient: "from-purple-500 to-pink-600",
         color: "#FF00FF",
       },
       {
         icon: CreditCard,
-        title: "Check billing",
+        title: "Verify Billing",
         subtitle: "Step 4 of 6",
-        description: "Verify your billing information and payment method to ensure uninterrupted service.",
+        description: "Ensure you have sufficient credit or a payment method set up to keep your agent running smoothly.",
         gradient: "from-orange-500 to-red-600",
         color: "#FFFF00",
       },
       {
         icon: Bot,
-        title: "Create agent",
+        title: "Configure Your Agent",
         subtitle: "Step 5 of 6",
-        description: "Configure your AI agent with a name, purpose, voice, and personality.",
+        description: "Give your AI agent a name, define its purpose, and select its voice. This is where your agent comes to life!",
         gradient: "from-indigo-500 to-purple-600",
         color: "#8A2BE2",
       },
       {
         icon: Plug,
-        title: "Connect tools",
+        title: "Connect Tools (Optional)",
         subtitle: "Step 6 of 6",
-        description: "Connect external tools and integrations to extend your agent's capabilities.",
+        description: "Connect external tools and integrations to extend your agent's capabilities. You can skip this and add tools later.",
         gradient: "from-pink-500 to-rose-600",
         color: "#FF0080",
       },
@@ -693,6 +766,84 @@ export default function Wizard({ onComplete }: WizardProps) {
             </div>
 
             <div className="space-y-6">
+              {/* Connected Phone Numbers */}
+              {phoneNumbers.length > 0 && (
+                <div className="space-y-4 mt-6">
+                  <Label className={clsx("text-lg", theme.textPrimary)}>
+                    Select from Your Connected Phone Numbers
+                  </Label>
+                  <p className={clsx("text-sm", theme.textTertiary)}>
+                    You can select an existing phone number to use, or continue to add a new one in the next step.
+                  </p>
+                  {isLoadingPhoneNumbers ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin" style={{ color: stepConfig.color }} />
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 max-h-64 overflow-y-auto">
+                      {phoneNumbers.map((phone) => {
+                        const isSelected = formData.useExistingPhone && formData.existingPhoneId === phone.id
+                        return (
+                          <Card
+                            key={phone.id}
+                            className={clsx(
+                              "cursor-pointer transition-all duration-300",
+                              isSelected
+                                ? isDarkMode
+                                  ? "bg-green-500/20 border-green-400"
+                                  : "bg-green-100 border-green-400"
+                                : isDarkMode
+                                  ? "bg-black/50 border-gray-600 hover:border-green-400"
+                                  : "bg-white/70 border-gray-300 hover:border-green-400"
+                            )}
+                            style={{
+                              boxShadow: isSelected
+                                ? isDarkMode
+                                  ? "0 0 30px #00FF00"
+                                  : "0 0 30px rgba(34,197,94,0.5)"
+                                : isDarkMode
+                                  ? "0 0 10px rgba(0, 255, 0, 0.3)"
+                                  : "0 0 10px rgba(34,197,94,0.2)",
+                            }}
+                            onClick={() => {
+                              if (isSelected) {
+                                // Deselect if already selected
+                                updateFormData("useExistingPhone", false)
+                                updateFormData("existingPhoneId", "")
+                              } else {
+                                // Select this phone
+                                updateFormData("useExistingPhone", true)
+                                updateFormData("existingPhoneId", phone.id)
+                              }
+                            }}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-3">
+                                <Phone className={clsx("w-5 h-5", isDarkMode ? 'text-green-400' : 'text-green-600')} />
+                                <div className="flex-1">
+                                  <h3 className={clsx("font-semibold", theme.textPrimary)}>{phone.id}</h3>
+                                  {phone.agent_id && (
+                                    <p className={clsx("text-sm", theme.textTertiary)}>
+                                      Currently assigned to an agent
+                                    </p>
+                                  )}
+                                </div>
+                                {isSelected && (
+                                  <CheckCircle2 className={clsx("w-5 h-5", isDarkMode ? 'text-green-400' : 'text-green-600')} />
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )
+                      })}
+                    </div>
+                  )}
+                  <p className={clsx("font-bold", theme.textTertiary)}>
+                    Or import a new phone number:
+                  </p>
+                </div>
+              )}
+
               {/* Provider Selection Tabs */}
               <div className="flex items-center border-b-2" style={{ borderColor: isDarkMode ? "rgba(0, 255, 255, 0.3)" : "rgba(14,165,233,0.3)" }}>
                 {["twilio", "vanage", "plivo", "exotel"].map((provider) => {
@@ -704,8 +855,8 @@ export default function Wizard({ onComplete }: WizardProps) {
                       className={clsx(
                         "cursor-pointer w-full border-b-2 transition-all duration-300 px-2 py-1 md:px-4 md:py-2",
                         isActive
-                          ? isDarkMode 
-                            ? "border-cyan-400 text-cyan-400" 
+                          ? isDarkMode
+                            ? "border-cyan-400 text-cyan-400"
                             : "border-cyan-600 text-cyan-600"
                           : isDarkMode
                             ? "text-gray-400 border-transparent hover:text-cyan-300"
@@ -996,33 +1147,35 @@ export default function Wizard({ onComplete }: WizardProps) {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <Label
-                htmlFor="phoneNumber"
-                className={clsx("text-lg", theme.textPrimary)}
-                style={{ textShadow: theme.textShadow }}
-              >
-                Phone Number
-              </Label>
-              <Input
-                id="phoneNumber"
-                placeholder="+12345678990"
-                value={formData.selectedPhoneNumber}
-                onChange={(e) => updateFormData("selectedPhoneNumber", e.target.value)}
-                className={clsx(
-                  "text-xl h-14 border-2",
-                  theme.inputBg,
-                  theme.inputText,
-                  theme.inputPlaceholder
-                )}
-                style={{
-                  border: `2px solid ${theme.inputBorder}`,
-                  boxShadow: theme.inputShadow,
-                }}
-              />
-              <p className={clsx("text-sm", theme.textTertiary)}>
-                Enter the phone number you want to use for your AI agent.
-              </p>
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <Label
+                  htmlFor="phoneNumber"
+                  className={clsx("text-lg", theme.textPrimary)}
+                  style={{ textShadow: theme.textShadow }}
+                >
+                  Phone Number
+                </Label>
+                <Input
+                  id="phoneNumber"
+                  placeholder="+12345678990"
+                  value={formData.selectedPhoneNumber}
+                  onChange={(e) => updateFormData("selectedPhoneNumber", e.target.value)}
+                  className={clsx(
+                    "text-xl h-14 border-2",
+                    theme.inputBg,
+                    theme.inputText,
+                    theme.inputPlaceholder
+                  )}
+                  style={{
+                    border: `2px solid ${theme.inputBorder}`,
+                    boxShadow: theme.inputShadow,
+                  }}
+                />
+                <p className={clsx("text-sm", theme.textTertiary)}>
+                  Enter the phone number you want to use for your AI agent.
+                </p>
+              </div>
             </div>
           </div>
         )
@@ -1060,61 +1213,91 @@ export default function Wizard({ onComplete }: WizardProps) {
             </div>
 
             <div className="space-y-6">
-              <div className="space-y-4">
-                <Label
-                  htmlFor="elevenlabsKey"
-                  className={clsx("text-lg", theme.textPrimary)}
-                  style={{ textShadow: theme.textShadow }}
-                >
-                  ElevenLabs API Key
-                </Label>
-                <div className="flex gap-3">
-                  <Input
-                    id="elevenlabsKey"
-                    type="password"
-                    placeholder="Enter your ElevenLabs API key"
-                    value={formData.elevenlabsApiKey}
-                    onChange={(e) => updateFormData("elevenlabsApiKey", e.target.value)}
-                    className={clsx(
-                      "text-xl h-14 border-2 flex-1",
-                      theme.inputBg,
-                      theme.inputText,
-                      theme.inputPlaceholder
-                    )}
-                    style={{
-                      border: `2px solid ${theme.inputBorder}`,
-                      boxShadow: theme.inputShadow,
-                    }}
-                  />
-                  <Button
-                    onClick={testElevenLabsConnection}
-                    disabled={!formData.elevenlabsApiKey.trim() || isTestingConnection}
-                    className="h-14 px-8 text-lg text-white border-0 transition-all duration-200 disabled:opacity-50"
-                    style={{
-                      background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
-                      boxShadow: "0 0 30px #FF00FF, 0 0 60px #00FFFF",
-                    }}
-                  >
-                    {isTestingConnection ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Testing...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        Test Connection
-                      </>
-                    )}
-                  </Button>
-                </div>
-                <p className={clsx("text-sm", theme.textTertiary)}>
-                  You can find your API key in your ElevenLabs account settings.
-                </p>
-              </div>
+              {!currentUser?.api_keys?.elevenlabs && (
+                <>
+                  <div className="space-y-4">
+                    <Label
+                      htmlFor="elevenlabsKey"
+                      className={clsx("text-lg", theme.textPrimary)}
+                      style={{ textShadow: theme.textShadow }}
+                    >
+                      ElevenLabs API Key
+                    </Label>
+                    <div className="flex gap-3">
+                      <Input
+                        id="elevenlabsKey"
+                        type="password"
+                        placeholder="Enter your ElevenLabs API key"
+                        value={formData.elevenlabsApiKey}
+                        onChange={(e) => updateFormData("elevenlabsApiKey", e.target.value)}
+                        className={clsx(
+                          "text-xl h-14 border-2 flex-1",
+                          theme.inputBg,
+                          theme.inputText,
+                          theme.inputPlaceholder
+                        )}
+                        style={{
+                          border: `2px solid ${theme.inputBorder}`,
+                          boxShadow: theme.inputShadow,
+                        }}
+                      />
+                      <Button
+                        onClick={testElevenLabsConnection}
+                        disabled={!formData.elevenlabsApiKey.trim() || isTestingConnection}
+                        className="h-14 px-8 text-lg text-white border-0 transition-all duration-200 disabled:opacity-50"
+                        style={{
+                          background: "linear-gradient(45deg, #FF00FF, #00FFFF)",
+                          boxShadow: "0 0 30px #FF00FF, 0 0 60px #00FFFF",
+                        }}
+                      >
+                        {isTestingConnection ? (
+                          <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Testing...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-5 h-5 mr-2" />
+                            Test Connection
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <p className={clsx("text-sm", theme.textTertiary)}>
+                      You can find your API key in your ElevenLabs account settings.
+                    </p>
+                  </div>
 
-              {/* Loading spark animation */}
-              {isTestingConnection && (
+                  {isTestingConnection && (
+                    <div className="relative h-32 flex items-center justify-center">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Sparkles className="w-12 h-12 animate-pulse" style={{ color: stepConfig.color }} />
+                      </div>
+                      <div className="absolute inset-0">
+                        {Array.from({ length: 20 }).map((_, i) => (
+                          <div
+                            key={i}
+                            className="absolute w-1 h-1 rounded-full animate-ping"
+                            style={{
+                              left: `${Math.random() * 100}%`,
+                              top: `${Math.random() * 100}%`,
+                              backgroundColor: stepConfig.color,
+                              animationDelay: `${Math.random() * 2}s`,
+                              animationDuration: `${1 + Math.random()}s`,
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <p className={clsx("text-lg font-semibold relative z-10", theme.textSecondary)}>
+                        Fetching available voices...
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Show loading animation if API key exists and voices are being fetched */}
+              {currentUser?.api_keys?.elevenlabs && isTestingConnection && (
                 <div className="relative h-32 flex items-center justify-center">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <Sparkles className="w-12 h-12 animate-pulse" style={{ color: stepConfig.color }} />
@@ -1140,7 +1323,115 @@ export default function Wizard({ onComplete }: WizardProps) {
                 </div>
               )}
 
-              {/* Voices list */}
+              {/* Default Voices list (when no ElevenLabs API key) */}
+              {!formData.elevenlabsApiKey.trim() && defaultVoices.length > 0 && (
+                <div className="space-y-4">
+                  <Label className={clsx("text-lg", theme.textPrimary)}>
+                    Select a Default Voice
+                  </Label>
+                  {isLoadingDefaultVoices ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin" style={{ color: stepConfig.color }} />
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 max-h-96 overflow-y-auto">
+                      {defaultVoices.map((voice) => {
+                        const isSelected = formData.voice === voice.voice_id
+                        const isPlaying = isPlayingVoice === voice.voice_id
+
+                        return (
+                          <Card
+                            key={voice.voice_id}
+                            className={clsx(
+                              "cursor-pointer transition-all duration-300",
+                              isSelected
+                                ? isDarkMode
+                                  ? "bg-purple-500/20 border-purple-400"
+                                  : "bg-purple-100 border-purple-400"
+                                : isDarkMode
+                                  ? "bg-black/50 border-gray-600 hover:border-purple-400"
+                                  : "bg-white/70 border-gray-300 hover:border-purple-400"
+                            )}
+                            style={{
+                              boxShadow: isSelected
+                                ? isDarkMode
+                                  ? "0 0 30px #FF00FF"
+                                  : "0 0 30px rgba(147,51,234,0.5)"
+                                : isDarkMode
+                                  ? "0 0 10px rgba(255, 0, 255, 0.3)"
+                                  : "0 0 10px rgba(147,51,234,0.2)",
+                            }}
+                            onClick={() => updateFormData("voice", voice.voice_id)}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-4 flex-1">
+                                  <Volume2
+                                    className={clsx(
+                                      "w-6 h-6",
+                                      isDarkMode ? 'text-purple-400' : 'text-purple-600'
+                                    )}
+                                  />
+                                  <div className="flex-1">
+                                    <h3 className={clsx("font-bold text-lg", theme.textPrimary)}>
+                                      {voice.name}
+                                    </h3>
+                                    {voice.provider && (
+                                      <p className={clsx("text-sm", theme.textTertiary)}>
+                                        Provider: {voice.provider}
+                                      </p>
+                                    )}
+                                    {voice.category && (
+                                      <p className={clsx("text-sm", theme.textTertiary)}>
+                                        {voice.category}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                {voice.preview_url && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      playVoicePreview(voice)
+                                    }}
+                                    className={clsx(
+                                      "ml-4",
+                                      isDarkMode
+                                        ? 'border-purple-400 text-purple-400 hover:bg-purple-400 hover:text-black'
+                                        : 'border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white'
+                                    )}
+                                    style={{
+                                      boxShadow: isDarkMode
+                                        ? "0 0 15px #FF00FF"
+                                        : "0 0 15px rgba(147,51,234,0.4)",
+                                    }}
+                                  >
+                                    {isPlaying ? (
+                                      <>
+                                        <Pause className="w-4 h-4 mr-2" />
+                                        Playing
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Play className="w-4 h-4 mr-2" />
+                                        Preview
+                                      </>
+                                    )}
+                                  </Button>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ElevenLabs Voices list */}
               {elevenlabsVoices.length > 0 && (
                 <div className="space-y-4">
                   <Label className={clsx("text-lg", theme.textPrimary)}>
@@ -1709,35 +2000,60 @@ export default function Wizard({ onComplete }: WizardProps) {
               ) : connectedTools.length > 0 ? (
                 <div className="space-y-4">
                   <Label className={clsx("text-lg", theme.textPrimary)}>
-                    Configured Tools
+                    Select Tools to Configure (Optional)
                   </Label>
-                  <div className="grid gap-3">
-                    {connectedTools.map((tool) => (
-                      <Card
-                        key={tool.id}
-                        className={clsx(
-                          "transition-all duration-300",
-                          isDarkMode ? "bg-black/50 border-gray-600" : "bg-white/70 border-gray-300"
-                        )}
-                        style={{
-                          boxShadow: isDarkMode
-                            ? "0 0 10px rgba(255, 255, 0, 0.3)"
-                            : "0 0 10px rgba(245,158,11,0.2)",
-                        }}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3">
-                            <Plug className={clsx("w-5 h-5", isDarkMode ? 'text-pink-400' : 'text-pink-600')} />
-                            <div className="flex-1">
-                              <h3 className={clsx("font-semibold", theme.textPrimary)}>{tool.name}</h3>
-                              {tool.description && (
-                                <p className={clsx("text-sm", theme.textTertiary)}>{tool.description}</p>
+                  <p className={clsx("text-sm", theme.textTertiary)}>
+                    Select the tools you want to configure for this agent. You can skip this step and configure tools later.
+                  </p>
+                  <div className="grid gap-3 max-h-96 overflow-y-auto">
+                    {connectedTools.map((tool) => {
+                      const isSelected = formData.selectedTools.includes(tool.id)
+                      return (
+                        <Card
+                          key={tool.id}
+                          className={clsx(
+                            "cursor-pointer transition-all duration-300",
+                            isSelected
+                              ? isDarkMode
+                                ? "bg-pink-500/20 border-pink-400"
+                                : "bg-pink-100 border-pink-400"
+                              : isDarkMode
+                                ? "bg-black/50 border-gray-600 hover:border-pink-400"
+                                : "bg-white/70 border-gray-300 hover:border-pink-400"
+                          )}
+                          style={{
+                            boxShadow: isSelected
+                              ? isDarkMode
+                                ? "0 0 30px #FF0080"
+                                : "0 0 30px rgba(236,72,153,0.5)"
+                              : isDarkMode
+                                ? "0 0 10px rgba(255, 0, 128, 0.3)"
+                                : "0 0 10px rgba(236,72,153,0.2)",
+                          }}
+                          onClick={() => {
+                            const newSelectedTools = isSelected
+                              ? formData.selectedTools.filter(id => id !== tool.id)
+                              : [...formData.selectedTools, tool.id]
+                            updateFormData("selectedTools", newSelectedTools)
+                          }}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center gap-3">
+                              <Plug className={clsx("w-5 h-5", isDarkMode ? 'text-pink-400' : 'text-pink-600')} />
+                              <div className="flex-1">
+                                <h3 className={clsx("font-semibold", theme.textPrimary)}>{tool.name}</h3>
+                                {tool.description && (
+                                  <p className={clsx("text-sm", theme.textTertiary)}>{tool.description}</p>
+                                )}
+                              </div>
+                              {isSelected && (
+                                <CheckCircle2 className={clsx("w-5 h-5", isDarkMode ? 'text-pink-400' : 'text-pink-600')} />
                               )}
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      )
+                    })}
                   </div>
                 </div>
               ) : (
@@ -1759,6 +2075,9 @@ export default function Wizard({ onComplete }: WizardProps) {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
+        if (formData.useExistingPhone && formData.existingPhoneId) {
+          return true
+        }
         const { provider } = formData.phoneSetup
         if (provider === "plivo") {
           return (
@@ -1786,7 +2105,10 @@ export default function Wizard({ onComplete }: WizardProps) {
             formData.phoneSetup.apiSecret
           )
         }
-      case 2: // Choose a number
+      case 2:
+        if (formData.useExistingPhone) {
+          return true
+        }
         return formData.selectedPhoneNumber.trim() !== ""
       case 3: // Connect ElevenLabs
         return formData.elevenlabsApiKey.trim() !== "" && formData.voice !== "" && formData.voice !== ""
@@ -1796,6 +2118,10 @@ export default function Wizard({ onComplete }: WizardProps) {
         // If payment method is required but not present, can't proceed
         if (needsPaymentMethod) {
           return false
+        }
+        // If credit is sufficient, allow skipping billing confirmation
+        if (creditInCents >= 100) {
+          return true
         }
         // Otherwise, require billing confirmation
         return formData.billingConfirmed

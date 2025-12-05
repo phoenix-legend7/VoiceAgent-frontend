@@ -220,11 +220,11 @@ export default function SignupScreen() {
             payment_method_id: pmId
           })
           toast.success("Account created and payment method verified successfully!")
-          window.location.assign("/")
+          window.location.assign("/onboarding")
           return
         } catch (paymentErr) {
           toast.warning("Account created, but payment method verification failed. Please add a payment method in settings.")
-          window.location.assign("/")
+          window.location.assign("/onboarding")
           return
         }
       }
