@@ -251,7 +251,7 @@ const MasterLayout = () => {
           <div className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)]">
             <ElevenLabsConvAIWidget 
               agentId={import.meta.env.VITE_APP_ELEVENLABS_CONVAI_AGENT_ID || ""}
-              className="w-full h-[500px]"
+              className="w-full h-fit"
             />
           </div>
         )}
