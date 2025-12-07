@@ -36,16 +36,17 @@ const UrlScraper = () => {
 
   const scrapeUrl = async (urlToScrape: string): Promise<string> => {
     try {
-      // try {
-      //   const response = await axiosInstance.post("/knowledge/scrape_url", {
-      //     url: urlToScrape,
-      //   });
-      //   if (response.data && response.data.text) {
-      //     return response.data.text;
-      //   }
-      // } catch (backendError) {
-      //   console.log("Backend scraping not available, trying client-side");
-      // }
+      try {
+        const response = await axiosInstance.post("/knowledge/scrape_url", {
+          url: urlToScrape,
+        });
+        if (response.data && response.data.text) {
+          return response.data.text;
+        }
+      } catch (backendError) {
+        console.log("Backend scraping not available, trying client-side");
+        toast.warning("Backend scraping not available, trying client-side");
+      }
 
       const response = await fetch(urlToScrape, {
         method: "GET",
@@ -245,7 +246,7 @@ const UrlScraper = () => {
               />
             </div>
 
-            <div className="flex justify-end">
+            <div>
               <button
                 className="flex items-center gap-2 cursor-pointer bg-sky-600 text-white px-5 py-2 rounded-md transition-all duration-300 hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleScrape}
