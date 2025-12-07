@@ -166,7 +166,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
     const stepConfigs = [
       {
         icon: Rocket,
-        title: "Welcome to Millis AI!",
+        title: "Welcome to Spark AI!",
         subtitle: "Step 1 of 3",
         description: "Let's get you started with your AI voice agent platform.",
         gradient: "from-blue-500 to-cyan-600",
