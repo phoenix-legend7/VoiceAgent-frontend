@@ -172,8 +172,7 @@ const PaymentMethodCard = ({
       await axiosInstance.delete(`/billing/payment-methods/${paymentMethod.id}`);
       onRemove(paymentMethod.id);
     } catch (error) {
-      console.error('Failed to remove payment method:', error);
-      toast.error(`Failed to remove payment method: ${(error as Error).message}`);
+      handleAxiosError('Failed to remove payment method', error);
     } finally {
       setLoading(false);
     }
@@ -185,8 +184,7 @@ const PaymentMethodCard = ({
     try {
       await onSetDefault(paymentMethod.id);
     } catch (error) {
-      console.error('Failed to set default payment method:', error);
-      toast.error(`Failed to set default payment method: ${(error as Error).message}`);
+      handleAxiosError('Failed to set default payment method', error);
     } finally {
       setLoading(false);
     }
@@ -270,8 +268,7 @@ const Billing = () => {
       const response = await axiosInstance.get("/billing/payment-methods");
       setPaymentMethods(response.data.payment_methods || []);
     } catch (error) {
-      console.error('Failed to fetch payment methods:', error);
-      toast.error(`Failed to fetch payment methods: ${(error as Error).message}`);
+      handleAxiosError('Failed to fetch payment methods', error);
     }
   };
 
@@ -294,8 +291,7 @@ const Billing = () => {
         }))
       );
     } catch (error) {
-      console.error('Failed to set default payment method:', error);
-      toast.error(`Failed to set default payment method: ${(error as Error).message}`);
+      handleAxiosError('Failed to set default payment method', error);
     }
   };
 
@@ -314,8 +310,7 @@ const Billing = () => {
       };
       await axiosInstance.post('/billing/auto-refill/configure', payload);
     } catch (error) {
-      console.error('Failed to configure auto-refill:', error);
-      toast.error(`Failed to configure auto-refill: ${(error as Error).message}`);
+      handleAxiosError('Failed to configure auto-refill', error);
     } finally {
       setAutoRefillLoading(false);
     }
@@ -341,8 +336,7 @@ const Billing = () => {
         })
       }
     } catch (error) {
-      console.error('Failed to process payment:', error);
-      toast.error(`Failed to process payment: ${(error as Error).message}`);
+      handleAxiosError('Failed to process payment', error);
     } finally {
       setLoading(false);
     }
