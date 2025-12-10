@@ -8,7 +8,7 @@ import Navbar from "../components/Navbar"
 import OnboardingTour from "../components/OnboardingTour"
 import { useAuth } from "../core/authProvider"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../components/ui/tooltip"
-import ElevenLabsConvAIWidget from "../components/ElevenLabsConvAIWidget"
+import ElfsightAIChatbot from "../components/ElfsightAIChatbot"
 
 type ThemeType = "light" | "dark" | "system"
 
@@ -211,7 +211,7 @@ const MasterLayout = () => {
   const location = useLocation()
 
   const isWizardRoute = location.pathname === '/onboarding' || location.pathname === '/wizard'
-  const showWidget = !!currentUser && !isWizardRoute && import.meta.env.VITE_APP_ELEVENLABS_CONVAI_AGENT_ID
+  const showWidget = !!currentUser && !isWizardRoute
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -246,11 +246,10 @@ const MasterLayout = () => {
         <div className="w-full mx-auto overflow-y-auto relative h-[calc(100vh-4rem)]">
           <Outlet />
         </div>
-        {/* ElevenLabs Conversational AI Widget */}
+        {/* Elfsight AI Chatbot Widget */}
         {showWidget && (
           <div className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)]">
-            <ElevenLabsConvAIWidget 
-              agentId={import.meta.env.VITE_APP_ELEVENLABS_CONVAI_AGENT_ID || ""}
+            <ElfsightAIChatbot 
               className="w-full h-fit"
             />
           </div>
