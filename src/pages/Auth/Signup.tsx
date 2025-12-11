@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
-import { Mail, Lock, Sparkles, User, CreditCard, ArrowLeft } from "lucide-react"
+import { Mail, Lock, Sparkles, User, CreditCard, ArrowLeft, CheckCircle2, Shield, Zap } from "lucide-react"
 import axiosInstance from "../../core/axiosInstance"
 import { Link, useNavigate } from "react-router-dom"
 import AuthLayout from "./AuthLayout"
@@ -91,6 +91,49 @@ const PaymentMethodForm = ({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Free Trial Banner */}
+      <div
+        className={`rounded-lg p-4 border-2 ${isDarkMode ? 'bg-green-900/20 border-green-500/50' : 'bg-green-50 border-green-200'}`}
+        style={{ boxShadow: isDarkMode ? '0 0 20px rgba(34, 197, 94, 0.2)' : '0 2px 8px rgba(34, 197, 94, 0.1)' }}
+      >
+        <div className="flex items-start gap-3">
+          <Zap className={`w-5 h-5 mt-0.5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+          <div className="flex-1">
+            <h3 className={`font-semibold text-base mb-1 ${isDarkMode ? 'text-green-300' : 'text-green-800'}`}>
+              3-Day Free Trial
+            </h3>
+            <p className={`text-sm ${isDarkMode ? 'text-green-200' : 'text-green-700'}`}>
+              Start your free trial today. No charges until your trial ends. Cancel anytime during the trial period.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* What You're Signing Up For */}
+      <div className={`rounded-lg p-4 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
+        <h4 className={`font-semibold text-sm mb-2 ${theme.labelColor}`} style={{ textShadow: theme.labelShadow }}>
+          What's Included
+        </h4>
+        <ul className={`space-y-1.5 text-sm ${theme.descColor}`} style={{ textShadow: theme.descShadow }}>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>AI voice agents with natural language processing</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>Inbound and outbound calling in 4 countries</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>Pay-as-you-go pricing starting at $0.04/min</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>Webhook integrations and API access</span>
+          </li>
+        </ul>
+      </div>
+
       <div className="space-y-2">
         <Label className={theme.labelColor} style={{ textShadow: theme.labelShadow }}>
           Payment Method
@@ -104,9 +147,12 @@ const PaymentMethodForm = ({
             <CardElement options={cardElementOptions} />
           </div>
         </div>
-        <p className={`text-xs ${theme.descColor}`} style={{ textShadow: theme.descShadow }}>
-          Your payment method will be verified but not charged during signup
-        </p>
+        <div className="flex items-start gap-2">
+          <Shield className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+          <p className={`text-xs ${theme.descColor}`} style={{ textShadow: theme.descShadow }}>
+            Your payment method will be verified but not charged during signup. Powered by <span className="font-semibold">Stripe</span> for secure payment processing.
+          </p>
+        </div>
       </div>
 
       {error && (
@@ -155,7 +201,7 @@ const PaymentMethodForm = ({
 
 export default function SignupScreen() {
   const navigate = useNavigate()
-  const [step, setStep] = useState<'account' | 'payment'>('account')
+  const [step, setStep] = useState<'account' | 'payment' | 'success'>('account')
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
@@ -229,8 +275,7 @@ export default function SignupScreen() {
         }
       }
 
-      toast.success("Account created. Please sign in.")
-      navigate("/login")
+      setStep('success')
     } catch (err) {
       const error = err as AxiosError
       if ((error.response?.data as any)?.detail) {
@@ -252,12 +297,51 @@ export default function SignupScreen() {
   return (
     <Elements stripe={stripePromise}>
       <AuthLayout
-        title={step === 'account' ? "Create your Spark account" : "Verify Payment Method"}
-        description={step === 'account' ? "Build powerful AI voice agents in minutes" : "Add a payment method to complete your registration"}
+        title={
+          step === 'account' ? "Create your Spark account" :
+            step === 'payment' ? "Verify Payment Method" :
+              "Registration Successful!"
+        }
+        description={
+          step === 'account' ? "Build powerful AI voice agents in minutes" :
+            step === 'payment' ? "Add a payment method to complete your registration" :
+              "Your account has been created successfully"
+        }
       >
         {(theme, isDarkMode) => (
           <>
-            {step === 'account' ? (
+            {step === 'success' ? (
+              <div className="space-y-6 text-center">
+                <div className="flex justify-center">
+                  <div className={`rounded-full p-4 ${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'}`}>
+                    <CheckCircle2 className={`w-12 h-12 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <h2 className={`text-2xl font-bold ${theme.labelColor}`} style={{ textShadow: theme.labelShadow }}>
+                    Thank You for Registering!
+                  </h2>
+                  <p className={`text-base ${theme.descColor}`} style={{ textShadow: theme.descShadow }}>
+                    Your account has been created successfully. Please log in using your account details to get started.
+                  </p>
+                </div>
+                <div className={`rounded-lg p-4 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
+                  <p className={`text-sm ${theme.descColor}`} style={{ textShadow: theme.descShadow }}>
+                    <span className="font-semibold">Email:</span> {email}
+                  </p>
+                </div>
+                <Button
+                  onClick={() => navigate("/login")}
+                  className="w-full h-12 text-white border-0 transition-all duration-200"
+                  style={{ background: theme.buttonGradient, boxShadow: theme.buttonShadow }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Go to Login
+                  </div>
+                </Button>
+              </div>
+            ) : step === 'account' ? (
               <>
                 <Button
                   onClick={handleGoogleSignup}

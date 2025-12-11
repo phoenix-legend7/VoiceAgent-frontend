@@ -169,7 +169,7 @@ const UserMenu = () => {
       )}>
         <div className="flex flex-col p-1.5">
           <div>
-            <div className="px-4 py-2 font-bold">
+            <div className="px-4 py-2 font-bold text-nowrap">
               {currentUser?.first_name} {currentUser?.last_name}
             </div>
             <hr className="w-full my-1 text-gray-200" />
