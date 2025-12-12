@@ -26,14 +26,18 @@ export default function ElfsightAIChatbot({
       document.body.appendChild(script);
     }
 
-    // The widget will be rendered by the Elfsight platform script
-    // based on the div with the class and data attribute
+    return () => {
+      const eaapsPortal = document.getElementById('__EAAPS_PORTAL');
+      if (eaapsPortal && eaapsPortal.parentNode) {
+        eaapsPortal.parentNode.removeChild(eaapsPortal);
+      }
+    };
   }, []);
 
   return (
     <div ref={containerRef} className={className}>
       <div
-        className="elfsight-app-60b0fe01-f123-43a2-82c7-ae2313f6b519"
+        className={import.meta.env.VITE_APP_ELFSHIHT_WIDGET_CLASS}
         data-elfsight-app-lazy
       />
     </div>

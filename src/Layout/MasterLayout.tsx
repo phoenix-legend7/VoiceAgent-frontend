@@ -255,11 +255,7 @@ const MasterLayout = () => {
           <Outlet />
         </div>
         {/* Elfsight AI Chatbot Widget */}
-        {showWidget && (
-          <div className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)]">
-            <ElfsightAIChatbot className="w-full h-fit" />
-          </div>
-        )}
+        {showWidget && <ElfsightAIChatbot />}
         {/* Onboarding tour runs after first login */}
         <OnboardingTour userId={currentUser?.email} />
       </div>
