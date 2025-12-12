@@ -13,7 +13,7 @@ import AuthLayout from "./AuthLayout"
 export default function VerifyEmailScreen() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { saveAuth, setCurrentUser } = useAuth()
+  const { saveAuth, setCurrentUser, currentUser, logout } = useAuth()
   const [email, setEmail] = useState("")
   const [code, setCode] = useState("")
   const [isEmailEditable, setIsEmailEditable] = useState(false)
@@ -24,6 +24,12 @@ export default function VerifyEmailScreen() {
   const codeInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if (currentUser?.email) {
+      setEmail(currentUser.email)
+      setIsEmailEditable(false)
+      return
+    }
+
     const emailParam = searchParams.get("email")
     const storedEmail = localStorage.getItem("pending-verification-email")
 
@@ -36,7 +42,7 @@ export default function VerifyEmailScreen() {
     setTimeout(() => {
       codeInputRef.current?.focus()
     }, 100)
-  }, [searchParams])
+  }, [searchParams, currentUser])
 
   const verifyEmail = useCallback(async (e?: React.FormEvent) => {
     if (e) {
@@ -202,13 +208,14 @@ export default function VerifyEmailScreen() {
 
               <form onSubmit={verifyEmail} className="space-y-4">
                 {/* Only show email input if no email is set OR if user clicked "Change email" */}
-                {(isEmailEditable || !email) && (
+                {/* If user is signed in, always show email but make it disabled */}
+                {(isEmailEditable || !email || currentUser) && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="email" className={theme.labelColor} style={{ textShadow: theme.labelShadow }}>
                         Email Address
                       </Label>
-                      {email && isEmailEditable && (
+                      {email && isEmailEditable && !currentUser && (
                         <button
                           type="button"
                           onClick={() => {
@@ -252,14 +259,14 @@ export default function VerifyEmailScreen() {
                         )}
                         style={{ border: `2px solid ${theme.inputBorder}`, boxShadow: theme.inputShadow }}
                         required
-                        disabled={isVerifying}
+                        disabled={isVerifying || !!currentUser}
                       />
                     </div>
                   </div>
                 )}
 
-                {/* Show "Change email" button when email is set and input is hidden */}
-                {email && !isEmailEditable && (
+                {/* Show "Change email" button when email is set and input is hidden, but NOT if user is signed in */}
+                {email && !isEmailEditable && !currentUser && (
                   <div className="flex items-center justify-end">
                     <button
                       type="button"
@@ -390,12 +397,29 @@ export default function VerifyEmailScreen() {
               </Button>
 
               <div className="text-center space-y-2">
-                <p className={clsx("text-sm", theme.textColor)} style={{ textShadow: theme.textShadow }}>
-                  Already verified? <Link to="/login" className="underline">Sign in</Link>
-                </p>
-                <p className={clsx("text-sm", theme.textColor)} style={{ textShadow: theme.textShadow }}>
-                  Don't have an account? <Link to="/signup" className="underline">Sign up</Link>
-                </p>
+                {currentUser ? (
+                  <p className={clsx("text-sm", theme.textColor)} style={{ textShadow: theme.textShadow }}>
+                    Signed in as {currentUser.email}?{" "}
+                    <button
+                      onClick={() => {
+                        logout()
+                        navigate("/login")
+                      }}
+                      className="underline hover:opacity-80 transition-opacity"
+                    >
+                      Sign out
+                    </button>
+                  </p>
+                ) : (
+                  <>
+                    <p className={clsx("text-sm", theme.textColor)} style={{ textShadow: theme.textShadow }}>
+                      Already verified? <Link to="/login" className="underline">Sign in</Link>
+                    </p>
+                    <p className={clsx("text-sm", theme.textColor)} style={{ textShadow: theme.textShadow }}>
+                      Don't have an account? <Link to="/signup" className="underline">Sign up</Link>
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           )}
