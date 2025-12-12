@@ -210,7 +210,15 @@ const MasterLayout = () => {
   const { currentUser } = useAuth()
   const location = useLocation()
 
-  const isWizardRoute = location.pathname === '/onboarding' || location.pathname === '/wizard'
+  const wizardRoutes = [
+    '/onboarding',
+    '/wizard',
+    '/setup-payment',
+    '/verify-email',
+    '/login',
+    '/signup',
+  ];
+  const isWizardRoute = wizardRoutes.includes(location.pathname);
   const showWidget = !!currentUser && !isWizardRoute
 
   return (
@@ -249,9 +257,7 @@ const MasterLayout = () => {
         {/* Elfsight AI Chatbot Widget */}
         {showWidget && (
           <div className="fixed bottom-4 right-4 z-50 w-96 max-w-[calc(100vw-2rem)]">
-            <ElfsightAIChatbot 
-              className="w-full h-fit"
-            />
+            <ElfsightAIChatbot className="w-full h-fit" />
           </div>
         )}
         {/* Onboarding tour runs after first login */}

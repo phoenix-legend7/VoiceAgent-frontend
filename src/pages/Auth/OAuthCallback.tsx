@@ -21,6 +21,30 @@ const OAuthCallback = () => {
         saveAuth({ access_token: data.access_token });
         const { data: user } = await getUserByToken(data.access_token);
         setCurrentUser(user);
+
+        // Check if email is verified
+        if (user && !user.is_verified) {
+          localStorage.setItem("pending-verification-email", user.email);
+          navigate(`/verify-email?email=${encodeURIComponent(user.email)}`);
+          return;
+        }
+
+        // Check if payment method exists
+        try {
+          const paymentResponse = await axiosInstance.get("/billing/payment-methods");
+          const paymentMethods = paymentResponse.data.payment_methods || [];
+
+          if (paymentMethods.length === 0) {
+            navigate("/setup-payment");
+            return;
+          }
+        } catch (paymentErr) {
+          console.error("Failed to check payment methods:", paymentErr);
+          navigate("/setup-payment");
+          return;
+        }
+
+        // All checks passed - go to dashboard
         const onboardingComplete = localStorage.getItem('onboarding-complete');
         if (!onboardingComplete) {
           navigate("/onboarding");

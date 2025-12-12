@@ -53,7 +53,22 @@ export default function LoginScreen() {
         // Get user data
         try {
           const { data: user } = await getUserByToken(data.access_token)
+
+          if (!user) {
+            throw new Error("Failed to get user data")
+          }
+
           setCurrentUser(user)
+
+          // Check if email is verified first
+          if (!user.is_verified) {
+            toast.error("Please verify your email before accessing the dashboard. Redirecting to verification page...")
+            localStorage.setItem("pending-verification-email", user.email)
+            setTimeout(() => {
+              navigate(`/verify-email?email=${encodeURIComponent(user.email)}`)
+            }, 1000)
+            return
+          }
 
           // Check if payment method exists
           try {
@@ -74,20 +89,14 @@ export default function LoginScreen() {
               }
             }
           } catch (paymentErr) {
-            // If we can't check payment methods, just go to dashboard
-            // User can add payment method later from settings
+            // If we can't check payment methods, redirect to payment setup
             console.error("Failed to check payment methods:", paymentErr)
-            const onboardingComplete = localStorage.getItem('onboarding-complete')
-            if (!onboardingComplete) {
-              navigate("/onboarding")
-            } else {
-              navigate("/")
-            }
+            toast.info("Please add a payment method to continue")
+            navigate("/setup-payment")
           }
         } catch (userErr) {
           console.error("Failed to get user data:", userErr)
-          // Still redirect to dashboard even if we can't get user data
-          navigate("/")
+          toast.error("Failed to get user data. Please try again.")
         }
       } else {
         throw new Error("Access token not found")

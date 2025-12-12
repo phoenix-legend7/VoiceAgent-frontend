@@ -30,6 +30,7 @@ import OnboardingWizard from './pages/OnboardingWizard'
 import BuildingAnimation from './pages/AgentBuilding'
 import OAuthCallback from './pages/Auth/OAuthCallback'
 import AdminDashboard from './pages/AdminDashboard'
+import ProtectedRoute from './components/ProtectedRoute'
 
 const CreateAgentWizardRoute = () => {
   const [agentData, setAgentData] = useState<any>();
@@ -88,19 +89,19 @@ function App() {
             <Route path='/wizard' element={<CreateAgentWizardRoute />} />
             <Route element={<MasterLayout />}>
               <Route path='/login' element={<Navigate to="/" />} />
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/agents" element={<Agents />} />
-              <Route path="/agents/:id" element={<AgentDetails />} />
-              <Route path="/phones" element={<PhoneNumbers />} />
-              <Route path="/campaigns" element={<Campaigns />} />
-              <Route path="/campaign-schedule" element={<CampaignScheduling />} />
-              <Route path="/campaigns/:id" element={<CampaignDetails />} />
-              <Route path="/knowledge" element={<AgentKnowledge />} />
-              <Route path="/url-scraper" element={<UrlScraper />} />
-              <Route path="/automation-library" element={<AutomationLibrary />} />
-              <Route path="/histories" element={<CallLogs />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/settings/*" element={<Settings />} />
+              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/agents" element={<ProtectedRoute><Agents /></ProtectedRoute>} />
+              <Route path="/agents/:id" element={<ProtectedRoute><AgentDetails /></ProtectedRoute>} />
+              <Route path="/phones" element={<ProtectedRoute><PhoneNumbers /></ProtectedRoute>} />
+              <Route path="/campaigns" element={<ProtectedRoute><Campaigns /></ProtectedRoute>} />
+              <Route path="/campaign-schedule" element={<ProtectedRoute><CampaignScheduling /></ProtectedRoute>} />
+              <Route path="/campaigns/:id" element={<ProtectedRoute><CampaignDetails /></ProtectedRoute>} />
+              <Route path="/knowledge" element={<ProtectedRoute><AgentKnowledge /></ProtectedRoute>} />
+              <Route path="/url-scraper" element={<ProtectedRoute><UrlScraper /></ProtectedRoute>} />
+              <Route path="/automation-library" element={<ProtectedRoute><AutomationLibrary /></ProtectedRoute>} />
+              <Route path="/histories" element={<ProtectedRoute><CallLogs /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/settings/*" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </>
@@ -109,10 +110,10 @@ function App() {
             {/* <Route path="/" element={<Home />} /> */}
             <Route path='/login' element={<LoginScreen />} />
             <Route path='/signup' element={<SignupScreen />} />
-            <Route path='/verify-email' element={<VerifyEmailScreen />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </>
         )}
+        <Route path='/verify-email' element={<VerifyEmailScreen />} />
         <Route path='/setup-payment' element={<PaymentSetupScreen />} />
         <Route path='/oauth-callback' element={<OAuthCallback />} />
       </Routes>

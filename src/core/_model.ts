@@ -3,7 +3,9 @@ export interface AuthModel {
   refresh_Token?: string;
 }
 export interface UserModel {
+  id: string;
   email: string;
+  is_verified: boolean;
   first_name: string | null;
   last_name: string | null;
   avatar: string | null;
