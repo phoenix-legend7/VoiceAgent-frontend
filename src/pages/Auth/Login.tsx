@@ -1,6 +1,6 @@
 import { AxiosError } from "axios"
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -8,9 +8,12 @@ import { Label } from "../../components/ui/label"
 import { Separator } from "../../components/ui/separator"
 import { Mail, Lock, Sparkles } from "lucide-react"
 import axiosInstance from "../../core/axiosInstance"
+import { getUserByToken, useAuth } from "../../core/authProvider"
 import AuthLayout from "./AuthLayout"
 
 export default function LoginScreen() {
+  const navigate = useNavigate()
+  const { saveAuth, setCurrentUser } = useAuth()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -45,8 +48,47 @@ export default function LoginScreen() {
       })
       const data = response.data
       if (data.access_token) {
-        localStorage.setItem("spark-auth", JSON.stringify({ access_token: data.access_token }))
-        window.location.assign("/")
+        saveAuth({ access_token: data.access_token })
+
+        // Get user data
+        try {
+          const { data: user } = await getUserByToken(data.access_token)
+          setCurrentUser(user)
+
+          // Check if payment method exists
+          try {
+            const paymentResponse = await axiosInstance.get("/billing/payment-methods")
+            const paymentMethods = paymentResponse.data.payment_methods || []
+
+            if (paymentMethods.length === 0) {
+              // No payment method - redirect to payment setup
+              toast.info("Please add a payment method to continue")
+              navigate("/setup-payment")
+            } else {
+              // Payment method exists - go to dashboard
+              const onboardingComplete = localStorage.getItem('onboarding-complete')
+              if (!onboardingComplete) {
+                navigate("/onboarding")
+              } else {
+                navigate("/")
+              }
+            }
+          } catch (paymentErr) {
+            // If we can't check payment methods, just go to dashboard
+            // User can add payment method later from settings
+            console.error("Failed to check payment methods:", paymentErr)
+            const onboardingComplete = localStorage.getItem('onboarding-complete')
+            if (!onboardingComplete) {
+              navigate("/onboarding")
+            } else {
+              navigate("/")
+            }
+          }
+        } catch (userErr) {
+          console.error("Failed to get user data:", userErr)
+          // Still redirect to dashboard even if we can't get user data
+          navigate("/")
+        }
       } else {
         throw new Error("Access token not found")
       }
@@ -54,8 +96,18 @@ export default function LoginScreen() {
       const error = e as Error
       if (error.name === "AxiosError") {
         const axiosError = e as AxiosError
-        if ((axiosError.response?.data as any)?.detail === "LOGIN_BAD_CREDENTIALS") {
+        const detail = (axiosError.response?.data as any)?.detail
+        if (detail === "LOGIN_BAD_CREDENTIALS") {
           toast.error("Failed to login: Bad credentials")
+        } else if (axiosError.response?.status === 403) {
+          toast.error("Please verify your email before logging in. Redirecting to verification page...")
+          // Store email for verification page
+          localStorage.setItem("pending-verification-email", email)
+          setTimeout(() => {
+            navigate(`/verify-email?email=${encodeURIComponent(email)}`)
+          }, 1000)
+        } else {
+          toast.error(`Failed to login: ${detail || "Please try again"}`)
         }
       } else {
         toast.error(`Failed to login: ${(e as Error).message}`)

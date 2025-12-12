@@ -23,6 +23,8 @@ import Dashboard from './pages/Dashboard'
 import CampaignScheduling from './pages/CampaignSchedule'
 import LoginScreen from './pages/Auth/Login'
 import SignupScreen from './pages/Auth/Signup'
+import VerifyEmailScreen from './pages/Auth/VerifyEmail'
+import PaymentSetupScreen from './pages/Auth/PaymentSetup'
 import CreateAgentWizard from './pages/CreateAgentWizard'
 import OnboardingWizard from './pages/OnboardingWizard'
 import BuildingAnimation from './pages/AgentBuilding'
@@ -107,9 +109,11 @@ function App() {
             {/* <Route path="/" element={<Home />} /> */}
             <Route path='/login' element={<LoginScreen />} />
             <Route path='/signup' element={<SignupScreen />} />
+            <Route path='/verify-email' element={<VerifyEmailScreen />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </>
         )}
+        <Route path='/setup-payment' element={<PaymentSetupScreen />} />
         <Route path='/oauth-callback' element={<OAuthCallback />} />
       </Routes>
     </BrowserRouter>
