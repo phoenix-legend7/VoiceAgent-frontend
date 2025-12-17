@@ -25,6 +25,8 @@ import LoginScreen from './pages/Auth/Login'
 import SignupScreen from './pages/Auth/Signup'
 import VerifyEmailScreen from './pages/Auth/VerifyEmail'
 import PaymentSetupScreen from './pages/Auth/PaymentSetup'
+import ForgotPasswordScreen from './pages/Auth/ForgotPassword'
+import ResetPasswordScreen from './pages/Auth/ResetPassword'
 import CreateAgentWizard from './pages/CreateAgentWizard'
 import OnboardingWizard from './pages/OnboardingWizard'
 import BuildingAnimation from './pages/AgentBuilding'
@@ -110,6 +112,8 @@ function App() {
             {/* <Route path="/" element={<Home />} /> */}
             <Route path='/login' element={<LoginScreen />} />
             <Route path='/signup' element={<SignupScreen />} />
+            <Route path='/forgot-password' element={<ForgotPasswordScreen />} />
+            <Route path='/reset-password' element={<ResetPasswordScreen />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </>
         )}

@@ -220,6 +220,15 @@ export default function LoginScreen() {
                   required
                 />
               </div>
+              <div className="flex justify-end">
+                <Link
+                  to="/forgot-password"
+                  className={`text-xs ${theme.textColor} hover:underline`}
+                  style={{ textShadow: theme.textShadow }}
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
             <Button
               onClick={(e) => {
