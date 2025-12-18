@@ -2298,8 +2298,8 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
                 className={clsx(
                   "h-14 px-6 text-lg border-2",
                   isDarkMode
-                    ? "text-white border-gray-600 bg-black/50 hover:bg-gray-700 hover:border-cyan-400"
-                    : "text-gray-900 border-gray-300 bg-white hover:bg-gray-100 hover:border-blue-400"
+                    ? "text-white border-gray-600 bg-black/50! hover:bg-gray-700! hover:border-cyan-400"
+                    : "text-gray-900 border-gray-300 bg-white hover:bg-gray-100! hover:border-blue-400"
                 )}
                 style={{ boxShadow: "0 0 15px rgba(0, 255, 255, 0.3)" }}
               >
