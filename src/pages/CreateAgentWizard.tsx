@@ -42,6 +42,7 @@ import {
   useStripe,
   useElements
 } from '@stripe/react-stripe-js'
+import { formatCurrency, getSelectedCurrency, convertFromUSDCents } from "../utils/currency"
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY || '')
@@ -306,6 +307,9 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
   // Default voices state
   const [defaultVoices, setDefaultVoices] = useState<VoiceType[]>([])
   const [isLoadingDefaultVoices, setIsLoadingDefaultVoices] = useState(false)
+  
+  // Currency state
+  const [selectedCurrency] = useState(getSelectedCurrency())
 
 
   const [formData, setFormData] = useState({
@@ -1556,8 +1560,8 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
         )
 
       case 4:
-        const availableCredit = ((currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)) / 100
         const creditInCents = (currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)
+        const availableCredit = convertFromUSDCents(creditInCents, selectedCurrency)
         const needsPaymentMethod = creditInCents < 100 && paymentMethods.length === 0
         const showPaymentMethods = creditInCents < 100 && paymentMethods.length > 0
 
@@ -1612,7 +1616,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
                         Available Credit
                       </h3>
                       <p className={clsx("text-3xl font-bold", creditInCents < 100 ? "text-red-500" : "text-green-500")}>
-                        ${availableCredit.toFixed(2)}
+                        {formatCurrency(availableCredit, selectedCurrency)}
                       </p>
                     </div>
                     <CreditCard className={clsx("w-12 h-12", isDarkMode ? "text-orange-400" : "text-orange-600")} />
@@ -1623,7 +1627,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
                       isDarkMode ? "bg-red-500/20 border border-red-500/50" : "bg-red-50 border border-red-200"
                     )}>
                       <p className={clsx("text-sm", isDarkMode ? "text-red-300" : "text-red-700")}>
-                        ⚠️ Your credit is below $1.00. Please add a payment method to continue.
+                        ⚠️ Your credit is below {formatCurrency(convertFromUSDCents(100, selectedCurrency), selectedCurrency)}. Please add a payment method to continue.
                       </p>
                     </div>
                   )}

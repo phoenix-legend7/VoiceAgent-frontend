@@ -30,6 +30,8 @@ import {
 } from "../components/ui/select";
 import { AnimatedCounter } from "../components/Animate/Counter";
 import { AnimatedCurrency } from "../components/Animate/Currency";
+import CurrencySelector from "../components/CurrencySelector";
+import { formatCurrency, getSelectedCurrency, convertFromUSDCents } from "../utils/currency";
 import { AnimatedPercentage } from "../components/Animate/Percentage";
 import axiosInstance, { handleAxiosError } from "../core/axiosInstance";
 import { AgentTypeRead } from "../models/agent";
@@ -64,6 +66,7 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState<DashboardDataType | null>(
     null
   );
+  const [selectedCurrency] = useState(getSelectedCurrency());
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -127,6 +130,7 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <CurrencySelector />
           <Badge
             variant="outline"
             className="border-cyan-500/50 text-cyan-600 dark:text-cyan-400 animate-pulse"
@@ -202,7 +206,7 @@ export default function Dashboard() {
           title="Total Cost"
           icon={DollarSign}
           value={
-            <AnimatedCurrency value={(dashboardData?.total_cost || 0) / 100} />
+            <AnimatedCurrency value={(dashboardData?.total_cost || 0)} fromCents={true} />
           }
           description="Campaign costs today"
         />
@@ -316,7 +320,7 @@ export default function Dashboard() {
                       </span>
                       <div className="text-xs text-slate-400">
                         {performance.success_call}/{performance.total_call}{" "}
-                        calls • ${(performance.total_cost / 100).toFixed(2)} cost •{" "}
+                        calls • {formatCurrency(convertFromUSDCents(performance.total_cost, selectedCurrency), selectedCurrency)} cost •{" "}
                         {performance.total_minutes} minutes
                       </div>
                     </div>
@@ -405,13 +409,13 @@ export default function Dashboard() {
                   key={index}
                 >
                   <div className="text-xl font-bold text-white mb-1">
-                    ${(performance.total_cost / 100).toFixed(2)}
+                    {formatCurrency(convertFromUSDCents(performance.total_cost, selectedCurrency), selectedCurrency)}
                   </div>
                   <div className="text-sm text-slate-400 mb-1">
                     {performance.agent_name}
                   </div>
                   <div className="text-xs text-cyan-400">
-                    ${(performance.cost_per_minute / 100).toFixed(2)}/min •{" "}
+                    {formatCurrency(convertFromUSDCents(performance.cost_per_minute, selectedCurrency), selectedCurrency)}/min •{" "}
                     {performance.total_minutes} minutes
                   </div>
                 </div>

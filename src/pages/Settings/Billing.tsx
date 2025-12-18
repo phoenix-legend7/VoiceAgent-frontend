@@ -15,6 +15,8 @@ import StatusBadge from "../../components/StatusBadge";
 import { useAuth } from "../../core/authProvider";
 import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import { toast } from "react-toastify";
+import CurrencySelector from "../../components/CurrencySelector";
+import { formatCurrency, getSelectedCurrency, convertFromUSDCents, convertToUSDCents } from "../../utils/currency";
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY || '');
@@ -256,6 +258,7 @@ const Billing = () => {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(false);
   const [autoRefillLoading, setAutoRefillLoading] = useState(false);
+  const [selectedCurrency] = useState(getSelectedCurrency());
 
   useEffect(() => {
     setThreshold(currentUser?.auto_threshold || 0);
@@ -345,6 +348,9 @@ const Billing = () => {
   return (
     <Elements stripe={stripePromise}>
       <SettingsLayout isOverlayShown={false}>
+        <div className="flex justify-end mb-4">
+          <CurrencySelector />
+        </div>
         <div className="w-full grid grid-cols-1 xl:grid-cols-2 items-start justify-center gap-6">
           <div
             className={clsx(
@@ -361,8 +367,7 @@ const Billing = () => {
             </p>
             <div className="flex items-center gap-3">
               <div className="text-nowrap">
-                ${((currentUser?.used_credit || 0) / 100).toFixed(4)} / $
-                {((currentUser?.total_credit || 0) / 100).toFixed(4)}
+                {formatCurrency(convertFromUSDCents(currentUser?.used_credit || 0, selectedCurrency), selectedCurrency)} / {formatCurrency(convertFromUSDCents(currentUser?.total_credit || 0, selectedCurrency), selectedCurrency)}
               </div>
               <div className="bg-sky-600/30 w-full h-2 rounded overflow-hidden">
                 <div
@@ -385,7 +390,7 @@ const Billing = () => {
                     disabled={loading}
                     className="cursor-pointer px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition-all duration-300"
                   >
-                    +${amount / 100}
+                    +{formatCurrency(convertFromUSDCents(amount, selectedCurrency), selectedCurrency)}
                   </button>
                 ))}
               </div>
@@ -426,7 +431,7 @@ const Billing = () => {
                     )}
                     onClick={() => setRefillAmount(amount)}
                   >
-                    ${amount / 100}
+                    {formatCurrency(convertFromUSDCents(amount, selectedCurrency), selectedCurrency)}
                   </div>
                 ))}
               </div>
