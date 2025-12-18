@@ -5,6 +5,7 @@ import axiosInstance, { handleAxiosError } from "../../core/axiosInstance"
 import { AgentTypeRead } from "../../models/agent"
 import Card from "../../library/Card"
 import { InputBox, InputBoxWithUnit, Slider, SwtichWithLabel } from "../../library/FormField"
+import timezones from "../../consts/timezones"
 
 interface ToolBarProps {
   handleSave: () => Promise<void>
@@ -74,11 +75,9 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
               }}
             >
               <option className="dark:bg-neutral-800 bg-neutral-200"></option>
-              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/New_York">America/New_York</option>
-              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Los_Angeles">America/Los_Angeles</option>
-              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Chicago">America/Chicago</option>
-              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Denver">America/Denver</option>
-              <option className="dark:bg-neutral-800 bg-neutral-200" value="America/Phoenix">America/Phoenix</option>
+              {timezones.map((tz) => (
+                <option className="dark:bg-neutral-800 bg-neutral-200" value={tz.value}>{tz.label}</option>
+              ))}
             </select>
           </div>
         </div>
