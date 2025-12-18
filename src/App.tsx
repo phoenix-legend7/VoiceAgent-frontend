@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
-import { BrowserRouter, Route, Routes, Navigate, useNavigate } from 'react-router-dom'
+import { useCallback, useState, useEffect } from 'react'
+import { BrowserRouter, Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from './core/authProvider'
 import MasterLayout from './Layout/MasterLayout'
 // import Home from './pages/Home'
@@ -38,6 +38,7 @@ const CreateAgentWizardRoute = () => {
   const [agentData, setAgentData] = useState<any>();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleWizardComplete = useCallback((data: any) => {
     setAgentData(data);
@@ -45,6 +46,13 @@ const CreateAgentWizardRoute = () => {
   const handleBuildingComplete = useCallback(() => {
     navigate('/');
   }, [navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('reset') === '1' && agentData) {
+      setAgentData(undefined);
+    }
+  }, [location.search, agentData])
 
   return agentData ? (
     <BuildingAnimation

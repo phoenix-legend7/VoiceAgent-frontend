@@ -345,7 +345,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       } catch (e) {
         handleAxiosError("Failed to build agent", e)
         setTimeout(() => {
-          navigate("/wizard")
+          navigate("/wizard?reset=1", { replace: true })
         }, 5000)
       }
     }
