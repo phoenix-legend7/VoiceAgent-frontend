@@ -2111,7 +2111,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
         }
         return formData.selectedPhoneNumber.trim() !== ""
       case 3: // Connect ElevenLabs
-        return formData.elevenlabsApiKey.trim() !== "" && formData.voice !== "" && formData.voice !== ""
+        return formData.voice !== ""
       case 4: // Check billing
         const creditInCents = (currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)
         const needsPaymentMethod = creditInCents < 100 && paymentMethods.length === 0
@@ -2136,7 +2136,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
 
   const isSkippable = (step: number) => {
     // Allow skipping for optional steps
-    return step === 6 // Tools are optional
+    return step === 6 || step === 1 || step === 2 || step === 3
   }
 
   const handleSkip = () => {
