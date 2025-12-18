@@ -166,19 +166,31 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       // Handle case where industry might be skipped (default to technology)
       const industryPrompt = industryPrompts[agentData.industry] || industryPrompts.technology
 
-      // Build prompt with user-provided description if available
-      let prompt = `You are ${agentData.agentName}.\n\n${industryPrompt}`
-
-      if (agentData.description) {
-        // Use the compiled description from wizard
-        prompt += `\n\nAdditional context:\n"""\n${agentData.description}\n"""`
-      } else {
-        // Fallback to individual fields
-        if (agentData.purpose) {
-          prompt += `\n\nYour primary purpose is:\n"""\n${agentData.purpose}\n"""`
-        }
-        if (agentData.personality) {
-          prompt += `\n\nYour personality is: ${agentData.personality}.`
+      // Generate prompt using backend OpenAI
+      let prompt: string
+      try {
+        const promptResponse = await axiosInstance.post("/agent/generate-prompt", {
+          agent_name: agentData.agentName,
+          industry: agentData.industry || "technology",
+          description: agentData.description,
+          purpose: agentData.purpose,
+          personality: agentData.personality,
+          industry_prompt: industryPrompt,
+        })
+        prompt = promptResponse.data.prompt
+      } catch (error) {
+        console.error('Failed to generate prompt with OpenAI, falling back to local generation', error)
+        // Fallback to local prompt generation
+        prompt = `You are ${agentData.agentName}.\n\n${industryPrompt}`
+        if (agentData.description) {
+          prompt += `\n\nAdditional context:\n"""\n${agentData.description}\n"""`
+        } else {
+          if (agentData.purpose) {
+            prompt += `\n\nYour primary purpose is:\n"""\n${agentData.purpose}\n"""`
+          }
+          if (agentData.personality) {
+            prompt += `\n\nYour personality is: ${agentData.personality}.`
+          }
         }
       }
 

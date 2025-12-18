@@ -25,6 +25,7 @@ import {
   Pause,
   Loader2,
   X,
+  Building2,
 } from "lucide-react"
 import clsx from "clsx"
 import { countryPhoneOptions } from "../consts/countryPhones"
@@ -255,6 +256,21 @@ export const voices = [
   }
 ]
 
+export const industries = [
+  { id: "real-estate", name: "Real Estate", icon: "🏠", description: "Property sales, rentals, and management" },
+  { id: "healthcare", name: "Healthcare", icon: "🏥", description: "Medical practices and health services" },
+  { id: "ecommerce", name: "E-commerce", icon: "🛒", description: "Online retail and product sales" },
+  { id: "finance", name: "Finance", icon: "💰", description: "Banking, loans, and financial services" },
+  { id: "education", name: "Education", icon: "🎓", description: "Schools, courses, and training" },
+  { id: "technology", name: "Technology", icon: "💻", description: "Software, IT, and tech services" },
+  { id: "hospitality", name: "Hospitality", icon: "🏨", description: "Hotels, restaurants, and travel" },
+  { id: "automotive", name: "Automotive", icon: "🚗", description: "Car sales, repairs, and services" },
+  { id: "insurance", name: "Insurance", icon: "🛡️", description: "Insurance policies and claims" },
+  { id: "legal", name: "Legal", icon: "⚖️", description: "Law firms and legal services" },
+  { id: "trade", name: "Trade", icon: "🔨", description: "Construction, plumbing, and skilled trades" },
+  { id: "solar", name: "Solar", icon: "☀️", description: "Solar energy and renewable solutions" },
+  { id: "other", name: "Other", icon: "💼", description: "Other business and services" },
+]
 
 export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps) {
   const [currentStep, setCurrentStep] = useState(1)
@@ -327,7 +343,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
     selectedTools: [] as string[], // Array of selected tool IDs
   })
 
-  const totalSteps = 6
+  const totalSteps = 7
   const navigate = useNavigate()
 
   // Get screen dimensions
@@ -659,15 +675,23 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
       {
         icon: CreditCard,
         title: "Verify Billing",
-        subtitle: "Step 4 of 6",
+        subtitle: "Step 4 of 7",
         description: "Ensure you have sufficient credit or a payment method set up to keep your agent running smoothly.",
         gradient: "from-orange-500 to-red-600",
         color: "#FFFF00",
       },
       {
+        icon: Building2,
+        title: "Select Industry",
+        subtitle: "Step 5 of 7",
+        description: "Choose the industry your AI agent will operate in. This helps optimize the agent's behavior and responses.",
+        gradient: "from-teal-500 to-emerald-600",
+        color: "#14b8a6",
+      },
+      {
         icon: Bot,
         title: "Configure Your Agent",
-        subtitle: "Step 5 of 6",
+        subtitle: "Step 6 of 7",
         description: "Give your AI agent a name, define its purpose, and select its voice. This is where your agent comes to life!",
         gradient: "from-indigo-500 to-purple-600",
         color: "#8A2BE2",
@@ -675,7 +699,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
       {
         icon: Plug,
         title: "Connect Tools (Optional)",
-        subtitle: "Step 6 of 6",
+        subtitle: "Step 7 of 7",
         description: "Connect external tools and integrations to extend your agent's capabilities. You can skip this and add tools later.",
         gradient: "from-pink-500 to-rose-600",
         color: "#FF0080",
@@ -1862,6 +1886,81 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
               </p>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {industries.map((industry) => {
+                const isSelected = formData.industry === industry.id
+                return (
+                  <Card
+                    key={industry.id}
+                    className={clsx(
+                      "cursor-pointer transition-all duration-300 hover:scale-105 border-2",
+                      isSelected
+                        ? isDarkMode
+                          ? "bg-teal-500/20 border-teal-400"
+                          : "bg-teal-100 border-teal-500"
+                        : isDarkMode
+                          ? "bg-black/50 border-gray-600 hover:border-teal-400"
+                          : "bg-white/70 border-gray-300 hover:border-teal-500"
+                    )}
+                    style={{
+                      boxShadow: isSelected
+                        ? isDarkMode
+                          ? `0 0 30px ${stepConfig.color}`
+                          : `0 0 30px rgba(20,184,166,0.5)`
+                        : isDarkMode
+                          ? `0 0 10px rgba(20,184,166,0.3)`
+                          : `0 0 10px rgba(20,184,166,0.2)`,
+                    }}
+                    onClick={() => updateFormData("industry", industry.id)}
+                  >
+                    <CardContent className="p-6 text-center">
+                      <div className="text-4xl mb-3">{industry.icon}</div>
+                      <h3 className={clsx("font-semibold text-lg mb-2", theme.textPrimary)}>
+                        {industry.name}
+                      </h3>
+                      <p className={clsx("text-sm", theme.textTertiary)}>
+                        {industry.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          </div>
+        )
+
+      case 6:
+        return (
+          <div className="space-y-8">
+            <div className="text-center space-y-4">
+              <div
+                className={clsx(
+                  "w-20 h-20 bg-gradient-to-r rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse",
+                  stepConfig.gradient
+                )}
+                style={{
+                  boxShadow: `0 0 30px ${stepConfig.color}, 0 0 60px ${stepConfig.color}`,
+                }}
+              >
+                <stepConfig.icon className="w-10 h-10 text-white" />
+              </div>
+              <h2
+                className={clsx("text-3xl font-bold", theme.textPrimary)}
+                style={{ textShadow: isDarkMode ? `0 0 20px ${stepConfig.color}` : 'none' }}
+              >
+                {stepConfig.title}
+              </h2>
+              <p
+                className={clsx("text-xl", theme.textSecondary)}
+                style={{ textShadow: isDarkMode ? `0 0 10px ${stepConfig.color}` : 'none' }}
+              >
+                {stepConfig.subtitle}
+              </p>
+              <p className={clsx("max-w-md mx-auto", theme.textTertiary)}>
+                {stepConfig.description}
+              </p>
+            </div>
+
             <div className="space-y-6">
               <div>
                 <Label htmlFor="agentName" className={clsx("text-lg", theme.textPrimary)}>
@@ -1959,8 +2058,8 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
           </div>
         )
 
-      case 6:
-        // This becomes the final step (personality/greeting)
+      case 7:
+        // This becomes the final step (tools)
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
@@ -2125,9 +2224,11 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
         }
         // Otherwise, require billing confirmation
         return formData.billingConfirmed
-      case 5: // Create agent
+      case 5: // Select industry
+        return formData.industry !== ""
+      case 6: // Create agent
         return formData.agentName.trim() !== "" && formData.purpose.trim() !== ""
-      case 6: // Connect tools
+      case 7: // Connect tools
         return true // Tools are optional
       default:
         return false
@@ -2136,7 +2237,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
 
   const isSkippable = (step: number) => {
     // Allow skipping for optional steps
-    return step === 6 || step === 1 || step === 2 || step === 3
+    return step === 7 || step === 1 || step === 2 || step === 3
   }
 
   const handleSkip = () => {
