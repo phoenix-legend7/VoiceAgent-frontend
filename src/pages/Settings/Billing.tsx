@@ -16,7 +16,7 @@ import { useAuth } from "../../core/authProvider";
 import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import { toast } from "react-toastify";
 import CurrencySelector from "../../components/CurrencySelector";
-import { formatCurrency, getSelectedCurrency, convertFromUSDCents, convertToUSDCents } from "../../utils/currency";
+import { formatCurrency, getSelectedCurrency, convertFromUSDCents } from "../../utils/currency";
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY || '');
