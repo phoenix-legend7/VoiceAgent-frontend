@@ -307,7 +307,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
   // Default voices state
   const [defaultVoices, setDefaultVoices] = useState<VoiceType[]>([])
   const [isLoadingDefaultVoices, setIsLoadingDefaultVoices] = useState(false)
-  
+
   // Currency state
   const [selectedCurrency] = useState(getSelectedCurrency())
 
@@ -347,7 +347,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
     selectedTools: [] as string[], // Array of selected tool IDs
   })
 
-  const totalSteps = 7
+  const totalSteps = 6
   const navigate = useNavigate()
 
   // Get screen dimensions
@@ -423,30 +423,30 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
     }
   }, [currentUser])
 
-  // Fetch phone numbers when step 1 or 2 is shown
+  // Fetch phone numbers when step 1 is shown
   useEffect(() => {
-    if (currentStep === 1 || currentStep === 2) {
+    if (currentStep === 1) {
       fetchPhoneNumbers()
     }
   }, [currentStep])
 
-  // Fetch default voices when step 3 is shown and no ElevenLabs API key
+  // Fetch default voices when step 2 is shown and no ElevenLabs API key
   useEffect(() => {
-    if (currentStep === 3 && !formData.elevenlabsApiKey.trim()) {
+    if (currentStep === 2 && !formData.elevenlabsApiKey.trim()) {
       fetchDefaultVoices()
     }
   }, [currentStep, formData.elevenlabsApiKey])
 
-  // Automatically fetch ElevenLabs voices when step 3 is shown and API key exists
+  // Automatically fetch ElevenLabs voices when step 2 is shown and API key exists
   useEffect(() => {
-    if (currentStep === 3 && formData.elevenlabsApiKey.trim() && elevenlabsVoices.length === 0 && !isTestingConnection) {
+    if (currentStep === 2 && formData.elevenlabsApiKey.trim() && elevenlabsVoices.length === 0 && !isTestingConnection) {
       testElevenLabsConnection()
     }
   }, [currentStep, formData.elevenlabsApiKey])
 
-  // Fetch payment methods when step 4 is shown
+  // Fetch payment methods when step 3 is shown
   useEffect(() => {
-    if (currentStep === 4) {
+    if (currentStep === 3) {
       fetchPaymentMethods()
     }
   }, [currentStep])
@@ -513,10 +513,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
 
 
   const handleNext = () => {
-    // Skip step 2 if user selected existing phone number
-    if (currentStep === 1 && formData.useExistingPhone && formData.existingPhoneId) {
-      setCurrentStep(3) // Skip to step 3 (ElevenLabs)
-    } else if (currentStep < totalSteps) {
+    if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
     } else {
       onComplete({
@@ -551,12 +548,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
       return
     }
     if (currentStep > 1) {
-      // Skip step 2 if going back from step 3 and existing phone was selected
-      if (currentStep === 3 && formData.useExistingPhone && formData.existingPhoneId) {
-        setCurrentStep(1)
-      } else {
-        setCurrentStep(currentStep - 1)
-      }
+      setCurrentStep(currentStep - 1)
     }
   }
 
@@ -656,22 +648,14 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
         icon: Phone,
         title: "Connect Phone System",
         subtitle: "Step 1 of 6",
-        description: "Connect your phone provider (Twilio, Vonage, Plivo, or Exotel) to enable calling capabilities for your AI agent.",
+        description: "Connect your phone provider (Twilio, Vonage, Plivo, or Exotel) and phone number to enable calling capabilities for your AI agent.",
         gradient: "from-blue-500 to-cyan-600",
         color: "#00FFFF",
       },
       {
-        icon: Hash,
-        title: "Choose Phone Number",
-        subtitle: "Step 2 of 6",
-        description: "Enter the phone number your AI agent will use for making and receiving calls.",
-        gradient: "from-green-500 to-emerald-600",
-        color: "#00FF00",
-      },
-      {
         icon: Mic,
         title: "Connect ElevenLabs",
-        subtitle: "Step 3 of 6",
+        subtitle: "Step 2 of 6",
         description: "Connect your ElevenLabs API key to access high-quality voice generation. This step is required to create your agent.",
         gradient: "from-purple-500 to-pink-600",
         color: "#FF00FF",
@@ -679,7 +663,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
       {
         icon: CreditCard,
         title: "Verify Billing",
-        subtitle: "Step 4 of 7",
+        subtitle: "Step 3 of 6",
         description: "Ensure you have sufficient credit or a payment method set up to keep your agent running smoothly.",
         gradient: "from-orange-500 to-red-600",
         color: "#FFFF00",
@@ -687,7 +671,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
       {
         icon: Building2,
         title: "Select Industry",
-        subtitle: "Step 5 of 7",
+        subtitle: "Step 4 of 6",
         description: "Choose the industry your AI agent will operate in. This helps optimize the agent's behavior and responses.",
         gradient: "from-teal-500 to-emerald-600",
         color: "#14b8a6",
@@ -695,7 +679,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
       {
         icon: Bot,
         title: "Configure Your Agent",
-        subtitle: "Step 6 of 7",
+        subtitle: "Step 5 of 6",
         description: "Give your AI agent a name, define its purpose, and select its voice. This is where your agent comes to life!",
         gradient: "from-indigo-500 to-purple-600",
         color: "#8A2BE2",
@@ -703,7 +687,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
       {
         icon: Plug,
         title: "Connect Tools (Optional)",
-        subtitle: "Step 7 of 7",
+        subtitle: "Step 6 of 6",
         description: "Connect external tools and integrations to extend your agent's capabilities. You can skip this and add tools later.",
         gradient: "from-pink-500 to-rose-600",
         color: "#FF0080",
@@ -1138,77 +1122,33 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
                     </div>
                   </>
                 )}
+                <div>
+                  <Label
+                    className={clsx(
+                      "text-sm mb-2 block",
+                      isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                    )}
+                  >
+                    Phone Number
+                  </Label>
+                  <Input
+                    value={formData.selectedPhoneNumber}
+                    onChange={(e) => updateFormData("selectedPhoneNumber", e.target.value)}
+                    placeholder="+12345678990"
+                    className={clsx(
+                      "border-2",
+                      isDarkMode ? "border-cyan-400" : "border-cyan-600",
+                      theme.inputBg, theme.inputText
+                    )}
+                    style={{ boxShadow: `0 0 10px rgba(0, 255, 255, ${isDarkMode ? 0.3 : 0.7})` }}
+                  />
+                </div>
               </div>
             </div>
           </div>
         )
 
       case 2:
-        return (
-          <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <div
-                className={clsx(
-                  "w-20 h-20 bg-gradient-to-r rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse",
-                  stepConfig.gradient
-                )}
-                style={{
-                  boxShadow: `0 0 30px ${stepConfig.color}, 0 0 60px ${stepConfig.color}`,
-                }}
-              >
-                <stepConfig.icon className="w-10 h-10 text-white" />
-              </div>
-              <h2
-                className={clsx("text-3xl font-bold", theme.textPrimary)}
-                style={{ textShadow: isDarkMode ? `0 0 20px ${stepConfig.color}` : 'none' }}
-              >
-                {stepConfig.title}
-              </h2>
-              <p
-                className={clsx("text-xl", theme.textSecondary)}
-                style={{ textShadow: isDarkMode ? `0 0 10px ${stepConfig.color}` : 'none' }}
-              >
-                {stepConfig.subtitle}
-              </p>
-              <p className={clsx("max-w-md mx-auto", theme.textTertiary)}>
-                {stepConfig.description}
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <Label
-                  htmlFor="phoneNumber"
-                  className={clsx("text-lg", theme.textPrimary)}
-                  style={{ textShadow: theme.textShadow }}
-                >
-                  Phone Number
-                </Label>
-                <Input
-                  id="phoneNumber"
-                  placeholder="+12345678990"
-                  value={formData.selectedPhoneNumber}
-                  onChange={(e) => updateFormData("selectedPhoneNumber", e.target.value)}
-                  className={clsx(
-                    "text-xl h-14 border-2",
-                    theme.inputBg,
-                    theme.inputText,
-                    theme.inputPlaceholder
-                  )}
-                  style={{
-                    border: `2px solid ${theme.inputBorder}`,
-                    boxShadow: theme.inputShadow,
-                  }}
-                />
-                <p className={clsx("text-sm", theme.textTertiary)}>
-                  Enter the phone number you want to use for your AI agent.
-                </p>
-              </div>
-            </div>
-          </div>
-        )
-
-      case 3:
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
@@ -1559,7 +1499,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
           </div>
         )
 
-      case 4:
+      case 3:
         const creditInCents = (currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)
         const availableCredit = convertFromUSDCents(creditInCents, selectedCurrency)
         const needsPaymentMethod = creditInCents < 100 && paymentMethods.length === 0
@@ -1858,7 +1798,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
           </div>
         )
 
-      case 5:
+      case 4:
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
@@ -1933,7 +1873,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
           </div>
         )
 
-      case 6:
+      case 5:
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
@@ -2062,8 +2002,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
           </div>
         )
 
-      case 7:
-        // This becomes the final step (tools)
+      case 6:
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4">
@@ -2182,40 +2121,38 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
           return true
         }
         const { provider } = formData.phoneSetup
+        let providerValid = false
         if (provider === "plivo") {
-          return (
-            formData.phoneSetup.authId &&
-            formData.phoneSetup.authToken
+          providerValid = (
+            !!formData.phoneSetup.authId &&
+            !!formData.phoneSetup.authToken
           )
         } else if (provider === "vanage") {
-          return (
-            formData.phoneSetup.apiKey &&
-            formData.phoneSetup.apiSecret
+          providerValid = (
+            !!formData.phoneSetup.apiKey &&
+            !!formData.phoneSetup.apiSecret
           )
         } else if (provider === "exotel") {
-          return (
-            formData.phoneSetup.apiKey &&
-            formData.phoneSetup.apiSecret &&
-            formData.phoneSetup.accountSid &&
-            formData.phoneSetup.appId &&
-            formData.phoneSetup.subdomain
+          providerValid = (
+            !!formData.phoneSetup.apiKey &&
+            !!formData.phoneSetup.apiSecret &&
+            !!formData.phoneSetup.accountSid &&
+            !!formData.phoneSetup.appId &&
+            !!formData.phoneSetup.subdomain
           )
         } else {
           // Twilio
-          return (
-            formData.phoneSetup.accountSid &&
-            formData.phoneSetup.apiKey &&
-            formData.phoneSetup.apiSecret
+          providerValid = (
+            !!formData.phoneSetup.accountSid &&
+            !!formData.phoneSetup.apiKey &&
+            !!formData.phoneSetup.apiSecret
           )
         }
-      case 2:
-        if (formData.useExistingPhone) {
-          return true
-        }
-        return formData.selectedPhoneNumber.trim() !== ""
-      case 3: // Connect ElevenLabs
+        // Also require phone number if not using existing phone
+        return providerValid && formData.selectedPhoneNumber.trim() !== ""
+      case 2: // Connect ElevenLabs
         return formData.voice !== ""
-      case 4: // Check billing
+      case 3: // Check billing
         const creditInCents = (currentUser?.total_credit || 0) - (currentUser?.used_credit || 0)
         const needsPaymentMethod = creditInCents < 100 && paymentMethods.length === 0
         // If payment method is required but not present, can't proceed
@@ -2228,11 +2165,11 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
         }
         // Otherwise, require billing confirmation
         return formData.billingConfirmed
-      case 5: // Select industry
+      case 4: // Select industry
         return formData.industry !== ""
-      case 6: // Create agent
+      case 5: // Create agent
         return formData.agentName.trim() !== "" && formData.purpose.trim() !== ""
-      case 7: // Connect tools
+      case 6: // Connect tools
         return true // Tools are optional
       default:
         return false
@@ -2241,7 +2178,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
 
   const isSkippable = (step: number) => {
     // Allow skipping for optional steps
-    return step === 7 || step === 1 || step === 2 || step === 3
+    return step === 6 || step === 1 || step === 2
   }
 
   const handleSkip = () => {
