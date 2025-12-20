@@ -43,9 +43,14 @@ const CreateAgentWizardRoute = () => {
   const handleWizardComplete = useCallback((data: any) => {
     setAgentData(data);
   }, []);
-  const handleBuildingComplete = useCallback(() => {
-    navigate('/');
-  }, [navigate]);
+  
+  const handleBuildingComplete = useCallback((agentId?: string) => {
+    if (agentData?.useSipEndpoint && agentId) {
+      navigate(`/agents/${agentId}?openSIP=1&auto=1`);
+    } else {
+      navigate('/');
+    }
+  }, [navigate, agentData]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);

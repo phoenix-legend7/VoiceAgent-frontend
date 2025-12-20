@@ -1,4 +1,5 @@
 import { Dispatch, FC, SetStateAction, useEffect, useState } from "react"
+import { useLocation } from "react-router-dom"
 import { FaChevronDown } from "react-icons/fa"
 import { MdDialerSip } from "react-icons/md"
 import { AIAgentIcon } from "../../../consts/svgIcons"
@@ -22,6 +23,7 @@ const AgentActions: FC<AgentActionsProps> = ({
   const [isOpen, setIsOpen] = useState(false)
   const [showCustomLlmModal, setShowCustomLlmModal] = useState(false)
   const [showManageSipEndpointModal, setShowManageSipEndpointModal] = useState(false)
+  const location = useLocation()
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -32,6 +34,15 @@ const AgentActions: FC<AgentActionsProps> = ({
     document.addEventListener('click', handleClickOutside)
     return () => document.removeEventListener('click', handleClickOutside)
   }, [isOpen])
+
+  // Auto-open SIP modal when instructed via query param
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const shouldOpenSip = params.get('openSIP') === '1'
+    if (shouldOpenSip) {
+      setShowManageSipEndpointModal(true)
+    }
+  }, [location.search])
 
   return (
     <div className="relative">

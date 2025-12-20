@@ -75,8 +75,14 @@ const AdvancedSettings: FC<AdvancedSettingsProps> = ({ agent, setAgent, setIsOve
               }}
             >
               <option className="dark:bg-neutral-800 bg-neutral-200"></option>
-              {timezones.map((tz) => (
-                <option className="dark:bg-neutral-800 bg-neutral-200" value={tz.value}>{tz.label}</option>
+              {timezones.map((tz, index) => (
+                <option
+                  key={index}
+                  className="dark:bg-neutral-800 bg-neutral-200"
+                  value={tz.value}
+                >
+                  {tz.label}
+                </option>
               ))}
             </select>
           </div>

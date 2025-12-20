@@ -92,7 +92,7 @@ const createKnowledge = async (file: File) => {
 
 interface BuildingAnimationProps {
   agentData: any
-  onComplete: () => void
+  onComplete: (agentId?: string) => void
 }
 
 export default function BuildingAnimation({ agentData, onComplete }: BuildingAnimationProps) {
@@ -296,6 +296,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
       setCurrentStep(6)
     }
     const startProgress = async () => {
+      let createdAgent: AgentTypeRead | null = null
       try {
         // Check if payment method exists before creating agent
         try {
@@ -314,6 +315,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
 
         const files = await createKnowledges()
         const agent = await createAgent(files)
+        createdAgent = agent
 
         // Check if using existing phone or need to import
         const hasExistingPhone = agentData.useExistingPhone && agentData.existingPhoneId
@@ -352,7 +354,7 @@ export default function BuildingAnimation({ agentData, onComplete }: BuildingAni
         }
 
         setTimeout(() => {
-          onComplete()
+          onComplete(createdAgent?.id)
         }, 1000)
       } catch (e) {
         handleAxiosError("Failed to build agent", e)

@@ -18,7 +18,6 @@ import {
   Sun,
   Moon,
   CreditCard,
-  Hash,
   Plug,
   CheckCircle2,
   Play,
@@ -332,6 +331,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
     selectedPhoneNumber: "",
     useExistingPhone: false, // Track if user selected existing phone
     existingPhoneId: "", // ID of selected existing phone
+    useSipEndpoint: false, // Track if user wants to use SIP endpoint
     elevenlabsApiKey: "",
     billingConfirmed: false,
     agentName: "",
@@ -526,6 +526,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
         },
         useExistingPhone: formData.useExistingPhone,
         existingPhoneId: formData.existingPhoneId,
+        useSipEndpoint: formData.useSipEndpoint,
         voiceType: formData.voice,
         tone: formData.personality,
         primaryGoal: formData.purpose,
@@ -779,7 +780,60 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
 
             <div className="space-y-6">
               {/* Connected Phone Numbers */}
-              {phoneNumbers.length > 0 && (
+              <div className="space-y-4">
+                <Label className={clsx("text-lg", theme.textPrimary)}>
+                  Would you like to connect via SIP endpoint?
+                </Label>
+                <Card
+                  className={clsx(
+                    "cursor-pointer transition-all duration-300",
+                    formData.useSipEndpoint
+                      ? isDarkMode
+                        ? "bg-blue-500/20 border-blue-400"
+                        : "bg-blue-100 border-blue-400"
+                      : isDarkMode
+                        ? "bg-black/50 border-gray-600 hover:border-blue-400"
+                        : "bg-white/70 border-gray-300 hover:border-blue-400"
+                  )}
+                  style={{
+                    boxShadow: formData.useSipEndpoint
+                      ? isDarkMode
+                        ? "0 0 30px #0099FF"
+                        : "0 0 30px rgba(59,130,246,0.5)"
+                      : isDarkMode
+                        ? "0 0 10px rgba(0, 153, 255, 0.3)"
+                        : "0 0 10px rgba(59,130,246,0.2)",
+                  }}
+                  onClick={() => {
+                    const newValue = !formData.useSipEndpoint
+                    updateFormData("useSipEndpoint", newValue)
+                    if (newValue) {
+                      updateFormData("useExistingPhone", false)
+                      updateFormData("existingPhoneId", "")
+                    }
+                  }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <Phone className={clsx("w-6 h-6", isDarkMode ? 'text-blue-400' : 'text-blue-600')} />
+                      <div className="flex-1">
+                        <h3 className={clsx("font-semibold text-lg mb-1", theme.textPrimary)}>
+                          Connect using SIP endpoint
+                        </h3>
+                        <p className={clsx("text-sm", theme.textTertiary)}>
+                          We&apos;ll automatically create a SIP endpoint after your agent is created and open the configuration on the Agent Details page for review or adjustments.
+                        </p>
+                      </div>
+                      {formData.useSipEndpoint && (
+                        <CheckCircle2 className={clsx("w-6 h-6", isDarkMode ? 'text-blue-400' : 'text-blue-600')} />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Existing Phone Numbers */}
+              {phoneNumbers.length > 0 && !formData.useSipEndpoint && (
                 <div className="space-y-4 mt-6">
                   <Label className={clsx("text-lg", theme.textPrimary)}>
                     Select from Your Connected Phone Numbers
@@ -826,6 +880,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
                                 // Select this phone
                                 updateFormData("useExistingPhone", true)
                                 updateFormData("existingPhoneId", phone.id)
+                                updateFormData("useSipEndpoint", false)
                               }
                             }}
                           >
@@ -857,6 +912,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
               )}
 
               {/* Provider Selection Tabs */}
+              {!formData.useSipEndpoint && (
               <div className="flex items-center border-b-2" style={{ borderColor: isDarkMode ? "rgba(0, 255, 255, 0.3)" : "rgba(14,165,233,0.3)" }}>
                 {["twilio", "vanage", "plivo", "exotel"].map((provider) => {
                   const isActive = formData.phoneSetup.provider === provider
@@ -883,8 +939,10 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
                   )
                 })}
               </div>
+              )}
 
               {/* Common Fields */}
+              {!formData.useSipEndpoint && (
               <div className="space-y-4">
                 <div>
                   <Label
@@ -1144,6 +1202,7 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
                   />
                 </div>
               </div>
+              )}
             </div>
           </div>
         )
@@ -2117,6 +2176,10 @@ export default function CreateAgentWizard({ onComplete }: CreateAgentWizardProps
   const canProceed = () => {
     switch (currentStep) {
       case 1:
+        // Allow proceeding if SIP endpoint is selected
+        if (formData.useSipEndpoint) {
+          return true
+        }
         if (formData.useExistingPhone && formData.existingPhoneId) {
           return true
         }

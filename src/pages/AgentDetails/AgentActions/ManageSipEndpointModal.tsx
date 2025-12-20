@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useState } from "react"
+import { Dispatch, FC, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "react-toastify"
 import axiosInstance from "../../../core/axiosInstance"
 import Modal from "../../../library/ModalProvider"
@@ -7,6 +7,7 @@ import { AgentTypeRead } from "../../../models/agent"
 import { SelectOptionType } from "../../../models/common"
 import { formatDateTime } from "../../../utils/helpers"
 import { FaCopy, FaTrashAlt } from "react-icons/fa"
+import { useLocation } from "react-router-dom"
 
 const regionOptions = [
   { label: 'us-west', value: 'us-west' },
@@ -31,6 +32,9 @@ const ManageSipEndpointModal: FC<Props> = ({
   setIsOverlayShow,
 }) => {
   const [selectedRegion, setSelectedRegion] = useState<string>(regionOptions[0].value)
+  const location = useLocation()
+  const autoGenerate = useMemo(() => new URLSearchParams(location.search).get('auto') === '1', [location.search])
+  const autoRunRef = useRef(false)
 
   const onClose = () => {
     setIsModalOpen(false)
@@ -78,6 +82,14 @@ const ManageSipEndpointModal: FC<Props> = ({
     navigator.clipboard.writeText(endpoint)
     toast.success('SIP endpoint copied to clipboard')
   }
+
+  // When opened with auto=1, trigger endpoint generation once
+  useEffect(() => {
+    if (isModalOpen && agent && autoGenerate && !autoRunRef.current) {
+      autoRunRef.current = true
+      handleGenerate()
+    }
+  }, [isModalOpen, agent, autoGenerate])
 
   return (
     <Modal
