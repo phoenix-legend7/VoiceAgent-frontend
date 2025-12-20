@@ -1,7 +1,7 @@
 import { AxiosError } from "axios"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
+import { toast, ToastContainer } from "react-toastify"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { Label } from "../../components/ui/label"
@@ -371,6 +371,7 @@ export default function LoginScreen() {
           </Card>
         </div>
       </div>
+      <ToastContainer newestOnTop limit={3} />
     </div>
   )
 }

@@ -342,7 +342,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
         </Card>
       </div>
 
-      <ToastContainer />
+      <ToastContainer newestOnTop limit={3} />
 
       <style>{`
         @keyframes electric-crackle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
