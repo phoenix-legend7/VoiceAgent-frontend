@@ -179,7 +179,7 @@ export default function SignupScreen() {
               <span className="text-gray-700 font-medium">
                 <span className="text-cyan-600 font-bold">3-day free trial</span>
                 {" · "}
-                <span className="text-gray-600">then $499/month AUD</span>
+                <span className="text-gray-600">then A$499/month</span>
               </span>
             </div>
           </div>

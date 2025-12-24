@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaCreditCard, FaRegCopyright, FaPlus, FaTrash } from "react-icons/fa";
+import { FaCreditCard, FaRegCopyright, FaPlus, FaTrash, FaCheck, FaCrown } from "react-icons/fa";
 import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
@@ -16,7 +16,7 @@ import { useAuth } from "../../core/authProvider";
 import axiosInstance, { handleAxiosError } from "../../core/axiosInstance";
 import { toast } from "react-toastify";
 import CurrencySelector from "../../components/CurrencySelector";
-import { formatCurrency, getSelectedCurrency, convertFromUSDCents } from "../../utils/currency";
+import { formatCurrency, getSelectedCurrency, convertFromUSDCents, Currency } from "../../utils/currency";
 
 // Initialize Stripe
 const stripePromise = loadStripe(import.meta.env.VITE_APP_STRIPE_PUBLISHABLE_KEY || '');
@@ -31,6 +31,15 @@ interface PaymentMethod {
     exp_year: number;
   };
   is_default: boolean;
+}
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  interval: string;
+  features: string[];
 }
 
 const CardSetupForm = ({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) => {
@@ -250,6 +259,69 @@ const CardAction = ({ onClick }: { onClick: () => void }) => {
   );
 };
 
+const SubscriptionPlanCard = ({
+  plan,
+  isCurrentPlan,
+  onSubscribe,
+  loading,
+  disabled,
+}: {
+  plan: SubscriptionPlan;
+  isCurrentPlan: boolean;
+  onSubscribe: (priceId: string) => void;
+  loading: boolean;
+  disabled: boolean;
+}) => {
+  return (
+    <div
+      className={clsx(
+        "border rounded-lg p-6 transition-all duration-300",
+        isCurrentPlan
+          ? "border-sky-500 bg-sky-50 dark:bg-sky-900/20"
+          : "border-gray-200 dark:border-gray-700 hover:border-sky-300 dark:hover:border-sky-700"
+      )}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold">{plan.name}</h3>
+        {isCurrentPlan && (
+          <div className="bg-sky-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <FaCheck size={12} />
+            Current
+          </div>
+        )}
+      </div>
+
+      <div className="mb-4">
+        <span className="text-3xl font-bold">{formatCurrency(plan.price, plan.currency.toUpperCase() as Currency)}</span>
+        <span className="text-gray-500">/{plan.interval}</span>
+      </div>
+
+      <ul className="space-y-2 mb-6">
+        {plan.features.map((feature, index) => (
+          <li key={index} className="flex items-start gap-2">
+            <FaCheck className="text-green-500 mt-1 flex-shrink-0" size={12} />
+            <span className="text-sm">{feature}</span>
+          </li>
+        ))}
+      </ul>
+
+      <button
+        onClick={() => onSubscribe(plan.id)}
+        disabled={loading || disabled || isCurrentPlan}
+        className={clsx(
+          "w-full px-4 py-2 rounded-md transition-all duration-300 font-medium",
+          isCurrentPlan
+            ? "bg-gray-300 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
+            : "bg-sky-600 text-white hover:bg-sky-700",
+          (loading || disabled) && "opacity-50 cursor-not-allowed"
+        )}
+      >
+        {isCurrentPlan ? "Current Plan" : loading ? "Processing..." : "Subscribe"}
+      </button>
+    </div>
+  );
+};
+
 const Billing = () => {
   const { currentUser, setCurrentUser } = useAuth();
   const [threshold, setThreshold] = useState<number>(0);
@@ -260,11 +332,116 @@ const Billing = () => {
   const [autoRefillLoading, setAutoRefillLoading] = useState(false);
   const [selectedCurrency] = useState(getSelectedCurrency());
 
+  // Subscription state
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
+  const [currentSubscription, setCurrentSubscription] = useState<any>(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+
   useEffect(() => {
     setThreshold(currentUser?.auto_threshold || 0);
     setRefillAmount(currentUser?.auto_refill_amount || 5000);
     fetchPaymentMethods();
+    fetchSubscriptionPlans();
+    fetchCurrentSubscription();
   }, [currentUser]);
+
+  const fetchSubscriptionPlans = async () => {
+    try {
+      const response = await axiosInstance.get("/billing/subscription/plans");
+      setSubscriptionPlans(response.data.plans || []);
+    } catch (error) {
+      handleAxiosError('Failed to fetch subscription plans', error);
+    }
+  };
+
+  const fetchCurrentSubscription = async () => {
+    try {
+      const response = await axiosInstance.get("/billing/subscription/current");
+      if (response.data.has_subscription) {
+        setCurrentSubscription(response.data.subscription);
+      }
+    } catch (error) {
+      handleAxiosError('Failed to fetch current subscription', error);
+    }
+  };
+
+  const handleSubscribe = async (priceId: string) => {
+    if (paymentMethods.length === 0) {
+      toast.warning('Please add a payment method first');
+      return;
+    }
+
+    setSubscriptionLoading(true);
+    try {
+      const response = await axiosInstance.post('/billing/subscription/create', {
+        price_id: priceId
+      });
+
+      if (response.data.success) {
+        toast.success('Successfully subscribed!');
+        fetchCurrentSubscription();
+        // Refresh user data
+        if (currentUser) {
+          setCurrentUser({
+            ...currentUser,
+            subscription_status: response.data.subscription.status,
+            subscription_plan: priceId,
+            stripe_subscription_id: response.data.subscription.id,
+          });
+        }
+      }
+    } catch (error) {
+      handleAxiosError('Failed to create subscription', error);
+    } finally {
+      setSubscriptionLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!window.confirm('Are you sure you want to cancel your subscription? You will retain access until the end of your billing period.')) {
+      return;
+    }
+
+    setSubscriptionLoading(true);
+    try {
+      const response = await axiosInstance.post('/billing/subscription/cancel');
+      if (response.data.success) {
+        toast.success('Subscription will be canceled at the end of the billing period');
+        fetchCurrentSubscription();
+        if (currentUser) {
+          setCurrentUser({
+            ...currentUser,
+            subscription_status: 'canceling',
+          });
+        }
+      }
+    } catch (error) {
+      handleAxiosError('Failed to cancel subscription', error);
+    } finally {
+      setSubscriptionLoading(false);
+    }
+  };
+
+  const handleReactivateSubscription = async () => {
+    setSubscriptionLoading(true);
+    try {
+      const response = await axiosInstance.post('/billing/subscription/reactivate');
+      if (response.data.success) {
+        toast.success('Subscription reactivated successfully');
+        fetchCurrentSubscription();
+        if (currentUser) {
+          setCurrentUser({
+            ...currentUser,
+            subscription_status: response.data.subscription.status,
+          });
+        }
+      }
+    } catch (error) {
+      handleAxiosError('Failed to reactivate subscription', error);
+    } finally {
+      setSubscriptionLoading(false);
+    }
+  };
 
   const fetchPaymentMethods = async () => {
     try {
@@ -351,6 +528,80 @@ const Billing = () => {
         <div className="flex justify-end mb-4">
           <CurrencySelector />
         </div>
+
+        {/* Subscription Plans Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <FaCrown className="text-yellow-500" size={32} />
+            <div>
+              <h2 className="text-2xl font-bold">Subscription Plans</h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                Choose a plan that requires both an active subscription AND sufficient credits to use
+              </p>
+            </div>
+          </div>
+
+          {/* Current Subscription Status */}
+          {currentUser?.subscription_status && (
+            <div className="mb-6 p-4 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-semibold">Current Subscription Status</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Status: <span className="font-medium">{currentUser.subscription_status}</span>
+                    {currentSubscription?.current_period_end && (
+                      <> • Renews: {new Date(currentSubscription.current_period_end * 1000).toLocaleDateString()}</>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {currentSubscription?.cancel_at_period_end ? (
+                    <button
+                      onClick={handleReactivateSubscription}
+                      disabled={subscriptionLoading}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition-all duration-300"
+                    >
+                      Reactivate
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleCancelSubscription}
+                      disabled={subscriptionLoading}
+                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-all duration-300"
+                    >
+                      Cancel Subscription
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Subscription Plans Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+            {subscriptionPlans.map((plan) => (
+              <SubscriptionPlanCard
+                key={plan.id}
+                plan={plan}
+                isCurrentPlan={currentUser?.subscription_plan === plan.id}
+                onSubscribe={handleSubscribe}
+                loading={subscriptionLoading}
+                disabled={paymentMethods.length === 0}
+              />
+            ))}
+          </div>
+
+          {paymentMethods.length === 0 && (
+            <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <p className="text-yellow-800 dark:text-yellow-200">
+                Please add a payment method below to subscribe to a plan
+              </p>
+            </div>
+          )}
+        </div>
+
+        <hr className="my-8 border-gray-300 dark:border-gray-700" />
+
         <div className="w-full grid grid-cols-1 xl:grid-cols-2 items-start justify-center gap-6">
           <div
             className={clsx(

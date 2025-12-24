@@ -252,16 +252,16 @@ export const ImportNumberModal: FC<Props> = ({
                   placeholder="Provider API Key"
                 />
               </label>
-              <label className="flex flex-col gap-1">
-                <div>API {activeTab === "exotel" ? "Token" : "Secret"}</div>
-                <InputBox value={apiSecret} onChange={setApiSecret} />
-              </label>
               {activeTab !== "vanage" && (
                 <label className="flex flex-col gap-1">
                   <div>Account SID</div>
                   <InputBox value={accoutSid} onChange={setAccountSid} />
                 </label>
               )}
+              <label className="flex flex-col gap-1">
+                <div>API {activeTab === "exotel" ? "Token" : "Secret"}</div>
+                <InputBox value={apiSecret} onChange={setApiSecret} />
+              </label>
             </>
           )}
           {activeTab === "exotel" && (
