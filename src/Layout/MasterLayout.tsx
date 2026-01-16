@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { FaBars } from "react-icons/fa"
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
-import { CreditCard, Laptop, LogOut, MoonStar, Sun, User, Zap } from "lucide-react"
+import { CreditCard, Laptop, LogOut, MoonStar, Sun, User } from "lucide-react"
 import Navbar from "../components/Navbar"
 import OnboardingTour from "../components/OnboardingTour"
 import { useAuth } from "../core/authProvider"
@@ -234,8 +234,13 @@ const MasterLayout = () => {
           </div>
           <Link to="/" className="flex items-center">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-950 rounded-lg flex items-center justify-center p-1">
+                <img
+                  src="/favicon.png"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
               </div>
               <span className="font-bold text-xl">Spark</span>
             </div>
