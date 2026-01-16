@@ -40,6 +40,7 @@ interface SubscriptionPlan {
   currency: string;
   interval: string;
   features: string[];
+  per_agent?: boolean;
 }
 
 const CardSetupForm = ({ onSuccess, onCancel }: { onSuccess: () => void; onCancel: () => void }) => {
@@ -268,7 +269,7 @@ const SubscriptionPlanCard = ({
 }: {
   plan: SubscriptionPlan;
   isCurrentPlan: boolean;
-  onSubscribe: (priceId: string) => void;
+  onSubscribe: (priceId: string, quantity: number) => void;
   loading: boolean;
   disabled: boolean;
 }) => {
@@ -294,6 +295,11 @@ const SubscriptionPlanCard = ({
       <div className="mb-4">
         <span className="text-3xl font-bold">{formatCurrency(plan.price, plan.currency.toUpperCase() as Currency)}</span>
         <span className="text-gray-500">/{plan.interval}</span>
+        {plan.per_agent && (
+          <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            Per agent pricing
+          </div>
+        )}
       </div>
 
       <ul className="space-y-2 mb-6">
@@ -306,7 +312,7 @@ const SubscriptionPlanCard = ({
       </ul>
 
       <button
-        onClick={() => onSubscribe(plan.id)}
+        onClick={() => onSubscribe(plan.id, 1)}
         disabled={loading || disabled || isCurrentPlan}
         className={clsx(
           "w-full px-4 py-2 rounded-md transition-all duration-300 font-medium",
@@ -316,7 +322,7 @@ const SubscriptionPlanCard = ({
           (loading || disabled) && "opacity-50 cursor-not-allowed"
         )}
       >
-        {isCurrentPlan ? "Current Plan" : loading ? "Processing..." : "Subscribe"}
+        {isCurrentPlan ? "Current Plan" : loading ? "Processing..." : "Start with 1 Agent"}
       </button>
     </div>
   );
@@ -365,7 +371,7 @@ const Billing = () => {
     }
   };
 
-  const handleSubscribe = async (priceId: string) => {
+  const handleSubscribe = async (priceId: string, quantity: number = 1) => {
     if (paymentMethods.length === 0) {
       toast.warning('Please add a payment method first');
       return;
@@ -374,7 +380,8 @@ const Billing = () => {
     setSubscriptionLoading(true);
     try {
       const response = await axiosInstance.post('/billing/subscription/create', {
-        price_id: priceId
+        price_id: priceId,
+        quantity: quantity
       });
 
       if (response.data.success) {
@@ -438,6 +445,36 @@ const Billing = () => {
       }
     } catch (error) {
       handleAxiosError('Failed to reactivate subscription', error);
+    } finally {
+      setSubscriptionLoading(false);
+    }
+  };
+
+  const handleUpdateQuantity = async (newQuantity: number) => {
+    if (newQuantity < 1) {
+      toast.error('You must have at least 1 agent slot');
+      return;
+    }
+
+    setSubscriptionLoading(true);
+    try {
+      const response = await axiosInstance.post('/billing/subscription/update-quantity', {
+        price_id: currentUser?.subscription_plan,
+        quantity: newQuantity
+      });
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        if (currentUser) {
+          setCurrentUser({
+            ...currentUser,
+            subscription_quantity: newQuantity,
+          });
+        }
+        fetchCurrentSubscription();
+      }
+    } catch (error) {
+      handleAxiosError('Failed to update subscription quantity', error);
     } finally {
       setSubscriptionLoading(false);
     }
@@ -536,45 +573,86 @@ const Billing = () => {
             <div>
               <h2 className="text-2xl font-bold">Subscription Plans</h2>
               <p className="text-gray-600 dark:text-gray-400">
-                Choose a plan that requires both an active subscription AND sufficient credits to use
+                A$299 per agent per month. Each agent requires its own subscription. Start with 1 agent and add more as needed.
               </p>
             </div>
           </div>
 
           {/* Current Subscription Status */}
           {currentUser?.subscription_status && (
-            <div className="mb-6 p-4 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-semibold">Current Subscription Status</div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">
-                    Status: <span className="font-medium">{currentUser.subscription_status}</span>
-                    {currentSubscription?.current_period_end && (
-                      <> • Renews: {new Date(currentSubscription.current_period_end * 1000).toLocaleDateString()}</>
+            <>
+              <div className="mb-6 p-4 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold">Current Subscription Status</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      Status: <span className="font-medium">{currentUser.subscription_status}</span>
+                      {currentSubscription?.current_period_end && (
+                        <> • Renews: {new Date(currentSubscription.current_period_end * 1000).toLocaleDateString()}</>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      Agent Slots: <span className="font-medium">{currentUser.subscription_quantity || 0}</span> × A$299/month = 
+                      <span className="font-bold text-sky-600"> A${(currentUser.subscription_quantity || 0) * 299}/month</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {currentSubscription?.cancel_at_period_end ? (
+                      <button
+                        onClick={handleReactivateSubscription}
+                        disabled={subscriptionLoading}
+                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition-all duration-300"
+                      >
+                        Reactivate
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleCancelSubscription}
+                        disabled={subscriptionLoading}
+                        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-all duration-300"
+                      >
+                        Cancel Subscription
+                      </button>
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  {currentSubscription?.cancel_at_period_end ? (
-                    <button
-                      onClick={handleReactivateSubscription}
-                      disabled={subscriptionLoading}
-                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 transition-all duration-300"
-                    >
-                      Reactivate
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleCancelSubscription}
-                      disabled={subscriptionLoading}
-                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-all duration-300"
-                    >
-                      Cancel Subscription
-                    </button>
-                  )}
+              </div>
+
+              {/* Agent Quantity Manager */}
+              <div className="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold">Manage Agent Subscriptions</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Each agent requires a subscription at $299/month. Adjust quantity to match your needs.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => handleUpdateQuantity((currentUser.subscription_quantity || 1) - 1)}
+                    disabled={subscriptionLoading || (currentUser.subscription_quantity || 0) <= 1}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  >
+                    - Remove Agent Slot
+                  </button>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">{currentUser.subscription_quantity || 0}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">Agent Slots</div>
+                  </div>
+                  <button
+                    onClick={() => handleUpdateQuantity((currentUser.subscription_quantity || 0) + 1)}
+                    disabled={subscriptionLoading}
+                    className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 disabled:opacity-50 transition-all duration-300"
+                  >
+                    + Add Agent Slot
+                  </button>
+                </div>
+                <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                  <strong>Note:</strong> Adding agents will be prorated and charged immediately. Removing agent slots will credit your account at the next billing cycle.
                 </div>
               </div>
-            </div>
+            </>
           )}
 
           {/* Subscription Plans Grid */}

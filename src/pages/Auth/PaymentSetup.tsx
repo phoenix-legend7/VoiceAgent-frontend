@@ -104,37 +104,58 @@ const PaymentMethodForm = ({
         <div className="flex items-start gap-3">
           <Zap className={`w-5 h-5 mt-0.5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
           <div className="flex-1">
-            <h3 className={`font-semibold text-base mb-1 ${isDarkMode ? 'text-green-300' : 'text-green-800'}`}>
-              3-Day Free Trial
+            <h3 className={`font-semibold text-base mb-2 ${isDarkMode ? 'text-green-300' : 'text-green-800'}`}>
+              30-Day Free Trial
             </h3>
-            <p className={`text-sm ${isDarkMode ? 'text-green-200' : 'text-green-700'}`}>
-              Start your free trial today. No charges until your trial ends. Cancel anytime during the trial period.
+            <p className={`text-sm mb-3 ${isDarkMode ? 'text-green-200' : 'text-green-700'}`}>
+              No subscription charge during the trial. Call usage is pay-as-you-go.
             </p>
           </div>
         </div>
       </div>
 
-      {/* What You're Signing Up For */}
+      {/* What You Can Test */}
       <div className={`rounded-lg p-4 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
         <h4 className={`font-semibold text-sm mb-2 ${theme.labelColor}`} style={{ textShadow: theme.labelShadow }}>
-          What's Included
+          What you can test
         </h4>
         <ul className={`space-y-1.5 text-sm ${theme.descColor}`} style={{ textShadow: theme.descShadow }}>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-            <span>AI voice agents with natural language processing</span>
+            <span>See how Spark handles your real inbound calls</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-            <span>Inbound and outbound calling in 4 countries</span>
+            <span>Capture and follow up enquiries automatically</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-            <span>Pay-as-you-go pricing starting at $0.04/min</span>
+            <span>Reduce missed calls without adding staff</span>
           </li>
           <li className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-            <span>Webhook integrations and API access</span>
+            <span>Measure the impact before committing</span>
+          </li>
+        </ul>
+      </div>
+
+      {/* Call Usage */}
+      <div className={`rounded-lg p-4 ${isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
+        <h4 className={`font-semibold text-sm mb-2 ${theme.labelColor}`} style={{ textShadow: theme.labelShadow }}>
+          Call usage
+        </h4>
+        <ul className={`space-y-1.5 text-sm ${theme.descColor}`} style={{ textShadow: theme.descShadow }}>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>Credits are only used when calls happen</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>You stay in control of usage and spend</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>Cancel anytime if it's not a fit</span>
           </li>
         </ul>
       </div>
@@ -178,8 +199,7 @@ const PaymentMethodForm = ({
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4" />
-              Verify Payment Method
+              <span>👉 Start 30-Day Trial</span>
             </div>
           )}
         </Button>
